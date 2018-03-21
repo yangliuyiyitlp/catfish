@@ -1,0 +1,111 @@
+.el-input{
+    width:250px;
+    height:40px;
+    background:rgba(255,255,255,1);
+    border-radius: 8px ;
+}
+.storeName{
+    margin-bottom:50px;
+}
+.storeTable{
+    padding:20px;
+    box-sizing: border-box;
+}
+.btnBar{
+   width:320px;
+    margin:24px auto;
+}
+.addForm,.query{
+    width:150px;
+    height:50px;
+    border-radius: 52px ;
+    outline-style: none;
+    cursor: pointer;
+}
+.addForm{
+    background:rgba(255,255,255,1);
+    color:#000;
+    border:1px solid #979797;
+}
+.search{
+    width:150px;
+    height:50px;
+    background:rgba(219,80,80,1);
+    border-radius: 52px ;
+    border:1px solid rgba(219,80,80,1);
+    color:#fff;
+    outline-style: none;
+    cursor: pointer;
+}
+.query{
+    color:#fff;
+    border:1px solid rgba(219,80,80,1);
+    margin-right:10px;
+    float:left;
+    background:rgba(219,80,80,1);
+}
+.storeTop{
+    width:70px;
+}
+.storeTime{
+    float:left;
+}
+.el-date-editor.el-input, .el-date-editor.el-input__inner,.week .el-input{
+    width:170px;
+}
+.storeAddr{
+    width:578px;
+}
+.el-textarea{
+    width:420px;
+}
+.timeDate{
+    width:750px;
+    margin-bottom:22px;
+}
+.weekInput{
+    float:right;
+}
+.el-cascader .el-input{
+    width:325px;
+}
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+    /*margin-top: 20px;*/
+    font-size: 28px;
+    color: #8c939d;
+    width: 88px;
+    height: 88px;
+    line-height: 88px;
+    text-align: center;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+}
+
+.avatar {
+    width: 88px;
+    height: 88px;
+    display: block;
+}
+html{height:100%}
+body{height:100%;margin:0px;padding:0px}
+.container{
+    width:600px;
+    height:400px!important;
+    font-family:"微软雅黑";
+}

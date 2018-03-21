@@ -1,0 +1,205 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <meta charset="UTF-8">
+    <title>门店管理</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/public.css"/>
+    <link rel="stylesheet" href="../css/storeManage.css"/>
+    <style type="text/css">
+        html{height:100%}
+        body{height:100%;margin:0px;padding:0px}
+        #l-map{width:800px;height:400px;}
+    </style>
+</head>
+
+<body>
+<div id="store" v-clock>
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane label="用户管理" name="first" class="storeTable">
+            <label>店铺名称：</label> <el-input v-model="formInline.storeName"></el-input>
+            <label>所属商户：</label> <el-input v-model="formInline.storeName"></el-input>
+            <div class="btnBar">
+                <button  class="query" round>查询</button>
+                <button  class='addForm' @click="addForm" round>添加</button>
+            </div>
+            <el-table
+                    :data="tableData"
+                    border
+                    style="width: 100%">
+                <el-table-column
+                        align="center"
+                        prop="id"
+                        label="id"
+                        v-if=0>
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeNam"
+                        label="所属商户">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeNam"
+                        label="门店名">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeAddr"
+                        label="联系地址">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeTel"
+                        label="联系电话">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="营业时间">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        fixed="right"
+                        label="操作"
+                        width="120">
+                    <template slot-scope="scope">
+                        <el-switch
+                                v-model="isOn"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949">
+                        </el-switch>
+                        <el-button
+                                @click="deleteRow(row)"
+                                type="text"
+                                size="small">
+                            修改
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="pagination.pageNo"
+                    :page-sizes="pagination.pageSizes"
+                    :page-size="pagination.pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="pagination.count">
+            </el-pagination>
+        </el-tab-pane>
+        <el-tab-pane label="配置管理" name="second">
+
+            <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-form-item label="门店名称：" prop="storeName">
+                    <el-input v-model="ruleForm.storeName" placeholder="门店名称最长支持20个字"></el-input>
+                </el-form-item>
+                <el-form-item label="联系电话：" prop="storeTel">
+                    <el-input class='storeTop' v-model="ruleForm.storeTop" placeholder="区号"></el-input>
+                    <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
+                </el-form-item>
+                <el-form-item label="所属区域：" prop="storeTel">
+                    <el-cascader
+                            expand-trigger="hover"
+                            :options="allCitys"
+                            v-model="selectedOptions"
+                            @change="handleChange">
+                    </el-cascader>
+                </el-form-item>
+                <el-form-item label="详细地址：" prop="storeAddr">
+                    <el-input id="suggestId" size="20" value="百度" class='storeAddr'v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                    <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
+                    <button  class="search" round>搜索</button>
+                </el-form-item>
+                <el-form-item>
+                    <i class="el-icon-location-outline"></i>显示经纬度 <span>{{pointValue}}</span>
+                </el-form-item>
+
+                <el-form-item label="地图定位：" prop="storeTel">
+                    <div id="l-map"></div>
+                </el-form-item>
+
+                <el-form-item label="门店照片：" prop="storeTel">
+                    <el-upload
+                            class="avatar-uploader"
+                            action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                            :data="Token"
+                            :show-file-list="false"
+                            :on-success="handleAvatarSuccess"
+                            :before-upload="beforeAvatarUpload">
+                        <img v-if="iconUrl" :src="iconUrl" class="avatar">
+                        <i v-else class="el-icon-plus
+                avatar-uploader-icon"></i>
+                    </el-upload>
+                </el-form-item>
+                <el-form-item label="运营时间：" prop="businessTime" class="storeTime">
+                    <input  v-if= 0 v-module="ruleForm.businessTime">
+                </el-form-item>
+                <div class="timeDate">
+                <el-time-select
+                        placeholder="起始时间"
+                        v-model="ruleForm.businessBeginTime"
+                        :picker-options="{
+                                 start: '00:00',
+                                 step: '00:30',
+                                 end: '24:00'
+                               }">
+                </el-time-select> -
+                <el-time-select
+                        placeholder="结束时间"
+                        v-model="ruleForm.businessEndTime"
+                        :picker-options="{
+                                     start: '00:00',
+                                     step: '00:30',
+                                     end: '24:00',
+                                     minTime: ruleForm.businessBeginTime
+                                   }">
+                </el-time-select>
+                <el-form-item label="星期：" prop="businessWeekday" class="weekInput">
+                    <el-select v-model="ruleForm.businessWeekday" multiple class="week">
+                        <el-option
+                                v-for="item in weeks"
+                                :key="item.value"
+                                :label="item.label"
+                                :value="item.value">
+                        </el-option>
+                    </el-select>
+                </el-form-item>
+                </div>
+                <el-form-item label="商家推荐：" prop="storeTel" class="textarea">
+                    <el-input
+                            type="textarea"
+                            :rows="2"
+                            placeholder="你可以简述店的推荐商品或者活动，也可以向买家陈述特色 服务，列如，免费停车和WIFI。（最多200个字）"
+                            v-model="ruleForm.storeTel">
+                    </el-input>
+                </el-form-item>
+                <el-form-item label="联系人：">
+                    <el-input v-model="ruleForm.storeTel"></el-input>
+                </el-form-item>
+                <el-form-item label="客服电话：">
+                    <el-input v-model="ruleForm.storeTel"></el-input>
+                </el-form-item>
+                <el-form-item>
+                    <button  class="search" round @click="submitForm('ruleForm')">确定</button>
+                    <button class='addForm'  round @click="resetForm('ruleForm')">重置</button>
+                </el-form-item>
+            </el-form>
+
+
+        </el-tab-pane>
+    </el-tabs>
+
+</div>
+
+<!-- 引入组件库 -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
+<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=IK5AlGXoZ23tDAGjldRalicbhdpsrKwE"></script>
+<script type="text/javascript" src="../js/public.js" ></script>
+<script type="text/javascript" src="../js/storeManage.js"></script>
+</body>
+
+</html>
