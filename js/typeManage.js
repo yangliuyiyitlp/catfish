@@ -1,12 +1,11 @@
 var searchData = {
-	useRangeSelect:1,
+	useRangeSelect: 1,
 	UseRange: 0,
 	TypeName: '',
 	ParValue: '',
 	PageNo: 1,
 	PageSize: 10
-};
-
+}
 var couponType = new Vue({
 	el: "#couponType",
 	data: {
@@ -78,20 +77,21 @@ var couponType = new Vue({
 			name: ''
 		},
 		fBgIsShow: false,
-		clearIsShow:false,
+		clearIsShow: false,
+		eleSelect: 'images/erp_input_bg.jpg'
 	},
 	methods: {
 		GetCouponTypeList: function(n) { //查询优惠券类型数据
-			var parValue=this.parValue;
-			var reg= /^[1-9]{1}[0-9]*$/;
-			if(parValue){
+			var parValue = this.parValue;
+			var reg = /^[1-9]{1}[0-9]*$/;
+			if(parValue) {
 				if(!reg.test(parValue)) {
 					fadeInOut("金额为正整数");
 					return false;
 				}
 			}
 			var content = {
-				useRangeSelect:this.useRangeId,
+				useRangeSelect: this.useRangeId,
 				UseRange: this.useRangeResultId,
 				TypeName: this.typeName,
 				ParValue: this.parValue,
@@ -99,7 +99,7 @@ var couponType = new Vue({
 				PageSize: 10
 			};
 			this.pageNo = n;
-			$('#kkpager').hide();
+			//			$('#kkpager').hide();
 			this.loadingShow = true;
 			PostAjax2(this, content, '/Coupon/GetCouponTypeList', function(data) {
 				if(data.status == "200") {
@@ -259,7 +259,7 @@ var couponType = new Vue({
 				}
 			}.bind(this))
 		},
-		ShopSelect: function (event, item, type) { //选择单个指定用户
+		ShopSelect: function(event, item, type) { //选择单个指定用户
 			if(type == 1) {
 				this.useRangeResult = item.UnitName;
 				this.useRangeResultId = item.UnitId;
@@ -276,7 +276,7 @@ var couponType = new Vue({
 				var reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
 				if(!reg.test(this.pAdd.typeName)) {
 					this.pAdd.typeNameShow = true;
-				}else {
+				} else {
 					this.pAdd.typeNameShow = false;
 				}
 			} else if(name == 'parValue') { //类型金额
@@ -322,7 +322,7 @@ var couponType = new Vue({
 				}
 				//金额
 				var parValue = parseInt(pAdd.parValue);
-				if(isNaN(parValue) || parValue == 0 || parValue < 0) { 
+				if(isNaN(parValue) || parValue == 0 || parValue < 0) {
 					pAdd.parValueShow = true;
 					index++;
 				}
@@ -341,7 +341,7 @@ var couponType = new Vue({
 				}
 				//订单满足条件
 				var conditionValue = parseInt(pAdd.conditionValue);
-				if(isNaN(conditionValue) || conditionValue == 0 || conditionValue < 0) { 
+				if(isNaN(conditionValue) || conditionValue == 0 || conditionValue < 0) {
 					pAdd.conditionValueShow = true;
 					index++;
 				}
@@ -545,5 +545,26 @@ var couponType = new Vue({
 				}
 			}.bind(this))
 		},
+	},
+	created: function() {
+		var that = this;
+		var data = {
+			"id": "28f547feb686464997ca8c77b3549ef7",
+			"updateDate": "2018-03-21 11:25:05",
+			"delFlag": "0",
+			"storeName": "商户名20",
+			"customId": "1",
+			"contact": "张2222工",
+			"storeAddr": "金11汇路114",
+			"storeTel": "13706533081",
+			"storeProvinceid": "111"
+		}
+		
+		PostAjax(that, 'post', data, '/customstore/nyCustomStore/list', function() {
+
+		})
+//		PostAjax(that,'get','','/limitoperateflag/tLimitOperateConfig/list',function(data){
+//			
+//		})
 	}
 })

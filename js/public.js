@@ -1,86 +1,89 @@
-// 请求封装
-function PostAjax(who,content,Pri,callBack,type){
-	var guid = NewGuid();
-	var userData = JSON.parse(localStorage.getItem('user'))==null?{}:JSON.parse(localStorage.getItem('user'));
-	var openId = localStorage.getItem('openId');
-    var userId = localStorage.getItem('userId');
-    var item = getParameter('items');
-    if (item != null){
-		userData = JSON.parse(window.atob(item));
-		openId = userData.UIUserId;
-		userId = userData.DeviceToken;
-	}
+document.write("<script language='javascript' src='../js/md5.js'></script>");
+var adminId = getParameter('adminId');
+if(adminId != null){
+	localStorage.setItem('adminId',adminId)
+}
+//http://192.168.0.167:10001/a/electric/ossutil/interface/sign
+//PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,linkU,ContentType)
 
-	var head = {
-        CertType: "MD5",
-        Certification: hex_md5(guid + keyNum),
-        Channel: "4.1.0",
-        DeviceToken: openId==null?'sfsf':openId,
-        OSInformation: "9.3",
-        Plat: "pc",
-        Timestamp: "1473407895755",
-        UserId: (userData.UserId==null?'999999999':userData.UserId),
-        Version: "1.0",
-        ToKen:(userData.UserToken==null?'':userData.UserToken),
-        UnitType:userData.UnitType,
-        UnitId:userData.UnitId,
-        ApplicationId : openId
-    };
-    
-    var request = {
-        RGuid: guid,
-        UIServiceId: "",
-        UIUserId: userId,
-        Pri: Pri,
-        IsTest: "1",
-        Content: JSON.stringify(content)
+//http://192.168.0.167:10010/layer/limitoperateflag/tLimitOperateConfig/list
+// 请求封装
+//who   this
+//type post/get
+//content 请求参数
+//Pri 接口名
+//callBack 成功回调方法
+//failCallBack 失败回调方法
+//isShowMsg  是否显示错误信息，传1为不显示
+//hideloa 是否隐藏加载效果 传1  不隐藏
+//showLod 是否显示加载效果    传1  不显示
+//ContentType 内容类型   默认 application/json  还有 form-data , application/x-www-form-urlencoded
+function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType){
+	var netLink = 'http://192.168.0.167:10012/layer';
+//	var ll = 'http://192.168.0.167:10010/layer';
+	var guid = NewGuid();
+	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
+	var ConType = ContentType ? ContentType : 'application/json'
+    console.log(content);
+    if(showLod != 1){
+    	who.loadingshow = true;
     }
-    var data = {
-        Head: head,
-        Request: request
-    };
-    console.log(data);
-    who.$http({
-	    method:'post',
-	    url:netLink,
-	    data:data,
-	    header: {
-	       'content-type': 'application/json',
-	    },
-	    emulateJSON: true
-    }).then(function(data){//es5写法
-        console.log(data);
-    	if(data.data.Status == 0){
-    		if (data.data != '' && data.data.Data !='') {
-    			var dataL = JSON.parse(data.data.Data);
-        		if(dataL.status == 20404){
-        			fadeInOut(dataL.msg);
-        			localStorage.removeItem('user');
-        			setTimeout(function(){
-//      				window.location.href = 'login.html';
-        			},1500);        			
-        		}else{
-        			if (typeof callBack == 'function');        		
-            			callBack(dataL);
-        		}
-        		
-            }else{
-				fadeInOut(infoList('00007'));	
+    axios({
+		method: type,
+		url: netLink + Pri,
+		data: JSON.stringify(content),
+		headers: {
+            'Content-Type': ConType,
+            CertType: "MD5",
+	        Certification: "0C0F1237C4B5B41F616322CCA8F59E1E",
+	        Channel: "4.1.0",
+	        OSInformation: "9.3",
+	        Plat: "pc",
+	        Timestamp: "1521635929766",
+	        UserId: adminId,
+	        Version: "1.0",
+	        ToKen:'',
+	        RGuid: guid
+      	},
+		withCredentials:false
+	}).then(function(data) { //es5写法
+		console.log(data);
+		if(data.status == 200) {
+			if(data.data != '' && data.data.data != '') {
+				var dataL = data.data.data;
+				console.log(dataL);
+				if(dataL != '' && data.data.code == 202){
+					
+				}else if(dataL != '' && data.data.code == 0){
+					if(typeof callBack == 'function')
+					fadeInOut(data.data.msg);
+						callBack(dataL)
+				}else {
+					if(isShowMsg != 1){
+						fadeInOut(data.data.msg);
+					}					
+					if(typeof failCallBack == 'function')
+						failCallBack(dataL)
+				}
+
+			} else {
+				fadeInOut('请检查网络连接');
 				console.log(data);
-			}  
-    	}else{
-			fadeInOut(infoList('00007'));
+			}
+		} else {
+			fadeInOut('请检查网络连接');
 			console.log(data.data.Message);
-			return false;	
-		}     
-		if(type != 1){
+			return false;
+		}
+		if(hideloa != 1) {
 			who.loadingshow = false;
 		}
-  	},function(error){
-  		who.loadingshow = false;
-	    fadeInOut(infoList('00007'));
-	    console.log(data);
-  	})
+	}).catch( function(error) {
+		who.loadingshow = false;
+		fadeInOut('请检查网络连接');
+		console.log(error);
+	})
+
 }
 //去除空格
 function trim(str) {
@@ -100,7 +103,7 @@ function fadeInOut(msg){
 	var time1 = null;
 	var div = document.createElement("div");
 	div.innerHTML = msg;
-	div.setAttribute('id','msg');
+	div.setAttribute('id','integral_fixed');
 	document.body.appendChild(div);
 	var num=0;
     var step=60;
@@ -117,15 +120,15 @@ function fadeInOut(msg){
 				    if(num==0){
 				        num=0;
 				        clearInterval(time1);
-				        document.body.removeChild(document.getElementById("msg"));
+				        document.body.removeChild(document.getElementById("integral_fixed"));
 				    }else{					
-				    	document.getElementById("msg").style.background='rgba(0,0,0,'+(num/400)+')';
+				    	document.getElementById("integral_fixed").style.background='rgba(0,0,0,'+(num/400)+')';
 				    }
 				  },50)
 	        },1000)
 	    }
-	    document.getElementById("msg").style.display = 'block';
-	    document.getElementById("msg").style.background='rgba(0,0,0,'+(num/400)+')';
+	    document.getElementById("integral_fixed").style.display = 'block';
+	    document.getElementById("integral_fixed").style.background='rgba(0,0,0,'+(num/400)+')';
 	    
 	},50)	
 }

@@ -1,23 +1,25 @@
+<!DOCTYPE html>
 <html>
-
 	<head>
 		<meta name="viewport" content="width=device-width" />
 		<meta charset="UTF-8">
 		<title>优惠券类型管理</title>
 		<!--<link href="/Content/css/erp_public2.css?ver=201707201119" rel="stylesheet" />-->
-		<link rel="stylesheet" href="css/public.css" />
-		<style type="text/css">
-		</style>
+		<link rel="stylesheet" href="../css/public.css" />
+		<!-- 引入样式 -->
+		<link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
 	</head>
-
 	<body>
 		<div id="couponType" class="erp_content wp" v-clock v-on:click="shopNameIsShow=false,pAdd.pUR.shopNameIsShow=false,pAdd.pG.goodsNameIsShow=false">
+			<el-button @click="visible = true">Button</el-button>
+			<el-dialog :visible.sync="visible" title="Hello world">
+				<p>Try Element</p>
+			</el-dialog>
 			<!--描述：右侧内容-->
 			<div class="erp_query_list pr" style="margin-top: 0px;padding-top: 30px;">
 				<p class="pr"><label style="width: 120px;">优惠劵指定类型：</label>
 					<select v-model="useRangeId" style="width: 60px;" v-on:change="changeUseRange($event,1)">
 						<option v-once v-for="item in useRangeSelect" :value="item.Id">{{item.Name}}</option>
-						<!--<option>指定单个</option>-->
 					</select>
 					<input type="text" :value="useRangeResult" v-on:click.stop="SingleClick(1)" readonly="readonly" v-on:mouseover="useRangeResult&&useRangeResultId?clearIsShow=true:clearIsShow=false" v-on:mouseout="clearIsShow=false" style="width: 180px;" />
 					<em class="pa emClear" v-show="clearIsShow" v-on:mouseover="useRangeResult&&useRangeResultId?clearIsShow=true:clearIsShow=false" v-on:mouseout="clearIsShow=false" v-on:click="useRangeResult='',useRangeResultId='',clearIsShow=false"></em>
@@ -146,9 +148,14 @@
 				</p>
 			</div>
 		</div>
-		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-		<script type="text/javascript" src="js/public.js" ></script>
-		<script type="text/javascript" src="js/typeManage.js" ></script>
+		<!-- import Vue before Element -->
+		<script src="https://unpkg.com/vue/dist/vue.js"></script>
+		<!-- import JavaScript -->
+		<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
+		<!--<script src="https://cdn.jsdelivr.net/npm/vue"></script>-->
+		<script type="text/javascript" src="../js/public.js"></script>
+		<script type="text/javascript" src="../js/typeManage.js"></script>
+
 	</body>
 
 </html>

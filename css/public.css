@@ -379,3 +379,26 @@ em{font-style:normal;font-weight:normal;}
 .searchDiv ul{height:180px;overflow: auto;}
 .searchDiv ul li{line-height:30px;padding:0 5px;font-size:14px;}
 .searchDiv ul li:hover{color:#408ed6;}
+
+/*错误弹窗*/
+#integral_fixed{
+	position: fixed;
+	min-height: 50px;
+	max-height:100px;
+	width: 300px;
+	background: #204071;
+	color: #fff;
+	border-radius: 10px;
+	top: 50%;
+	left: 50%;
+	margin-top: -25px;
+	margin-left: -150px;
+	text-align: center;
+	z-index: 100000000;
+	display: none;
+	box-sizing: border-box;
+}
+#integral_fixed p{
+	line-height: 25px;
+	margin: 13px 10px;
+}
