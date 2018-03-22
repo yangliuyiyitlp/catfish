@@ -2,12 +2,10 @@ var store = new Vue({
     el: '#store',
     data: function () {
         return {
-            isOn: false,
             activeName: 'first',
             formInline: {
                 pageSize: 30,
                 pageNo: 1,
-                storeName: ''
             },
             pointValue: '',
             weeks: [{
@@ -32,7 +30,7 @@ var store = new Vue({
                 value: '7',
                 label: '周日'
             }],
-            tableData: [{"id": '2'}],
+            tableData: [],
             ruleForm: {},
             Token: {},
             iconUrl: '',
@@ -76,6 +74,7 @@ var store = new Vue({
                     {min: 0, max: 20, message: '长度小于20字符', trigger: 'blur'}]
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
+            loadingshow:false
         }
     },
     methods: {
@@ -227,22 +226,31 @@ var store = new Vue({
             alert(this.iconUrl)
         },
         query: function () {
-            var that = this;
-            PostAjax(this, this.formInline, 'url', function (data) {
-                if (data.code == 200) {
-                    console.log(data);
-                    this.tableData = data.data
-                    this.tableData.businessTime = this.tableData.businessBeginTime + '-' + this.tableData.businessEndTime
+           PostAjax(this,'post',this.formInline,'/layer/customstore/nyCustomStore/list',function(data){
+                   this.tableData =data.result
+                   for(var i=0;i< this.tableData.length;i++){
+                       this.tableData[i].businessTime = this.tableData[i].businessBeginTime + '-' + data.result[i].businessEndTime
+                   }
+                   this.pagination.count=data.total
 
-                } else {
-                    fadeInOut(data.msg)
-                }
-            })
+           }.bind(this),function(data){fadeInOut(data.msg)})
+        },
+        isOnChange:function(row){
+            var flag
+            if(row.openFlag ='1'){
+                flag = '0'
+            }else if(row.openFlag ='0'){
+                flag = '1'
+            }
+            PostAjax(this,'post',{'id':row.id,'openFlag':flag},'/layer/customstore/nyCustomStore/save',function(data){
+                this.query()
+            }.bind(this),function(data){fadeInOut(data.msg)},'','','','',1)
         },
         addForm: function () {
 
         },
-        deleteRow: function (row) {
+        modifyRow: function (row) {
+            console.log(row.id)
         },
         moreInfo: function () {
             var that = this;
