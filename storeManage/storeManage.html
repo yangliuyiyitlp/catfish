@@ -97,21 +97,21 @@
                     <el-input class='storeTop' v-model="ruleForm.storeTop" placeholder="区号"></el-input>
                     <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
                 </el-form-item>
-                <el-form-item label="所属区域：" prop="storeTel">
+                <el-form-item label="所属区域：" prop="storeCity">
                     <el-cascader
                             expand-trigger="hover"
                             :options="allCitys"
-                            v-model="selectedOptions"
+                            v-model="ruleForm.storeCity"
                             @change="handleChange">
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="详细地址：" prop="storeAddr">
-                    <el-input id="suggestId" size="20" value="百度" class='storeAddr'v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                    <el-input id="suggestId" size="20"  class='storeAddr' @blur="storeBlur" v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
                     <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
-                    <button  class="search" round>搜索</button>
+                    <!--<button  class="search" round>搜索</button>-->
                 </el-form-item>
                 <el-form-item>
-                    <i class="el-icon-location-outline"></i>显示经纬度 <span>{{pointValue}}</span>
+                    <i class="el-icon-location-outline"></i>&nbsp;经度：<span >{{ruleForm.longitude}}</span>&nbsp;&nbsp;纬度：<span>{{ruleForm.latitude}}</span>
                 </el-form-item>
 
                 <el-form-item label="地图定位：" prop="storeTel">
@@ -154,8 +154,8 @@
                                      minTime: ruleForm.businessBeginTime
                                    }">
                 </el-time-select>
-                <el-form-item label="星期：" prop="businessWeekday" class="weekInput">
-                    <el-select v-model="ruleForm.businessWeekday" multiple class="week">
+                <el-form-item label="星期：" prop="Weekday" class="weekInput">
+                    <el-select v-model="Weekday" multiple class="week">
                         <el-option
                                 v-for="item in weeks"
                                 :key="item.value"
@@ -165,23 +165,23 @@
                     </el-select>
                 </el-form-item>
                 </div>
-                <el-form-item label="商家推荐：" prop="storeTel" class="textarea">
+                <el-form-item label="商家推荐：" prop="storeRecommend" class="textarea">
                     <el-input
                             type="textarea"
                             :rows="2"
                             placeholder="你可以简述店的推荐商品或者活动，也可以向买家陈述特色 服务，列如，免费停车和WIFI。（最多200个字）"
-                            v-model="ruleForm.storeTel">
+                            v-model="ruleForm.storeRecommend">
                     </el-input>
                 </el-form-item>
                 <el-form-item label="联系人：">
-                    <el-input v-model="ruleForm.storeTel"></el-input>
+                    <el-input v-model="ruleForm.contact"></el-input>
                 </el-form-item>
                 <el-form-item label="客服电话：">
                     <el-input v-model="ruleForm.serviceTel"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <button  class="search" round @click="submitForm('ruleForm')">确定</button>
-                    <button class='addForm'  round @click="resetForm('ruleForm')">重置</button>
+                    <button  class="search" round @click="submitForm('ruleForm')">{{title}}</button>
+                    <button class='addForm'  round @click="resetForm('ruleForm')" type="button">重置</button>
                 </el-form-item>
             </el-form>
 

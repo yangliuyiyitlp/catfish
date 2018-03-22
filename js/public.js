@@ -19,10 +19,14 @@ if(adminId != null){
 //showLod 是否显示加载效果    传1  不显示
 //ContentType 内容类型   默认 application/json  还有 form-data , application/x-www-form-urlencoded
 //fadeIn 弹框是否显示    传1  不显示
-function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn){
-	// var netLink = 'http://192.168.0.167:10012/layer';
-	var netLink = 'http://192.168.0.164:8080';
-//	var ll = 'http://192.168.0.167:10010/layer';
+// urlDr
+function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn,urlDr){
+    var netLink = 'http://192.168.0.164:8080';
+	if(urlDr == 1){
+        netLink = 'http://192.168.0.167:10013';
+	}else if(urlDr == 2){
+        netLink = 'http://192.168.0.167:10012/layer';
+	}
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
 	var ConType = ContentType ? ContentType : 'application/json'
