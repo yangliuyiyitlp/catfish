@@ -19,7 +19,7 @@ if(adminId != null){
 //showLod 是否显示加载效果    传1  不显示
 //ContentType 内容类型   默认 application/json  还有 form-data , application/x-www-form-urlencoded
 function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType){
-	var netLink = 'http://192.168.0.167:10012/layer';
+	var netLink = 'http://192.168.0.123:8080/layer';
 //	var ll = 'http://192.168.0.167:10010/layer';
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
@@ -102,7 +102,7 @@ function fadeInOut(msg){
 	var time = null;
 	var time1 = null;
 	var div = document.createElement("div");
-	div.innerHTML = msg;
+	div.innerHTML = '<p>'+ msg +'</p>';
 	div.setAttribute('id','integral_fixed');
 	document.body.appendChild(div);
 	var num=0;
