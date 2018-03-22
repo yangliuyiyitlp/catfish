@@ -25,7 +25,7 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 	if(urlDr == 1){
         netLink = 'http://192.168.0.167:10013';
 	}else if(urlDr == 2){
-        netLink = 'http://192.168.0.167:10012/layer';
+        netLink = 'http://192.168.0.123:8080/layer';
 	}
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
@@ -63,7 +63,7 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 				}else if(dataL != '' && data.data.code == 0){
 					if(typeof callBack == 'function')
 						if(fadeIn !=1)
-					fadeInOut(data.data.msg);
+							fadeInOut(data.data.msg);
 						callBack(dataL)
 				}else {
 					if(isShowMsg != 1){
@@ -109,7 +109,7 @@ function fadeInOut(msg){
 	var time = null;
 	var time1 = null;
 	var div = document.createElement("div");
-	div.innerHTML = msg;
+	div.innerHTML = '<p>'+ msg +'</p>';
 	div.setAttribute('id','integral_fixed');
 	document.body.appendChild(div);
 	var num=0;
