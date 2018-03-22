@@ -18,9 +18,15 @@ if(adminId != null){
 //hideloa 是否隐藏加载效果 传1  不隐藏
 //showLod 是否显示加载效果    传1  不显示
 //ContentType 内容类型   默认 application/json  还有 form-data , application/x-www-form-urlencoded
-function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType){
-	var netLink = 'http://192.168.0.123:8080/layer';
-//	var ll = 'http://192.168.0.167:10010/layer';
+//fadeIn 弹框是否显示    传1  不显示
+// urlDr
+function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn,urlDr){
+    var netLink = 'http://192.168.0.164:8080';
+	if(urlDr == 1){
+        netLink = 'http://192.168.0.167:10013';
+	}else if(urlDr == 2){
+        netLink = 'http://192.168.0.123:8080/layer';
+	}
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
 	var ConType = ContentType ? ContentType : 'application/json'
@@ -56,7 +62,8 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 					
 				}else if(dataL != '' && data.data.code == 0){
 					if(typeof callBack == 'function')
-					fadeInOut(data.data.msg);
+						if(fadeIn !=1)
+							fadeInOut(data.data.msg);
 						callBack(dataL)
 				}else {
 					if(isShowMsg != 1){

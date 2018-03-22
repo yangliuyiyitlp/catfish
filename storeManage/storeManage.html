@@ -20,9 +20,9 @@
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="用户管理" name="first" class="storeTable">
             <label>店铺名称：</label> <el-input v-model="formInline.storeName"></el-input>
-            <label>所属商户：</label> <el-input v-model="formInline.storeName"></el-input>
+            <label>所属商户：</label> <el-input v-model="formInline.customName"></el-input>
             <div class="btnBar">
-                <button  class="query" round>查询</button>
+                <button  class="query" round @click="query">查询</button>
                 <button  class='addForm' @click="addForm" round>添加</button>
             </div>
             <el-table
@@ -37,12 +37,12 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeNam"
+                        prop="custom.customName"
                         label="所属商户">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeNam"
+                        prop="storeName"
                         label="门店名">
                 </el-table-column>
                 <el-table-column
@@ -66,13 +66,10 @@
                         label="操作"
                         width="120">
                     <template slot-scope="scope">
-                        <el-switch
-                                v-model="isOn"
-                                active-color="#13ce66"
-                                inactive-color="#ff4949">
-                        </el-switch>
+                            <button  @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">启用</button>
+                            <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
                         <el-button
-                                @click="deleteRow(row)"
+                                @click="modifyRow(scope.row)"
                                 type="text"
                                 size="small">
                             修改
@@ -100,28 +97,28 @@
                     <el-input class='storeTop' v-model="ruleForm.storeTop" placeholder="区号"></el-input>
                     <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
                 </el-form-item>
-                <el-form-item label="所属区域：" prop="storeTel">
+                <el-form-item label="所属区域：" prop="storeCity">
                     <el-cascader
                             expand-trigger="hover"
                             :options="allCitys"
-                            v-model="selectedOptions"
+                            v-model="ruleForm.storeCity"
                             @change="handleChange">
                     </el-cascader>
                 </el-form-item>
                 <el-form-item label="详细地址：" prop="storeAddr">
-                    <el-input id="suggestId" size="20" value="百度" class='storeAddr'v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                    <el-input id="suggestId" size="20"  class='storeAddr' @blur="storeBlur" v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
                     <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
-                    <button  class="search" round>搜索</button>
+                    <!--<button  class="search" round>搜索</button>-->
                 </el-form-item>
                 <el-form-item>
-                    <i class="el-icon-location-outline"></i>显示经纬度 <span>{{pointValue}}</span>
+                    <i class="el-icon-location-outline"></i>&nbsp;经度：<span >{{ruleForm.longitude}}</span>&nbsp;&nbsp;纬度：<span>{{ruleForm.latitude}}</span>
                 </el-form-item>
 
                 <el-form-item label="地图定位：" prop="storeTel">
                     <div id="l-map"></div>
                 </el-form-item>
 
-                <el-form-item label="门店照片：" prop="storeTel">
+                <el-form-item label="门店照片：" prop="storePic1">
                     <el-upload
                             class="avatar-uploader"
                             action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
@@ -157,8 +154,8 @@
                                      minTime: ruleForm.businessBeginTime
                                    }">
                 </el-time-select>
-                <el-form-item label="星期：" prop="businessWeekday" class="weekInput">
-                    <el-select v-model="ruleForm.businessWeekday" multiple class="week">
+                <el-form-item label="星期：" prop="Weekday" class="weekInput">
+                    <el-select v-model="Weekday" multiple class="week">
                         <el-option
                                 v-for="item in weeks"
                                 :key="item.value"
@@ -168,23 +165,23 @@
                     </el-select>
                 </el-form-item>
                 </div>
-                <el-form-item label="商家推荐：" prop="storeTel" class="textarea">
+                <el-form-item label="商家推荐：" prop="storeRecommend" class="textarea">
                     <el-input
                             type="textarea"
                             :rows="2"
                             placeholder="你可以简述店的推荐商品或者活动，也可以向买家陈述特色 服务，列如，免费停车和WIFI。（最多200个字）"
-                            v-model="ruleForm.storeTel">
+                            v-model="ruleForm.storeRecommend">
                     </el-input>
                 </el-form-item>
                 <el-form-item label="联系人：">
-                    <el-input v-model="ruleForm.storeTel"></el-input>
+                    <el-input v-model="ruleForm.contact"></el-input>
                 </el-form-item>
                 <el-form-item label="客服电话：">
-                    <el-input v-model="ruleForm.storeTel"></el-input>
+                    <el-input v-model="ruleForm.serviceTel"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <button  class="search" round @click="submitForm('ruleForm')">确定</button>
-                    <button class='addForm'  round @click="resetForm('ruleForm')">重置</button>
+                    <button  class="search" round @click="submitForm('ruleForm')">{{title}}</button>
+                    <button class='addForm'  round @click="resetForm('ruleForm')" type="button">重置</button>
                 </el-form-item>
             </el-form>
 
@@ -196,6 +193,7 @@
 
 <!-- 引入组件库 -->
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
 <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=IK5AlGXoZ23tDAGjldRalicbhdpsrKwE"></script>
 <script type="text/javascript" src="../js/public.js" ></script>
