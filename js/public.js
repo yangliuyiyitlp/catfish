@@ -26,12 +26,11 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 	if(urlDr == 1){
         netLink = 'http://192.168.0.167:10013';
 	}else if(urlDr == 2){
-        netLink = 'http://192.168.0.167:10012/layer';
+        netLink = 'http://192.168.0.167:10012';
 	}else if(urlDr == 3){
         netLink = 'http://192.168.0.164:10005';
     }else if(urlDr == 4){
-        netLink = 'http://192.168.0.123:8080/layer';
-
+        netLink = 'http://192.168.0.123:8080';
 	}
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');

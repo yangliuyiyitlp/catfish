@@ -90,7 +90,7 @@ var couponManage = new Vue({
 				pageSize:that.formInline.pageSize,
 				pageNo:that.formInline.pageNo				
 			}
-			PostAjax(that, 'post', content, '/nycoupon/nyCoupon/list', function(data) {
+			PostAjax(that, 'post', content, '/layer/nycoupon/nyCoupon/list', function(data) {
 				that.couponList = data.result;
 				var newA = [];
 				for (var i = 0;i<data.result.length;i++) {				
@@ -101,7 +101,7 @@ var couponManage = new Vue({
 				}
 				that.couponList = newA;
 				that.formInline.pageNo ++;
-			},'','','','','','',2)
+			},'','','','','','',4)
 		},
 		searchData:function(){
 			var that = this;
@@ -145,21 +145,11 @@ var couponManage = new Vue({
 				couponAssignType:that.serachData.statusValidData,
 				couponTypeName:that.serachData.couponName				
 			}
-//			window.location.href="http://192.168.0.123:8080/layer/nycoupon/nyCoupon/export?id="+ that.serachData.couponId 
-//			+ '&couponCode=' + that.serachData.couponNum
-//			+ '&realName=' + that.serachData.userName
-//			+ '&startDate=' + startTime
-//			+ '&endDate=' + endTime
-//			+ '&couponStatus=' + that.serachData.useStateData
-//			+ '&isExpired=' + that.serachData.useRangeData
-//			+ '&couponAssignType=' + that.serachData.statusValidData
-//			+ '&couponTypeName=' + that.serachData.couponName
-			
-			
-			PostAjax(that, 'post', content, '/layer/customstore/nyCustomStore/exportAll', function(data) {
+	
+			PostAjax(that, 'post', content, '/layer/nycoupon/nyCoupon/export', function(data) {
 				console.log(data)
-				window.location.href = 'http://192.168.0.167:10012'+data;
-			},'','','','','','',2)
+				window.location.href = 'http://192.168.0.123:8080'+data;
+			},'','','','','','',4)
 		}
 	},
 	created: function() {

@@ -154,18 +154,18 @@
 					</div>
 					<div class="AddDiv searchDiv pa" v-show="pAdd.pUR.shopNameIsShow" v-on:click.stop="pAdd.pUR.shopNameIsShow=true">
 						<h3>
-						<input type="text" placeholder="输入店铺名称" :value="pAdd.pUR.useRangeSearch" v-model="pAdd.pUR.useRangeSearch" v-on:keydown="KeyDownEnter($event,2)" spellcheck="false"/>
-						<input type="button" value="搜索" v-on:click="GetSearchShop(2)"/>
-					</h3>
+							<input type="text" placeholder="输入店铺名称" :value="pAdd.pUR.useRangeSearch" v-model="pAdd.pUR.useRangeSearch" v-on:keydown="KeyDownEnter($event,2)" spellcheck="false"/>
+							<input type="button" value="搜索" v-on:click="GetSearchShop(2)"/>
+						</h3>
 						<ul>
 							<li v-for="item in pAdd.pUR.useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,2)">{{item.UnitName}}</li>
 						</ul>
 					</div>
 					<div class="GoodsDiv searchDiv pa" v-show="pAdd.pG.goodsNameIsShow" v-on:click.stop="pAdd.pG.goodsNameIsShow=true">
 						<h3>
-						<input type="text" placeholder="输入商品名称" :value="pAdd.pG.goodsSearch" v-model="pAdd.pG.goodsSearch" v-on:keydown="KeyDownEnter($event,3)" spellcheck="false"/>
-						<input type="button" value="搜索" v-on:click="GetSearchGoods()"/>
-					</h3>
+							<input type="text" placeholder="输入商品名称" :value="pAdd.pG.goodsSearch" v-model="pAdd.pG.goodsSearch" v-on:keydown="KeyDownEnter($event,3)" spellcheck="false"/>
+							<input type="button" value="搜索" v-on:click="GetSearchGoods()"/>
+						</h3>
 						<ul>
 							<li v-for="item in pAdd.pG.goodsSearchResult" v-on:click.stop="ShopSelect($event,item,3)">{{item.UnitName}}</li>
 						</ul>
