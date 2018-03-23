@@ -80,13 +80,11 @@ var couponType = new Vue({
 		searchResult: [],
 		fBgIsShow: false,
 		clearIsShow: false,
+		useRangeSelect:''
 	},
 	methods: {
 		getData:function(){
 			var that = this;
-			var dateT = that.serachData.dateTime;
-			var startTime = null,endTime = null;
-			console.log(that.serachData.dateTime)
 			if(dateT != ''){
 				startTime = dateT[0].getFullYear() + '-' + (dateT[0].getMonth() + 1) + '-' + dateT[0].getDate() + ' ' + dateT[0].getHours() + ':' + dateT[0].getMinutes() + ':' + dateT[0].getSeconds();
 				endTime = dateT[1].getFullYear() + '-' + (dateT[1].getMonth() + 1) + '-' + dateT[1].getDate() + ' ' + dateT[1].getHours() + ':' + dateT[1].getMinutes() + ':' + dateT[1].getSeconds();			
@@ -95,12 +93,6 @@ var couponType = new Vue({
 				id:that.serachData.couponId,
 				couponCode:that.serachData.couponNum,
 				realName:that.serachData.userName,
-				startDate:startTime,
-				endDate:endTime,
-				couponStatus:that.serachData.useStateData,
-				isExpired:that.serachData.useRangeData,
-				couponAssignType:that.serachData.statusValidData,
-				couponTypeName:that.serachData.couponName,
 				pageSize:that.formInline.pageSize,
 				pageNo:that.formInline.pageNo				
 			}
@@ -135,7 +127,6 @@ var couponType = new Vue({
 				PageSize: 10
 			};
 			this.pageNo = n;
-			//			$('#kkpager').hide();
 			this.loadingShow = true;
 			PostAjax2(this, content, '/Coupon/GetCouponTypeList', function(data) {
 				if(data.status == "200") {
@@ -607,20 +598,7 @@ var couponType = new Vue({
       	}
 	},
 	created: function() {
-		var that = this;
-		that.coupontype = that.useRangeSelect[0].Name;
-		var data = {
-			"id": "28f547feb686464997ca8c77b3549ef7",
-			"updateDate": "2018-03-21 11:25:05",
-			"delFlag": "0",
-			"storeName": "商户名20",
-			"customId": "1",
-			"contact": "张2222工",
-			"storeAddr": "金11汇路114",
-			"storeTel": "13706533081",
-			"storeProvinceid": "111"
-		}
-		
+		var that = this;		
 //		PostAjax(that, 'post', '', '/nycoupon/nyCoupon/list', function(data) {
 //			that.searchResult = data.result
 //		})
