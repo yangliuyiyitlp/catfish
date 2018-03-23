@@ -22,7 +22,16 @@
 					      :value="item.Id">
 					    </el-option>
 					</el-select>
-					<el-input v-model="useRangeResult"></el-input>
+					<el-autocomplete
+				      class="inline-input"
+				      v-model="useRangeResult"
+				      :fetch-suggestions="querySearch"
+				      placeholder=""
+				      :trigger-on-focus="false"
+				      @select="handleSelect"
+				      :disabled="true"
+				    ></el-autocomplete>
+					<!--<el-input v-model="useRangeResult" ></el-input>-->
 				</div>
 				<div class="searchItem">
 					<label>名称：</label> <el-input v-model="typeName"></el-input>
@@ -31,7 +40,7 @@
 					<label>金额：</label> <el-input v-model="parValue"></el-input>
 				</div>            	
 				<div class="btnPart">
-	                <el-button type="search" round>查询</el-button>
+	                <el-button type="search" round v-on:click="getData">查询</el-button>
 	  				<el-button round>添加</el-button>
 	           </div>
 			</div>
@@ -89,76 +98,9 @@
                                 active-color="#13ce66"
                                 inactive-color="#ff4949">
                         </el-switch>
-                        <el-button
-                                @click="deleteRow(row)"
-                                type="text"
-                                size="small">
-                            修改
-                        </el-button>
                     </template>
                 </el-table-column>
             </el-table>
-			
-			
-			
-			<!--<div class="erp_query_list pr" style="margin-top: 0px;padding-top: 30px;">
-				<p class="pr"><label style="width: 120px;">优惠劵指定类型：</label>
-					<select v-model="useRangeId" style="width: 60px;" v-on:change="changeUseRange($event,1)">
-						<option v-once v-for="item in useRangeSelect" :value="item.Id">{{item.Name}}</option>
-					</select>
-					<input type="text" :value="useRangeResult" v-on:click.stop="SingleClick(1)" readonly="readonly" v-on:mouseover="useRangeResult&&useRangeResultId?clearIsShow=true:clearIsShow=false" v-on:mouseout="clearIsShow=false" style="width: 180px;" />
-					<em class="pa emClear" v-show="clearIsShow" v-on:mouseover="useRangeResult&&useRangeResultId?clearIsShow=true:clearIsShow=false" v-on:mouseout="clearIsShow=false" v-on:click="useRangeResult='',useRangeResultId='',clearIsShow=false"></em>
-				</p>
-				<p><label>名称：</label><input type="text" :value="typeName" v-model="typeName" maxlength="20" /></p>
-				<p><label>金额：</label><input type="text" :value="parValue" v-model="parValue" maxlength="20" /></p>
-				<div class="shopDiv searchDiv pa" v-show="shopNameIsShow" v-on:click.stop="shopNameIsShow=true">
-					<h3>
-					<input type="text" placeholder="输入店铺名称" :value="useRangeSearch" v-model="useRangeSearch" v-on:keydown="KeyDownEnter($event,1)" spellcheck="false"/>
-					<input type="button" value="搜索" v-on:click="GetSearchShop(1)"/>
-				</h3>
-					<ul>
-						<li v-for="item in useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,1)">{{item.UnitName}}</li>
-					</ul>
-				</div>
-			</div>-->
-			<!--<div class="erp_submit_list">
-				<input type="submit" class="search" value="查询" v-on:click="GetCouponTypeList(1)" />
-				<input type="button" class="add_type" value="添加" v-on:click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true" />
-			</div>-->
-			<!--<p class="more_line"><span></span></p>-->
-			<!--描述：列表表单 -->
-			<!--<table cellpadding="0" cellspacing="0" class="product_list">
-				<thead id="type_menu">
-					<tr class="title_tr">
-						<td>名称</td>
-						<td>金额(元)</td>
-						<td>有效时长(天)</td>
-						<td>优惠券指定类型</td>
-						<td>订单满足条件(元)</td>
-						<td>是否可以叠加</td>
-						<td>是否混合使用</td>
-						<td>操作</td>
-					</tr>
-				</thead>
-				<tbody id="type_list">
-					<tr v-for="(item,index) in searchResult">
-						<td :title="item.TypeName">{{item.TypeName?(item.TypeName.length>15?item.TypeName.substr(0,15)+'...':item.TypeName):''}}</td>
-						<td>{{item.ParValue?item.ParValue+'元':''}}</td>
-						<td>{{!item.ValidPeriod?"永久":item.ValidPeriod}}</td>
-						<td :title="item.UnitName">{{item.UnitName?(item.UnitName.length>15?item.UnitName.substr(0,15)+'...':item.UnitName):''}}</td>
-						<td>{{item.ConditionValue}}</td>
-						<td>{{item.IsRepeatable?"是":"否"}}</td>
-						<td>{{item.IsMixable?"是":"否"}}</td>
-						<td>
-							<a class="edit" v-show="item.IsSureEdit" v-on:click="EditCouponType(index)">编辑</a>
-							<a class='delete' v-show="item.IsSureEdit" v-on:click="DeleteDisplay={deleteIsShow:true,Id:item.Id,name:item.TypeName},fBgIsShow=true">删除</a>
-							<a :class="item.Status==1?'onOff selectON':'onOff'" v-on:click="SetStatusChange(index)">&nbsp;</a>
-						</td>
-					</tr>
-				</tbody>
-			</table>-->
-			<!--描述：分页-->
-			<!--<div id="kkpager"></div>-->
 			<el-pagination
                     @size-change="handleSizeChange"
                     @current-change="handleCurrentChange"
@@ -230,16 +172,6 @@
 					</div>
 				</div>
 				<p class="edit_sure_box"><input type="button" class="edit_sure" value="确定" v-on:click="AddCouponType()" /></p>
-			</div>
-			<div class="popup_public" id="del_popup" v-show="DeleteDisplay.deleteIsShow">
-				<div class="erp_close" v-on:click="PopupConcel()"></div>
-				<h2>删除</h2>
-				<p class="mt100">你将删除“{{DeleteDisplay.name}}”。</p>
-				<p>确认删除？</p>
-				<p class="edit_sure_box">
-					<input value="确定" type="button" v-on:click="SetIsDelete()">
-					<input class="cancel_sure" value="取消" type="button" v-on:click="PopupConcel()">
-				</p>
 			</div>
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>

@@ -101,7 +101,7 @@ var couponManage = new Vue({
 				}
 				that.couponList = newA;
 				that.formInline.pageNo ++;
-			})
+			},'','','','','','',2)
 		},
 		searchData:function(){
 			var that = this;
@@ -124,9 +124,45 @@ var couponManage = new Vue({
 		},
 		closePopup:function(){
 			this.fBgIsShow = false;
+		},
+		exportData:function(){
+			var that = this;
+			var dateT = that.serachData.dateTime;
+			var startTime = null,endTime = null;
+			console.log(that.serachData.dateTime)
+			if(dateT != ''){
+				startTime = dateT[0].getFullYear() + '-' + (dateT[0].getMonth() + 1) + '-' + dateT[0].getDate() + ' ' + dateT[0].getHours() + ':' + dateT[0].getMinutes() + ':' + dateT[0].getSeconds();
+				endTime = dateT[1].getFullYear() + '-' + (dateT[1].getMonth() + 1) + '-' + dateT[1].getDate() + ' ' + dateT[1].getHours() + ':' + dateT[1].getMinutes() + ':' + dateT[1].getSeconds();			
+			}
+			var content = {
+				id:that.serachData.couponId,
+				couponCode:that.serachData.couponNum,
+				realName:that.serachData.userName,
+				startDate:startTime,
+				endDate:endTime,
+				couponStatus:that.serachData.useStateData,
+				isExpired:that.serachData.useRangeData,
+				couponAssignType:that.serachData.statusValidData,
+				couponTypeName:that.serachData.couponName				
+			}
+//			window.location.href="http://192.168.0.123:8080/layer/nycoupon/nyCoupon/export?id="+ that.serachData.couponId 
+//			+ '&couponCode=' + that.serachData.couponNum
+//			+ '&realName=' + that.serachData.userName
+//			+ '&startDate=' + startTime
+//			+ '&endDate=' + endTime
+//			+ '&couponStatus=' + that.serachData.useStateData
+//			+ '&isExpired=' + that.serachData.useRangeData
+//			+ '&couponAssignType=' + that.serachData.statusValidData
+//			+ '&couponTypeName=' + that.serachData.couponName
+			
+			
+			PostAjax(that, 'post', content, '/layer/customstore/nyCustomStore/exportAll', function(data) {
+				console.log(data)
+				window.location.href = 'http://192.168.0.167:10012'+data;
+			},'','','','','','',2)
 		}
 	},
 	created: function() {
-		var that = this;
+		
 	}
 })

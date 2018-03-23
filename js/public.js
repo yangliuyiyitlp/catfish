@@ -21,11 +21,13 @@ if(adminId != null){
 //fadeIn 弹框是否显示    传1  不显示
 // urlDr
 function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn,urlDr){
+	console.log(type)
     var netLink = 'http://192.168.0.164:8080';
 	if(urlDr == 1){
         netLink = 'http://192.168.0.167:10013';
 	}else if(urlDr == 2){
         netLink = 'http://192.168.0.123:8080/layer';
+
 	}
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
@@ -41,11 +43,11 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 		headers: {
             'Content-Type': ConType,
             CertType: "MD5",
-	        Certification: "0C0F1237C4B5B41F616322CCA8F59E1E",
+	        Certification: "D33B351946691F22D08CEE85B793B6CE",
 	        Channel: "4.1.0",
 	        OSInformation: "9.3",
 	        Plat: "pc",
-	        Timestamp: "1521635929766",
+	        Timestamp: "1521781731757",
 	        UserId: adminId,
 	        Version: "1.0",
 	        ToKen:'',

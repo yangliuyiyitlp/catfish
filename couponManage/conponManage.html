@@ -58,7 +58,7 @@
 				</div>
 				<div class="btnPart">
 					<el-button type="search" round v-on:click="searchData()">查询</el-button>
-					<el-button round>导出</el-button>
+					<el-button round v-on:click="exportData()">导出</el-button>
 				</div>
 			</div>
 
@@ -100,7 +100,7 @@
 			</el-pagination>
 			<!--<div id="kkpager"></div>-->
 			<!--描述：弹窗-->
-			<p class="loading_p" v-show="loadingShow"><img src="/Content/images/loading.gif" /></p>
+			<p class="loading_p" v-show="loadingShow"><img src="../images/loading.gif" /></p>
 			<div id="fixedBg" v-if="fBgIsShow"></div>
 			<div id="view_popup" v-if="fBgIsShow" class="popup_public">
 				<div class="erp_close" @click="closePopup"><i class="el-icon-close"></i></div>
