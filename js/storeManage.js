@@ -3,8 +3,8 @@ var store = new Vue({
     data: function () {
         return {
             activeName: 'first',
-            title:'',
-            storeLongCity:'',
+            title: '',
+            storeLongCity: '',
             formInline: {
                 pageSize: 30,
                 pageNo: 1,
@@ -37,58 +37,32 @@ var store = new Vue({
             Weekday: [],
             Token: {},
             iconUrl: '',
-            allCitys: [{
-                value: '1',
-                label: '安徽省',
-                children: [{
-                    value: '2',
-                    label: '合肥市',
-                    children: [{
-                        value: '3',
-                        label: '蜀山区',
-                        children: [{
-                            value: '4',
-                            label: '明珠街道'
-                        },
-                            {
-                                value: '89',
-                                label: '海风街道'
-                            }]
-                    },
-                        {
-                            value: '9',
-                            label: '瑶海区',
-                            children: [{
-                                value: '4',
-                                label: '枫林街道'
-                            }]
-                        }]
-                },
-                    {
-                        id: '89',
-                        label: '芜湖市',
-                        children: []
-                    }
-                ]
-            }, {id: '5', label: '四川省'}],
             selectedOptions: [],
             rules: {
                 storeName: [{required: true, message: '请输入门店名称', trigger: 'blur'},
                     {min: 0, max: 20, message: '长度小于20字符', trigger: 'blur'}],
-                storeTel:{required: true, message: '请输入联系电话', trigger: 'blur'},
-                storeCity:{required: true, message: '请选择区域', trigger: 'blur'},
-                storeAddr:{required: true, message: '请输入详细地址', trigger: 'blur'},
-                storePic1:{required: true, message: '请选择门店照片', trigger: 'blur'},
-                businessTime:{required: true, message: '请选择运营时间', trigger: 'blur'},
-                Weekday:{required: true, message: '请选择星期', trigger: 'blur'},
-                storeRecommend:{required: true, message: '请输入商家推荐', trigger: 'blur'}
+                storeTel: {required: true, message: '请输入联系电话', trigger: 'blur'},
+                storeCity: {required: true, message: '请选择区域', trigger: 'blur'},
+                storeAddr: {required: true, message: '请输入详细地址', trigger: 'blur'},
+                storePic1: {required: true, message: '请选择门店照片', trigger: 'blur'},
+                businessTime: {required: true, message: '请选择运营时间', trigger: 'blur'},
+                Weekday: {required: true, message: '请选择星期', trigger: 'blur'},
+                storeRecommend: {required: true, message: '请输入商家推荐', trigger: 'blur'}
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
-            loadingshow:false
+            loadingshow: false,
+            allCities:[],
+            props: {
+                value: 'label',
+                children: 'children'
+            }
         }
     },
+    created: function () {
+        this.getCity()
+    },
     methods: {
-        mapSelect:function (longitude,latitude,storeAddr) {
+        mapSelect: function (longitude, latitude, storeAddr) {
             var that = this
             var marker
 
@@ -96,10 +70,12 @@ var store = new Vue({
             var myGeo = new BMap.Geocoder();
             var map = new BMap.Map("l-map");
             map.enableScrollWheelZoom(true); //缩放
-            var point = new BMap.Point(longitude,latitude);
+
+
+            var point = new BMap.Point(longitude, latitude);
             map.centerAndZoom(point, 16);
             //将地址解析结果显示在地图上,并调整地图视野
-            myGeo.getPoint(storeAddr, function(point){
+            myGeo.getPoint(storeAddr, function (point) {
                 if (point) {
                     map.centerAndZoom(point, 16);
                     // 点坐标
@@ -109,26 +85,19 @@ var store = new Vue({
                     map.addOverlay(marker);
                     marker.addEventListener("dragend", function (e) {
                         // that.pointValue= e.point.lng + "," + e.point.lat
-                        that.ruleForm.longitude= e.point.lng
-                        that.ruleForm.latitude= e.point.lat
+                        that.ruleForm.longitude = e.point.lng
+                        that.ruleForm.latitude = e.point.lat
                     })
-                }else{
+                } else {
                     that.$message.warning('您选择地址没有解析到坐标')
                 }
             });
+
             // 百度地图API功能
             function G(id) {
                 return document.getElementById(id);
             }
 
-
-                               // 初始化地图,设置城市和地图级别。
-            //
-            // // setTimeout(function(){
-            // //     map.setZoom(14);
-            // // }, 2000);  //2秒后放大到14级
-
-            //
             var ac = new BMap.Autocomplete(    //建立一个自动完成的对象
                 {
                     "input": "suggestId"
@@ -153,12 +122,12 @@ var store = new Vue({
                 str += "<br />ToItem<br />index = " + e.toitem.index + "<br />value = " + value;
                 G("searchResultPanel").innerHTML = str;
             });
-            var myValue =''
+            var myValue = ''
             ac.addEventListener("onconfirm", function (e) {    //鼠标点击下拉列表后的事件
                 var _value = e.item.value;
                 myValue = _value.province + _value.city + _value.district + _value.street + _value.business;
                 G("searchResultPanel").innerHTML = "onconfirm<br />index = " + e.item.index + "<br />myValue = " + myValue;
-                that.ruleForm.storeAddr =  myValue;// 后续添加
+                that.ruleForm.storeAddr = myValue;// 后续添加
                 setPlace();
             });
 
@@ -167,16 +136,16 @@ var store = new Vue({
                 function myFun() {
                     var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
                     // that.pointValue= pp.lng + "," + pp.lat
-                    that.ruleForm.longitude= pp.lng
-                    that.ruleForm.latitude= pp.lat
+                    that.ruleForm.longitude = pp.lng
+                    that.ruleForm.latitude = pp.lat
                     map.centerAndZoom(pp, 16);
-                    marker=new BMap.Marker(pp)
+                    marker = new BMap.Marker(pp)
                     marker.enableDragging()
                     map.addOverlay(marker);
                     marker.addEventListener("dragend", function (e) {
                         // that.pointValue= e.point.lng + "," + e.point.lat
-                        that.ruleForm.longitude= e.point.lng
-                        that.ruleForm.latitude= e.point.lat
+                        that.ruleForm.longitude = e.point.lng
+                        that.ruleForm.latitude = e.point.lat
                     })
                 }
 
@@ -186,7 +155,7 @@ var store = new Vue({
                 local.search(myValue);
             }
         },
-        storeBlur:function(){
+        storeBlur: function () {
             var that = this
             var marker
             // 点坐标
@@ -194,21 +163,21 @@ var store = new Vue({
             var myGeo = new BMap.Geocoder();
             var map = new BMap.Map("l-map");
             // 将地址解析结果显示在地图上,并调整地图视野
-            myGeo.getPoint(that.ruleForm.storeAddr, function(point){
+            myGeo.getPoint(that.ruleForm.storeAddr, function (point) {
                 if (point) {
                     map.centerAndZoom(point, 16);
-                    that.ruleForm.longitude= point.lng
-                    that.ruleForm.latitude= point.lat
+                    that.ruleForm.longitude = point.lng
+                    that.ruleForm.latitude = point.lat
                     // 点坐标
                     marker = new BMap.Marker(point);// 创建标注
                     marker.enableDragging()
                     map.addOverlay(marker);
                     marker.addEventListener("dragend", function (e) {
-                        that.ruleForm.longitude= e.point.lng
-                        that.ruleForm.latitude= e.point.lat
+                        that.ruleForm.longitude = e.point.lng
+                        that.ruleForm.latitude = e.point.lat
                     })
                     setPlace()
-                }else{
+                } else {
                     that.$message.warning('您选择地址没有解析到坐标')
                 }
             });
@@ -217,15 +186,15 @@ var store = new Vue({
                 map.clearOverlays();    //清除地图上所有覆盖物
                 function myFun() {
                     var pp = local.getResults().getPoi(0).point;    //获取第一个智能搜索的结果
-                    that.ruleForm.longitude= pp.lng
-                    that.ruleForm.latitude= pp.lat
+                    that.ruleForm.longitude = pp.lng
+                    that.ruleForm.latitude = pp.lat
                     map.centerAndZoom(pp, 16);
-                    marker=new BMap.Marker(pp)
+                    marker = new BMap.Marker(pp)
                     marker.enableDragging()
                     map.addOverlay(marker);
                     marker.addEventListener("dragend", function (e) {
-                        that.ruleForm.longitude= e.point.lng
-                        that.ruleForm.latitude= e.point.lat
+                        that.ruleForm.longitude = e.point.lng
+                        that.ruleForm.latitude = e.point.lat
                     })
                 }
 
@@ -236,10 +205,12 @@ var store = new Vue({
             }
         },
         handleClick: function (tab, event) {
-            if(this.activeName = 'second'){
+            console.log(tab.name)
+            if (tab.name = 'second') {
+                this.$refs['ruleForm'].resetFields()
                 this.ruleForm = {}
-                this.title='新增'
-                this.mapSelect('121.478527','31.233212','')
+                this.title = '新增'
+                this.mapSelect('', '', '')
             }
         },
         handleSizeChange: function (val) {
@@ -252,92 +223,101 @@ var store = new Vue({
             this.pagination.pageNo = val
             this.query()
         },
-        handleChange: function (value) {
-            console.log(value)
-        },
         // 获取oss秘钥
         beforeAvatarUpload: function (file) {
             var that = this;
-            PostAjax(this, 'post',{'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
-                console.log(data);
-                    this.Token = res.data
-                    this.Token.key = this.Token.dir + '/' + (+new Date()) + file.name
-                    this.Token.OSSAccessKeyId = this.Token.accessid
-                    this.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
+            // PostAjax(that, 'post',{'user_dir':'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
+            //     console.log(data);
+            //         that.Token = data
+            //         that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
+            //         that.Token.OSSAccessKeyId = that.Token.accessid
+            //         that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+            //     console.log(9696,that.Token);
+            //
+            // },function(data){fadeInOut(data.msg);},'','','','application/json','',1)
 
-            },function(data){fadeInOut(data.msg);},'','','','','',1)
+            return new Promise(function (resolve) {
+                PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
+                    that.Token = data
+                    that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
+                    that.Token.OSSAccessKeyId = that.Token.accessid
+                    that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+                    resolve()
 
-            //     return new Promise(function(resolve){
-            //         this.$ajax.get('http://192.168.0.167:10001/a/electric/ossutil/interface/policy', {params: {user_dir: 'storeManage'}})
-            //         .then(function(res){
-            //         this.Token = res.data
-            //     this.Token.key = this.Token.dir + '/' + (+new Date()) + file.name
-            //     this.Token.OSSAccessKeyId = this.Token.accessid
-            //     this.ruleForm.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
-            //     resolve()
-            // }
-            // )
-            // .catch(function(err) {
-            //         console.log(err)
-            // })})
+                }, function (data) {
+                    fadeInOut(data.msg);
+                }, '', '', '', 'application/json', '', 1)
+            })
         },
         handleAvatarSuccess: function () {
-            alert(99)
             this.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
-            alert(this.iconUrl)
         },
         query: function () {
-           PostAjax(this,'post',this.formInline,'/layer/customstore/nyCustomStore/list',function(data){
-                   this.tableData =data.result
-                   for(var i=0;i< this.tableData.length;i++){
-                       this.tableData[i].businessTime = this.tableData[i].businessBeginTime + '-' + data.result[i].businessEndTime
-                   }
-                   this.pagination.count=data.total
+            PostAjax(this, 'post', this.formInline, '/layer/customstore/nyCustomStore/list', function (data) {
+                this.tableData = data.result
+                for (var i = 0; i < this.tableData.length; i++) {
+                    if (this.tableData[i].businessBeginTime && data.result[i].businessEndTime) {
+                        this.tableData[i].businessTime = this.tableData[i].businessBeginTime + '-' + data.result[i].businessEndTime
+                    }
+                }
+                this.pagination.count = data.total
 
-           }.bind(this),function(data){fadeInOut(data.msg)})
+            }.bind(this), function (data) {
+                fadeInOut(data.msg)
+            })
         },
-        isOnChange:function(row){
+        isOnChange: function (row) {
             var flag
-            if(row.openFlag ='1'){
+            if (row.openFlag = '1') {
                 flag = '0'
-            }else if(row.openFlag ='0'){
+            } else if (row.openFlag = '0') {
                 flag = '1'
             }
-            PostAjax(this,'post',{'id':row.id,'openFlag':flag},'/layer/customstore/nyCustomStore/save',function(data){
+            PostAjax(this, 'post', {
+                'id': row.id,
+                'openFlag': flag
+            }, '/layer/customstore/nyCustomStore/save', function (data) {
                 this.query()
-            }.bind(this),function(data){fadeInOut(data.msg)},'','','','',1)
+            }.bind(this), function (data) {
+                fadeInOut(data.msg)
+            }, '', '', '', '', 1)
         },
         modifyRow: function (row) {
-            this.activeName='second'
+            this.activeName = 'second'
             this.title = '提交修改'
             this.moreInfo(row)
         },
         moreInfo: function (row) {
-            var that =this
-            PostAjax(this,'post','','/layer/customstore/nyCustomStore/form/'+row.id,function(data){
-                that.ruleForm =data
+            var that = this
+            PostAjax(this, 'post', '', '/layer/customstore/nyCustomStore/form/' + row.id, function (data) {
+                that.ruleForm = data
                 that.iconUrl = that.ruleForm.storePic1
                 // 区号
                 if (that.ruleForm.storeTel.indexOf('-') > -1) {
-                    that.ruleForm.storeTop = that.ruleForm.storeTel.split('-'[0])
-                    that.ruleForm.storeTel = that.ruleForm.storeTel.split('-'[0])
+                    that.ruleForm.storeTop = that.ruleForm.storeTel.split('-')[0]
+                    that.ruleForm.storeTel = that.ruleForm.storeTel.split('-')[1]
                 }
 
                 //星期
-                that.Weekday =  that.ruleForm.businessWeekday.split(',');
+                that.Weekday = that.ruleForm.businessWeekday.split(',');
 
                 //地区
-                that.storeLongCity = ''+ that.ruleForm.storeAddr;
+                // $('#demo3 select[name="province"]').val('安徽省')
+                that.storeLongCity = '' + that.ruleForm.storeAddr;
                 //地图
-                that.mapSelect(that.ruleForm.longitude,that.ruleForm.latitude,that.ruleForm.storeAddr)
+                that.mapSelect(that.ruleForm.longitude, that.ruleForm.latitude, that.ruleForm.storeAddr)
 
-            }.bind(this),function(data){fadeInOut(data.msg)})
+            }.bind(this), function (data) {
+                fadeInOut(data.msg)
+            })
         },
         addForm: function () {
-            this.activeName ='second'
+            this.$refs['ruleForm'].resetFields()
+            this.activeName = 'second'
             this.ruleForm = {}
-            this.title='新增'
-            this.mapSelect('121.478527','31.233212','')
+            this.title = '新增'
+            this.mapSelect('', '', '')
+            console.log(this.activeName)
         },
         resetForm: function (formName) {
             // this.$refs[formName].resetFields();
@@ -349,9 +329,54 @@ var store = new Vue({
             if (this.ruleForm.storeTop) {
                 this.ruleForm.storeTel = this.ruleForm.storeTop + '-' + this.ruleForm.storeTel
             }
+            this.ruleForm.businessWeekday=this.Weekday.join(',')
+                console.log(55,this.ruleForm);
+            PostAjax(this,'post',this.ruleForm,'/customstore/nyCustomStore/save',function(data){
+                this.ruleForm.storeTop = ''
+                this.activeName = 'first'
+                this.query()
+            },function(msg){fadeInOut(22,msg)},'','','','','',2)
 
+        },
+        getCity: function () {
+            var _this =this
+            PostAjax(_this,'post','','/layer/position/provices/1',function (data) {
+                _this.allCities = data
+                _this.allCities=[{
+                    "children": [],
+                    "value": "120",
+                    "label": "天津市"
+                },
+                    {
+                        "children": [],
+                        "value": "130",
+                        "label": "河北省"
+                    }]
+            },function(msg){}, '', '', '', 'application/x-www-form-urlencoded',1, 3)
+        },
+        handleItemChange:function(val){
+            console.log(8989,val);
+            var _this =this
+            PostAjax(_this,'post','','/layer/position/cities/1',function (data) {
+                for(var i=0;i<_this.allCities.length;i++){
 
+                }
+
+            },function(msg){}, '', '', '', 'application/x-www-form-urlencoded',1, 3)
         }
     }
 })
 
+// function searchRole (result, checkedRoles) {
+//     for (var i = 0; i < result.length; i++) {
+//         var item = result[i]
+//         if (item.children !== undefined && item.children.length > 0) {
+//             // 递归
+//             searchRole(item.children, checkedRoles)
+//         }
+//         if (item.roleId && item.roleId) {
+//             var arr = checkedRoles.push(item.id)
+//             return arr
+//         }
+//     }
+// }

@@ -9,9 +9,20 @@
     <link rel="stylesheet" href="../css/public.css"/>
     <link rel="stylesheet" href="../css/storeManage.css"/>
     <style type="text/css">
-        html{height:100%}
-        body{height:100%;margin:0px;padding:0px}
-        #l-map{width:800px;height:400px;}
+        html {
+            height: 100%
+        }
+
+        body {
+            height: 100%;
+            margin: 0px;
+            padding: 0px
+        }
+
+        #l-map {
+            width: 800px;
+            height: 400px;
+        }
     </style>
 </head>
 
@@ -19,11 +30,13 @@
 <div id="store" v-clock>
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
         <el-tab-pane label="用户管理" name="first" class="storeTable">
-            <label>店铺名称：</label> <el-input v-model="formInline.storeName"></el-input>
-            <label>所属商户：</label> <el-input v-model="formInline.customName"></el-input>
+            <label>店铺名称：</label>
+            <el-input v-model="formInline.storeName"></el-input>
+            <label>所属商户：</label>
+            <el-input v-model="formInline.customName"></el-input>
             <div class="btnBar">
-                <button  class="query" round @click="query">查询</button>
-                <button  class='addForm' @click="addForm" round>添加</button>
+                <button class="query" round @click="query" type="button">查询</button>
+                <button class='addForm' @click="addForm" round type="button">添加</button>
             </div>
             <el-table
                     :data="tableData"
@@ -66,8 +79,10 @@
                         label="操作"
                         width="120">
                     <template slot-scope="scope">
-                            <button  @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">启用</button>
-                            <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
+                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">
+                            启用
+                        </button>
+                        <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
                         <el-button
                                 @click="modifyRow(scope.row)"
                                 type="text"
@@ -90,6 +105,7 @@
         <el-tab-pane label="配置管理" name="second">
 
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+                <el-input v-if="0" v-model="ruleForm.id"></el-input>
                 <el-form-item label="门店名称：" prop="storeName">
                     <el-input v-model="ruleForm.storeName" placeholder="门店名称最长支持20个字"></el-input>
                 </el-form-item>
@@ -98,20 +114,35 @@
                     <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
                 </el-form-item>
                 <el-form-item label="所属区域：" prop="storeCity">
+                    <!--<el-cascader-->
+                    <!--expand-trigger="hover"-->
+                    <!--:options="allCitys"-->
+                    <!--v-model="ruleForm.storeCity"-->
+                    <!--@change="handleChange">-->
+                    <!--</el-cascader>-->
                     <el-cascader
-                            expand-trigger="hover"
-                            :options="allCitys"
-                            v-model="ruleForm.storeCity"
-                            @change="handleChange">
-                    </el-cascader>
+                            :options="allCities"
+                            @active-item-change="handleItemChange"
+                            :props="props"
+                    ></el-cascader>
+
+                    <!--<div id="demo3" class="citys">-->
+                        <!--<p>-->
+                            <!--<select name="province"></select>-->
+                            <!--<select name="city"></select>-->
+                            <!--<select name="area"></select>-->
+                            <!--<select name="town"></select>-->
+                        <!--</p>-->
+                    <!--</div>-->
                 </el-form-item>
                 <el-form-item label="详细地址：" prop="storeAddr">
-                    <el-input id="suggestId" size="20"  class='storeAddr' @blur="storeBlur" v-model="ruleForm.storeAddr" placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
-                    <div id="searchResultPanel" style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
-                    <!--<button  class="search" round>搜索</button>-->
+                    <el-input id="suggestId" size="20" class='storeAddr' @blur="storeBlur" v-model="ruleForm.storeAddr"
+                              placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                    <div id="searchResultPanel"
+                         style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
                 </el-form-item>
                 <el-form-item>
-                    <i class="el-icon-location-outline"></i>&nbsp;经度：<span >{{ruleForm.longitude}}</span>&nbsp;&nbsp;纬度：<span>{{ruleForm.latitude}}</span>
+                    <i class="el-icon-location-outline"></i>&nbsp;经度：<span>{{ruleForm.longitude}}</span>&nbsp;&nbsp;纬度：<span>{{ruleForm.latitude}}</span>
                 </el-form-item>
 
                 <el-form-item label="地图定位：" prop="storeTel">
@@ -132,38 +163,39 @@
                     </el-upload>
                 </el-form-item>
                 <el-form-item label="运营时间：" prop="businessTime" class="storeTime">
-                    <input  v-if= 0 v-module="ruleForm.businessTime">
+                    <input v-if=0 v-module="ruleForm.businessTime">
                 </el-form-item>
                 <div class="timeDate">
-                <el-time-select
-                        placeholder="起始时间"
-                        v-model="ruleForm.businessBeginTime"
-                        :picker-options="{
+                    <el-time-select
+                            placeholder="起始时间"
+                            v-model="ruleForm.businessBeginTime"
+                            :picker-options="{
                                  start: '00:00',
                                  step: '00:30',
                                  end: '24:00'
                                }">
-                </el-time-select> -
-                <el-time-select
-                        placeholder="结束时间"
-                        v-model="ruleForm.businessEndTime"
-                        :picker-options="{
+                    </el-time-select>
+                    -
+                    <el-time-select
+                            placeholder="结束时间"
+                            v-model="ruleForm.businessEndTime"
+                            :picker-options="{
                                      start: '00:00',
                                      step: '00:30',
                                      end: '24:00',
                                      minTime: ruleForm.businessBeginTime
                                    }">
-                </el-time-select>
-                <el-form-item label="星期：" prop="Weekday" class="weekInput">
-                    <el-select v-model="Weekday" multiple class="week">
-                        <el-option
-                                v-for="item in weeks"
-                                :key="item.value"
-                                :label="item.label"
-                                :value="item.value">
-                        </el-option>
-                    </el-select>
-                </el-form-item>
+                    </el-time-select>
+                    <el-form-item label="星期：" prop="Weekday" class="weekInput">
+                        <el-select v-model="Weekday" multiple class="week">
+                            <el-option
+                                    v-for="item in weeks"
+                                    :key="item.value"
+                                    :label="item.label"
+                                    :value="item.value">
+                            </el-option>
+                        </el-select>
+                    </el-form-item>
                 </div>
                 <el-form-item label="商家推荐：" prop="storeRecommend" class="textarea">
                     <el-input
@@ -180,8 +212,8 @@
                     <el-input v-model="ruleForm.serviceTel"></el-input>
                 </el-form-item>
                 <el-form-item>
-                    <button  class="search" round @click="submitForm('ruleForm')">{{title}}</button>
-                    <button class='addForm'  round @click="resetForm('ruleForm')" type="button">重置</button>
+                    <button class="search" round @click="submitForm('ruleForm')" type="button">{{title}}</button>
+                    <button class='addForm' round @click="resetForm('ruleForm')" type="button">重置</button>
                 </el-form-item>
             </el-form>
 
@@ -193,11 +225,14 @@
 
 <!-- 引入组件库 -->
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!--<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>-->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
 <script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=IK5AlGXoZ23tDAGjldRalicbhdpsrKwE"></script>
-<script type="text/javascript" src="../js/public.js" ></script>
+<script type="text/javascript" src="../js/public.js"></script>
 <script type="text/javascript" src="../js/storeManage.js"></script>
+
+
 </body>
 
 </html>
