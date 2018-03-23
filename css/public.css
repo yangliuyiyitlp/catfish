@@ -65,6 +65,10 @@ em{font-style:normal;font-weight:normal;}
 	color: #fff;
 	background: #C54646;
 }
+.el-button--search:focus{
+	background: #DB5050;
+	color: #fff;
+}
 /*table*/
 .el-table thead,.el-table__empty-text{
 	color: #333;
