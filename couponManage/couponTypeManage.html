@@ -10,12 +10,98 @@
 	</head>
 	<body>
 		<div id="couponType" class="erp_content wp" v-clock v-on:click="shopNameIsShow=false,pAdd.pUR.shopNameIsShow=false,pAdd.pG.goodsNameIsShow=false">
-			<!--<el-button @click="visible = true">Button</el-button>
-			<el-dialog :visible.sync="visible" title="Hello world">
-				<p>Try Element</p>
-			</el-dialog>-->
-			<!--描述：右侧内容-->
-			<div class="erp_query_list pr" style="margin-top: 0px;padding-top: 30px;">
+			<!--筛选头部-->
+			<div class="searchPart">
+				<div class="searchItem">
+					<label>优惠劵指定类型：</label>
+					<el-select v-model="coupontype" class="smSelect">
+					    <el-option
+					      v-for="item in useRangeSelect"
+					      :key="item.Id"
+					      :label="item.Name"
+					      :value="item.Id">
+					    </el-option>
+					</el-select>
+					<el-input v-model="useRangeResult"></el-input>
+				</div>
+				<div class="searchItem">
+					<label>名称：</label> <el-input v-model="typeName"></el-input>
+				</div>
+				<div class="searchItem">
+					<label>金额：</label> <el-input v-model="parValue"></el-input>
+				</div>            	
+				<div class="btnPart">
+	                <el-button type="search" round>查询</el-button>
+	  				<el-button round>添加</el-button>
+	           </div>
+			</div>
+			
+            <el-table :data="searchResult" border style="margin: 0 auto; width: 97.5%;">
+                <el-table-column
+                        align="center"
+                        prop="id"
+                        label="id"
+                        v-if=0>
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeNam"
+                        label="名称">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeNam"
+                        label="金额（元）">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeAddr"
+                        label="有效时长（天）">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeTel"
+                        label="优惠券指定类型">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="订单满足条件（元）">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="是否可以叠加">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="是否混合使用">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        fixed="right"
+                        label="操作"
+                        width="120">
+                    <template slot-scope="scope">
+                        <el-switch
+                                v-model="isOn"
+                                active-color="#13ce66"
+                                inactive-color="#ff4949">
+                        </el-switch>
+                        <el-button
+                                @click="deleteRow(row)"
+                                type="text"
+                                size="small">
+                            修改
+                        </el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+			
+			
+			
+			<!--<div class="erp_query_list pr" style="margin-top: 0px;padding-top: 30px;">
 				<p class="pr"><label style="width: 120px;">优惠劵指定类型：</label>
 					<select v-model="useRangeId" style="width: 60px;" v-on:change="changeUseRange($event,1)">
 						<option v-once v-for="item in useRangeSelect" :value="item.Id">{{item.Name}}</option>
@@ -34,14 +120,14 @@
 						<li v-for="item in useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,1)">{{item.UnitName}}</li>
 					</ul>
 				</div>
-			</div>
-			<div class="erp_submit_list">
+			</div>-->
+			<!--<div class="erp_submit_list">
 				<input type="submit" class="search" value="查询" v-on:click="GetCouponTypeList(1)" />
 				<input type="button" class="add_type" value="添加" v-on:click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true" />
-			</div>
-			<p class="more_line"><span></span></p>
+			</div>-->
+			<!--<p class="more_line"><span></span></p>-->
 			<!--描述：列表表单 -->
-			<table cellpadding="0" cellspacing="0" class="product_list">
+			<!--<table cellpadding="0" cellspacing="0" class="product_list">
 				<thead id="type_menu">
 					<tr class="title_tr">
 						<td>名称</td>
@@ -70,9 +156,18 @@
 						</td>
 					</tr>
 				</tbody>
-			</table>
+			</table>-->
 			<!--描述：分页-->
-			<div id="kkpager"></div>
+			<!--<div id="kkpager"></div>-->
+			<el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="pagination.pageNo"
+                    :page-sizes="pagination.pageSizes"
+                    :page-size="pagination.pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="pagination.count">
+            </el-pagination>
 			<!--描述：弹窗-->
 			<p class="loading_p" v-show="loadingShow"><img src="../images/loading.gif" /></p>
 			<div id="fixedBg" v-show="fBgIsShow"></div>
@@ -147,9 +242,6 @@
 				</p>
 			</div>
 		</div>
-		<!-- import Vue before Element -->
-		<!--<script src="https://unpkg.com/vue/dist/vue.js"></script>-->
-		<!-- import JavaScript -->
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>		

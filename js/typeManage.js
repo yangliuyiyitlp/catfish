@@ -9,6 +9,8 @@ var searchData = {
 var couponType = new Vue({
 	el: "#couponType",
 	data: {
+		
+		pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
 		useRangeSelect: [{
 			Id: 1,
 			Name: "不限"
@@ -19,6 +21,7 @@ var couponType = new Vue({
 			Id: -1,
 			Name: "单个"
 		}], //优惠券指定类型（使用场地）
+		coupontype:'',
 		useRangeId: 1, //优惠券指定类型（Id）
 		useRangeResult: "", //单个：配送商店铺名
 		useRangeResultId: -1, //单个：配送商店铺Id
@@ -545,9 +548,20 @@ var couponType = new Vue({
 				}
 			}.bind(this))
 		},
+		handleCurrentChange: function (val) {
+            this.formInline.pageNo = val
+            this.pagination.pageNo = val
+            this.query()
+        },
+        handleSizeChange: function (val) {
+            this.formInline.pageSize = val
+            this.pagination.pageSize = val
+            this.query()
+        },
 	},
 	created: function() {
 		var that = this;
+		that.coupontype = that.useRangeSelect[0].Name;
 		var data = {
 			"id": "28f547feb686464997ca8c77b3549ef7",
 			"updateDate": "2018-03-21 11:25:05",
@@ -560,8 +574,8 @@ var couponType = new Vue({
 			"storeProvinceid": "111"
 		}
 		
-		PostAjax(that, 'post', data, '/customstore/nyCustomStore/list', function() {
-
+		PostAjax(that, 'post', '', '/nycoupon/nyCoupon/list', function(data) {
+			that.searchResult = data.result
 		})
 //		PostAjax(that,'get','','/limitoperateflag/tLimitOperateConfig/list',function(data){
 //			
