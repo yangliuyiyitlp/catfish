@@ -9,18 +9,22 @@ var searchData = {
 var couponType = new Vue({
 	el: "#couponType",
 	data: {
-		
+		serachData:{
+			couponNum:'',
+			userName:'',
+			couponName:'',
+			useRange: [{//指定类型
+				id: 1,
+				name: "不限"
+			}, {
+				id: 0,
+				name: "全场"
+			}, {
+				id: -1,
+				name: "单个"
+			}]
+		},
 		pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
-		useRangeSelect: [{
-			Id: 1,
-			Name: "不限"
-		}, {
-			Id: 0,
-			Name: "全场"
-		}, {
-			Id: -1,
-			Name: "单个"
-		}], //优惠券指定类型（使用场地）
 		coupontype:'',
 		useRangeId: 1, //优惠券指定类型（Id）
 		useRangeResult: "", //单个：配送商店铺名
@@ -74,16 +78,37 @@ var couponType = new Vue({
 			couponType: 1, //优惠券形式
 		},
 		searchResult: [],
-		DeleteDisplay: {
-			deleteIsShow: false,
-			Id: -1,
-			name: ''
-		},
 		fBgIsShow: false,
 		clearIsShow: false,
-		eleSelect: 'images/erp_input_bg.jpg'
+		useRangeSelect:''
 	},
 	methods: {
+		getData:function(){
+			var that = this;
+			if(dateT != ''){
+				startTime = dateT[0].getFullYear() + '-' + (dateT[0].getMonth() + 1) + '-' + dateT[0].getDate() + ' ' + dateT[0].getHours() + ':' + dateT[0].getMinutes() + ':' + dateT[0].getSeconds();
+				endTime = dateT[1].getFullYear() + '-' + (dateT[1].getMonth() + 1) + '-' + dateT[1].getDate() + ' ' + dateT[1].getHours() + ':' + dateT[1].getMinutes() + ':' + dateT[1].getSeconds();			
+			}
+			var content = {
+				id:that.serachData.couponId,
+				couponCode:that.serachData.couponNum,
+				realName:that.serachData.userName,
+				pageSize:that.formInline.pageSize,
+				pageNo:that.formInline.pageNo				
+			}
+			PostAjax(that, 'post', content, '/nycoupon/nyCoupon/list', function(data) {
+				that.couponList = data.result;
+				var newA = [];
+				for (var i = 0;i<data.result.length;i++) {				
+					var li = data.result[i];
+					li.couponStatus = li.couponStatus == 0 ? '未使用': '使用';
+					li.isExpired = li.isExpired == 0 ? '过期': '有效';
+					newA[i] = li;			
+				}
+				that.couponList = newA;
+				that.formInline.pageNo ++;
+			},'','','','','','',2)
+		},
 		GetCouponTypeList: function(n) { //查询优惠券类型数据
 			var parValue = this.parValue;
 			var reg = /^[1-9]{1}[0-9]*$/;
@@ -102,7 +127,6 @@ var couponType = new Vue({
 				PageSize: 10
 			};
 			this.pageNo = n;
-			//			$('#kkpager').hide();
 			this.loadingShow = true;
 			PostAjax2(this, content, '/Coupon/GetCouponTypeList', function(data) {
 				if(data.status == "200") {
@@ -558,25 +582,26 @@ var couponType = new Vue({
             this.pagination.pageSize = val
             this.query()
         },
+        querySearch(queryString, cb) {
+	        var restaurants = this.restaurants;
+	        var results = queryString ? restaurants.filter(this.createFilter(queryString)) : restaurants;
+	        // 调用 callback 返回建议列表的数据
+	        cb(results);
+	    },
+	    createFilter(queryString) {
+	        return (restaurant) => {
+	          return (restaurant.value.toLowerCase().indexOf(queryString.toLowerCase()) === 0);
+	        };
+	    },
+	    handleSelect(item) {
+        	console.log(item);
+      	}
 	},
 	created: function() {
-		var that = this;
-		that.coupontype = that.useRangeSelect[0].Name;
-		var data = {
-			"id": "28f547feb686464997ca8c77b3549ef7",
-			"updateDate": "2018-03-21 11:25:05",
-			"delFlag": "0",
-			"storeName": "商户名20",
-			"customId": "1",
-			"contact": "张2222工",
-			"storeAddr": "金11汇路114",
-			"storeTel": "13706533081",
-			"storeProvinceid": "111"
-		}
-		
-		PostAjax(that, 'post', '', '/nycoupon/nyCoupon/list', function(data) {
-			that.searchResult = data.result
-		})
+		var that = this;		
+//		PostAjax(that, 'post', '', '/nycoupon/nyCoupon/list', function(data) {
+//			that.searchResult = data.result
+//		})
 //		PostAjax(that,'get','','/limitoperateflag/tLimitOperateConfig/list',function(data){
 //			
 //		})
