@@ -37,6 +37,11 @@
     outline-style: none;
     cursor: pointer;
 }
+.modify{
+    font: 400 13.3333px Arial;
+    color:#409EFF;
+    cursor: pointer;
+}
 .query{
     color:#fff;
     border:1px solid rgba(219,80,80,1);
@@ -47,8 +52,11 @@
 .storeTop{
     width:70px;
 }
-.storeTime{
-    float:left;
+.storeTime {
+     float:left;
+ }
+.storeTime .el-form-item__error{
+    width:200px;
 }
 .el-date-editor.el-input, .el-date-editor.el-input__inner,.week .el-input{
     width:170px;
@@ -60,11 +68,14 @@
     width:420px;
 }
 .timeDate{
-    width:750px;
-    margin-bottom:22px;
+    width:800px;margin-bottom:22px;
 }
-.weekInput{
-    float:right;
+.weekDate{
+   height:40px;float:right
+}
+.timeTip{
+    height:40px;
+    line-height: 40px;
 }
 .el-cascader .el-input{
     width:325px;
