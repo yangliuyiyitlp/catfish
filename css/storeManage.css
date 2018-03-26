@@ -7,6 +7,9 @@
 .storeName{
     margin-bottom:50px;
 }
+.redTip{
+    color:red;
+}
 .storeTable{
     padding:20px;
     box-sizing: border-box;

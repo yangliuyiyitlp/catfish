@@ -4,7 +4,7 @@ var store = new Vue({
         return {
             activeName: 'first',
             title: '',
-            storeLongCity: '',
+            reg: false,
             formInline: {
                 pageSize: 30,
                 pageNo: 1,
@@ -356,12 +356,22 @@ var store = new Vue({
             // 地区
             _this.ruleForm.selectedCities =_this.selectedCities
             console.log(89,_this.selectedCities)
+            // 区号合并
+            console.log(_this.ruleForm.storeTel);
+            if(getpho(_this.ruleForm.storeTel) == false){
+                _this.reg =true
+                return
+            }
+            if (_this.ruleForm.storeTop) {
+                if(getNumber(_this.ruleForm.storeTop) == false){
+                    _this.reg =true
+                    return
+                }
+                _this.ruleForm.storeTel = _this.ruleForm.storeTop + '-' + _this.ruleForm.storeTel
+            }
+            _this.reg =false
             _this.$refs[ruleForm].validate(function (valid) {
                 if (valid) {
-                    // 区号合并
-                    if (_this.ruleForm.storeTop) {
-                        _this.ruleForm.storeTel = _this.ruleForm.storeTop + '-' + _this.ruleForm.storeTel
-                    }
                     _this.ruleForm.longitude = String(_this.ruleForm.longitude)
                     _this.ruleForm.latitude =String(_this.ruleForm.latitude)
                     PostAjax(_this, 'post', _this.ruleForm, '/layer/customstore/nyCustomStore/save', function (data) {
