@@ -59,6 +59,7 @@
                         label="门店名">
                 </el-table-column>
                 <el-table-column
+                        show-overflow-tooltip="false"
                         align="center"
                         prop="storeAddr"
                         label="联系地址">
@@ -116,6 +117,7 @@
                 </el-form-item>
                 <el-form-item label="所属区域：" prop="selectedCities">
                     <el-cascader
+                            id="cityName"
                             :options="allCities"
                             @active-item-change="handleItemChange"
                             :props="props"
@@ -125,7 +127,7 @@
                 <el-form-item label="详细地址：" prop="storeAddr">
                     <el-input id="suggestId" size="20" class='storeAddr' @change="storeBlur"
                               v-model="ruleForm.storeAddr"
-                              placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                              placeholder="请填写详细地址，以便买家联系"></el-input>
                     <div id="searchResultPanel"
                          style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
                 </el-form-item>
@@ -214,7 +216,6 @@
 
 <!-- 引入组件库 -->
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<!--<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>-->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
 <script type="text/javascript"

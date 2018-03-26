@@ -60,7 +60,8 @@ var store = new Vue({
                 id: 'label',
                 children: 'children'
             },
-            selectedCities: []
+            selectedCities: [],
+            cityNames:''
         }
     },
     created: function () {
@@ -160,8 +161,16 @@ var store = new Vue({
                 local.search(myValue);
             }
         },
-        storeBlur: function () {
+        storeBlur: function (val) {
             var that = this
+
+            // that.ruleForm.storeLongCity = that.cityNames+ myValue
+            // console.log(88888,that.ruleForm.storeLongCity);
+            // console.log(444,val);
+
+            // console.log(5555,that.ruleForm.storeAddr);
+            // that.ruleForm.storeLongCity = that.cityNames+ myValue
+            // console.log(88888,that.ruleForm.storeLongCity);
             var marker
             // 点坐标
             // 创建地址解析器实例
@@ -186,6 +195,8 @@ var store = new Vue({
                     that.$message.warning('您选择地址没有解析到坐标')
                 }
             });
+
+
 
             function setPlace() {
                 map.clearOverlays();    //清除地图上所有覆盖物
@@ -212,13 +223,7 @@ var store = new Vue({
         handleClick: function (tab, event) {
             console.log(tab.name)
             if (tab.name = 'second') {
-                this.$refs['ruleForm'].resetFields()
-                this.iconUrl = ''
-                this.title = '新增'
-                this.Weekday =[]
-                this.selectedCities =[]
-                this.ruleForm = {'longitude': '121.487899', 'latitude': '31.249162','storeTel':'','selectedCities':[]}
-                this.mapSelect(this.ruleForm.longitude, this.ruleForm.latitude, '上海市')
+                this.setEmptyForm()
             }
         },
         handleSizeChange: function (val) {
@@ -312,18 +317,23 @@ var store = new Vue({
                 //地区
                 that.selectedCities =[]
                 that.selectedCities.push(that.ruleForm.storeProvinceid, that.ruleForm.storeCityid, that.ruleForm.storeRegionid, that.ruleForm.storeStreetid)
-                that.ruleForm.storeLongCity = '' + that.ruleForm.storeAddr;
+                // that.ruleForm.storeLongCity = trim(that.ruleForm.storeProvinceName +that.ruleForm.storeCityName +that.ruleForm.storeRegionName +that.ruleForm.storeStreeName + that.ruleForm.storeAddr);
+                // console.log(666666,that.ruleForm.storeLongCity);
                 //地图
-                that.mapSelect(that.ruleForm.longitude, that.ruleForm.latitude, that.ruleForm.storeLongCity)
+                that.mapSelect(that.ruleForm.longitude, that.ruleForm.latitude, that.ruleForm.storeAddr)
 
             }.bind(this), function (data) {
                 fadeInOut(data.msg)
             })
         },
         addForm: function () {
+            this.setEmptyForm()
+            this.activeName = 'second'
+        },
+        setEmptyForm:function(){
             this.$refs['ruleForm'].resetFields()
             this.iconUrl = ''
-            this.activeName = 'second'
+            this.cityNames = ''
             this.selectedCities =[]
             this.Weekday =[]
             this.title = '新增'
@@ -331,7 +341,7 @@ var store = new Vue({
             this.mapSelect(this.ruleForm.longitude, this.ruleForm.latitude, '上海市')
         },
         resetForm: function (formName) {
-            // this.$refs[formName].resetFields();
+            this.$refs[formName].resetFields();
             this.selectedCities =[]
             this.iconUrl = ''
             this.Weekday =[]
@@ -377,7 +387,6 @@ var store = new Vue({
             }, '', '', '', 'application/x-www-form-urlencoded', 1, 3)
         },
         handleItemChange: function (val) {
-            console.log(22, val[0])
             var _this = this
             if (val && val.length == 1) {
                 _this.ruleForm.storeProvinceid = val[0]
@@ -438,17 +447,3 @@ var store = new Vue({
         }
     }
 })
-
-// function searchRole (result, checkedRoles) {
-//     for (var i = 0; i < result.length; i++) {
-//         var item = result[i]
-//         if (item.children !== undefined && item.children.length > 0) {
-//             // 递归
-//             searchRole(item.children, checkedRoles)
-//         }
-//         if (item.roleId && item.roleId) {
-//             var arr = checkedRoles.push(item.id)
-//             return arr
-//         }
-//     }
-// }
