@@ -17,7 +17,7 @@ var couponManage = new Vue({
             pageSize: 30,
             pageNo: 1,
             storeName: ''
-       },
+       	},
 		pagination: {
 			pageSizes: [30, 40, 60, 100],
 			pageSize: 30,

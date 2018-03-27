@@ -29,11 +29,13 @@ em{font-style:normal;font-weight:normal;}
 	padding:20px 0;
 	width: 97.5%;
 	margin: 20px auto;
+	position: relative;
 }
 .searchItem{
 	margin:0 20px 20px 20px;
 	display: inline-block;
 }
+
 /*小的select框*/
 .smSelect{
 	width:100px;
@@ -89,9 +91,8 @@ em{font-style:normal;font-weight:normal;}
 	min-height: 50px;
 	max-height:100px;
 	width: 300px;
-	background: #204071;
-	color: #fff;
-	border-radius: 10px;
+	background: none;
+	color: #fff;	
 	top: 50%;
 	left: 50%;
 	margin-top: -25px;
@@ -103,9 +104,11 @@ em{font-style:normal;font-weight:normal;}
 }
 #integral_fixed p{
 	line-height: 25px;
-	margin: 13px 10px;
+	padding: 10px 20px;
+	display: inline;
+	border-radius: 10px;
 }
-#fixedBg{/*display: none;*/position: fixed;_position:absolute;top:0;left:0;bottom:0;right:0;background:#000;opacity: 0.5;z-index: 9999;filter: alpha(opacity=50); -moz-opacity: 0.5;}
+#fixedBg{/*display: none;*/position: fixed;_position:absolute;top:0;left:0;bottom:0;right:0;background:#000;opacity: 0.5;z-index: 999;filter: alpha(opacity=50); -moz-opacity: 0.5;}
 .popup_public{
 	/*display: none;*/
 	position: fixed;
@@ -113,7 +116,7 @@ em{font-style:normal;font-weight:normal;}
 	width: 674px;
 	height: 490px;
 	background: #fff;
-	z-index: 99999;
+	z-index: 1000;
 	top: 50%;
 	left: 50%;
 	margin-top: -245px;
@@ -124,9 +127,78 @@ em{font-style:normal;font-weight:normal;}
 .popup_public h2{line-height: 55px;height: 55px;text-align: center;color: #333;font-size: 22px;background: #fff;border-bottom: solid 1px #D4D4D4;}
 .erp_close{position: absolute;width: 40px;height: 40px;right: 10px;top: 7px;cursor: pointer;font-size: 35px;}
 .erp_close:hover{color: #DB5050;}
-.edit_area{padding-left: 20px;height: 360px;overflow: auto;width: 630px;margin-top: 30px;}
-.edit_area p{height:29px;line-height: 29px;margin-bottom: 15px;font-size: 14px;}
+.edit_area{padding-left: 20px;overflow: auto;width: 630px;margin-top: 10px;}
+.edit_area2{height: 400px;margin-top: 10px;}
+.edit_area p{height:40px;line-height: 39px;margin-bottom: 5px;font-size: 14px;}
+.edit_area2 p{height:30px;line-height: 29px;}
 .edit_area p label{display: block;width: 150px;text-align: right;color: #646464;float: left;}
 .edit_area p label em{color: #ff2929;font-size: 18px;}
-.edit_area p span{margin-left: 10px;font-size: 12px;color: #ff2929;float: left;}
+.edit_area p span{margin-left: 10px;font-size: 12px;color: #ff2929;}
 .edit_area p span.error_msg{display: block;}
+
+.edit_area p em{margin-left: 10px;font-size: 12px;color: #000;}
+.edit_area p strong{font-weight: normal;color: #333;display: inline-block;}
+/*.edit_area p input{}*/
+.edit_area p input{
+	width: 200px;
+	display: block;
+	/*float: left;*/
+	-webkit-appearance: none;
+    background-color: #fff;
+    background-image: none;
+    border-radius: 4px;
+    border: 1px solid #dcdfe6;
+    -webkit-box-sizing: border-box;
+    box-sizing: border-box;
+    color: #606266;
+    display: inline-block;
+    font-size: inherit;
+    height: 40px;
+    line-height: 40px;
+    outline: 0;
+    padding: 0 15px;
+    -webkit-transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
+}
+.edit_area p .smSelect{
+	float: left;
+	margin-right: 10px;
+}
+.edit_area p .smSelect input{width:100px;}
+.edit_area p select {width: 157px;}
+.edit_area p.updataBtn span{display: block;color: #fff;}
+.edit_area p.updataBtn,.edit_area .imgBox{margin-left: 20px;}
+.edit_area .imgBox,.edit_area .imgBox img{height: 110px;width: 128px;}
+.edit_area p.updataBtn span:hover{color: #78a5b5;}
+.edit_area .imgBox p span{display: block;float: none;color: #333;}
+.edit_sure_box{margin-top: 10px;text-align: center;}
+.edit_sure_box input{background: #4369a9;margin-right: 20px;height: 35px;line-height: 35px;width: 100px;}
+.edit_sure_box input:hover{background: #517fcd;}
+.edit_sure_box input.cancel_sure{background: #fff;color: #646464;border: solid 1px #646464;}
+.edit_sure_box input.cancel_sure:hover{border-color: #517fcd;color: #517fcd;}
+.edit_sure_box input.edit_sure_gary{background: #ccc;cursor: default;}
+
+.emClear{display: inline-block;width: 10px;height: 10px;top: 26px;left: 415px;font-size: 20px;}
+/*实时搜索弹窗*/
+.edit_area p.canSearch{position: relative;}
+.edit_area p.canSearch span.nameSearch{background-color:#fff;text-indent:0px;position: absolute;top: 32px;left: 140px;width: 230px;max-height: 160px;overflow:auto;display: none;border: solid 1px #a2a2a2;border-radius: 3px;}
+.edit_area p.canSearch span.nameSearch em{color:#666;display: block;cursor: pointer;margin-left: 0;padding:0px 5px;line-height: 25px;margin-bottom: 5px;text-overflow: ellipsis;white-space: nowrap;overflow: hidden; }
+.edit_area p.canSearch span.nameSearch em:last-child{border-bottom: none;}
+.edit_area p.canSearch span.nameSearch em:hover{color: #408ed6;}
+
+.searchDiv{width:300px;height:230px;top:70px;left:220px;border:1px solid #dcdfe6;z-index:999;border-radius:5px;background:#fff;}
+.searchDiv h3{height:31px;border-bottom:1px solid #dcdfe6;padding:7px 0;}
+.searchDiv h3 input[type="button"]{float:right;width:92px;height:30px;background:#408ed6;color:#fff;margin-right:5px;border-radius: 2px;}
+.searchDiv h3 input[type="text"]{text-indent:10px;width:200px;line-height:30px;font-size:16px;}
+.searchDiv ul{height:180px;overflow: auto;}
+.searchDiv ul li{line-height:30px;padding:0 5px;font-size:14px;cursor: pointer;}
+.searchDiv ul li:hover{color:#408ed6;}
+
+.AddDiv {
+	height:200px;
+	top: 130px;
+	left: 280px;
+}
+.AddDiv ul{
+	height: 150px;
+}

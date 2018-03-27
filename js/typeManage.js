@@ -1,18 +1,12 @@
-var searchData = {
-	useRangeSelect: 1,
-	UseRange: 0,
-	TypeName: '',
-	ParValue: '',
-	PageNo: 1,
-	PageSize: 10
-}
 var couponType = new Vue({
 	el: "#couponType",
 	data: {
 		serachData:{
-			couponNum:'',
-			userName:'',
-			couponName:'',
+			couponAssignType:'',
+			storeName:'',
+			storeId:'',
+			couponTypeName:'',
+			parValue:'',
 			useRange: [{//指定类型
 				id: 1,
 				name: "不限"
@@ -24,7 +18,43 @@ var couponType = new Vue({
 				name: "单个"
 			}]
 		},
-		pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
+		formInline: {
+            pageSize: 30,
+            pageNo: 1,
+            storeName: ''
+       	},
+		pagination: {
+			pageSizes: [30, 40, 60, 100], 
+			pageSize: 30, 
+			count: 0, 
+			pageNo: 1
+		},
+		couponTypeList:[//优惠券形式
+			{
+				id: 1,
+				name: "虚拟券"
+			}
+		],
+		isRepeatableList:[
+			{
+				id: 0,
+				name: "否"
+			},
+			{
+				id: 1,
+				name: "是"
+			}
+		],
+		isMixableList:[
+			{
+				id: 0,
+				name: "否"
+			},
+			{
+				id: 1,
+				name: "是"
+			}
+		],
 		coupontype:'',
 		useRangeId: 1, //优惠券指定类型（Id）
 		useRangeResult: "", //单个：配送商店铺名
@@ -37,18 +67,19 @@ var couponType = new Vue({
 		pageNo: 1,
 		loadingShow: false, //loading
 		pAdd: {
+			index:'',
 			uSelect: [{
-				Id: 0,
-				Name: "全场"
+				id: 1,
+				name: "全场"
 			}, {
-				Id: -1,
-				Name: "单个"
+				id: 2,
+				name: "单个"
 			}],
 			popupName: '', //添加/编辑
 			popupShow: false, //弹框
-			useRangeId: 0, //优惠券指定类型（Id）
+			useRangeId: 1, //优惠券指定类型（Id）
 			pUR: { //使用范围
-				shopNameIsShow: false,
+				shopNameIsShow: true,
 				useRangeSearch: "", //单个，搜索店铺
 				useRangeSearchResult: [], //搜索结果
 			},
@@ -63,143 +94,64 @@ var couponType = new Vue({
 			useRange: "", //使用范围（0 全场 >0 单个配送商Id）
 			validPeriod: 0, //有效期（天）
 			validPeriodShow: false,
-			pG: { //商品
-				goodsNameIsShow: true, //商品
-				goodsSearch: "", //单个，搜索店铺
-				goodsSearchResult: [], //搜索结果
-			},
-			goodsName: "",
-			goodsId: "",
-			goodsNameShow: false,
 			conditionValue: "", //订单总额满足
 			conditionValueShow: false,
 			isRepeatable: 0, //是否可以叠加使用
 			isMixable: 0, //是否混合使用
 			couponType: 1, //优惠券形式
 		},
-		searchResult: [],
+		couponList: [],
 		fBgIsShow: false,
 		clearIsShow: false,
-		useRangeSelect:''
+		isOn:false
 	},
 	methods: {
 		getData:function(){
 			var that = this;
-			if(dateT != ''){
-				startTime = dateT[0].getFullYear() + '-' + (dateT[0].getMonth() + 1) + '-' + dateT[0].getDate() + ' ' + dateT[0].getHours() + ':' + dateT[0].getMinutes() + ':' + dateT[0].getSeconds();
-				endTime = dateT[1].getFullYear() + '-' + (dateT[1].getMonth() + 1) + '-' + dateT[1].getDate() + ' ' + dateT[1].getHours() + ':' + dateT[1].getMinutes() + ':' + dateT[1].getSeconds();			
-			}
 			var content = {
-				id:that.serachData.couponId,
-				couponCode:that.serachData.couponNum,
-				realName:that.serachData.userName,
+				couponAssignType:that.serachData.couponAssignType,
+				couponTypeName:that.serachData.couponTypeName,
+				storeId:that.serachData.storeId,
+				parValue:that.serachData.parValue,
 				pageSize:that.formInline.pageSize,
 				pageNo:that.formInline.pageNo				
 			}
-			PostAjax(that, 'post', content, '/nycoupon/nyCoupon/list', function(data) {
+			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/list', function(data) {
+//				var newA = [];
+//				for (var i = 0;i<data.result.length;i++) {				
+//					var li = data.result[i];
+//					console.log(li)
+//					li.isRepeatable = li.isRepeatable == 0 ? '否': '是';
+//					li.isMixable = li.isMixable == 0 ? '否': '是';
+//					li.couponAssignType = that.serachData.useRange[li.couponAssignType].label
+//					newA[i] = li;			
+//				}
 				that.couponList = data.result;
-				var newA = [];
-				for (var i = 0;i<data.result.length;i++) {				
-					var li = data.result[i];
-					li.couponStatus = li.couponStatus == 0 ? '未使用': '使用';
-					li.isExpired = li.isExpired == 0 ? '过期': '有效';
-					newA[i] = li;			
-				}
-				that.couponList = newA;
 				that.formInline.pageNo ++;
-			},'','','','','','',2)
-		},
-		GetCouponTypeList: function(n) { //查询优惠券类型数据
-			var parValue = this.parValue;
-			var reg = /^[1-9]{1}[0-9]*$/;
-			if(parValue) {
-				if(!reg.test(parValue)) {
-					fadeInOut("金额为正整数");
-					return false;
-				}
-			}
-			var content = {
-				useRangeSelect: this.useRangeId,
-				UseRange: this.useRangeResultId,
-				TypeName: this.typeName,
-				ParValue: this.parValue,
-				PageNo: n,
-				PageSize: 10
-			};
-			this.pageNo = n;
-			this.loadingShow = true;
-			PostAjax2(this, content, '/Coupon/GetCouponTypeList', function(data) {
-				if(data.status == "200") {
-					var obj = data.obj;
-					if(obj) {
-						if(obj.length > 0) {
-							this.searchResult = data.obj;
-							pageDatamyPagin('#kkpager', n, data.TotalCount, data.pageSize, this.GetCouponTypeList);
-							$('#kkpager').show();
-						} else {
-							if(n > 1) {
-								this.GetCouponTypeList(n - 1);
-							} else {
-								this.searchResult = data.obj;
-								fadeInOut("没有数据");
-							}
-						}
-					} else {
-						if(n > 1) {
-							this.GetCouponTypeList(n - 1);
-						} else {
-							this.searchResult = data.obj;
-							fadeInOut("没有数据");
-						}
-					}
-					this.loadingShow = false;
-				} else {
-					this.loadingShow = false;
-					fadeInOut(data.msg);
-				}
-			}.bind(this))
-		},
-		changeUseRange: function(event, type) {
-			if(event.target.value !== -1) {
-				if(type == 1) {
-					this.useRangeResult = "";
-					this.useRangeResultId = -1;
-				} else {
-					this.pAdd.useRangeResult = "";
-					this.pAdd.useRangeResultId = -1;
-				}
-			}
+			},'','','','','','',4)
 		},
 		SingleClick: function(type) { //选择单个可查询，选择全场不可以查询
+			console.log(type)
+			var that = this;
 			if(type == 1) {
-				if(this.useRangeId !== -1) {
+				if(that.serachData.couponAssignType != 2) {
 					return false;
 				} else {
-					if(this.shopNameIsShow != true) {
-						this.useRangeSearch = '';
-						this.useRangeSearchResult = null;
-						this.shopNameIsShow = true;
+					if(!that.shopNameIsShow) {
+						that.useRangeSearch = '';
+						that.useRangeSearchResult = null;
+						that.shopNameIsShow = true;
 					}
 				}
 			} else if(type == 2) {
-				if(this.pAdd.useRangeId == 0) {
+				if(that.pAdd.useRangeId == 1) {
 					return false;
 				} else {
-					if(this.pAdd.pUR.shopNameIsShow != true) {
-						this.pAdd.pUR.useRangeSearch = '';
-						this.pAdd.pUR.useRangeSearchResult = null;
-						this.pAdd.pUR.shopNameIsShow = true;
+					if(!that.pAdd.pUR.shopNameIsShow) {
+						that.pAdd.pUR.useRangeSearch = '';
+						that.pAdd.pUR.useRangeSearchResult = null;
+						that.pAdd.pUR.shopNameIsShow = true;
 					}
-				}
-			} else if(type == 3) {
-				if(this.pAdd.useRangeId == -1 && !this.pAdd.useRangeResultId) { //判断是否单个，是单个是否有选中供应商
-					fadeInOut("请先选择优惠券指定类型");
-					return false;
-				}
-				if(this.pAdd.pG.goodsNameIsShow != true) {
-					this.pAdd.pG.goodsSearch = '';
-					this.pAdd.pG.goodsSearchResult = null;
-					this.pAdd.pG.goodsNameIsShow = true;
 				}
 			}
 
@@ -212,88 +164,62 @@ var couponType = new Vue({
 					this.GetSearchShop(type);
 				}
 			}
-
 		},
 		GetSearchShop: function(type) { //搜索店铺
+			console.log(type)
 			var content = "";
+			var that = this;
 			if(type == 1) {
-				if(this.useRangeSearch == "") {
+				if(that.useRangeSearch == "") {
 					fadeInOut("请输入搜索条件");
 					return false;
 				}
 				content = {
-					SearchValue: this.useRangeSearch
+					storeName: that.useRangeSearch
 				};
 			} else if(type == 2) {
-				if(this.pAdd.pUR.useRangeSearch == "") {
+				if(that.pAdd.pUR.useRangeSearch == "") {
 					fadeInOut("请输入搜索条件");
 					return false;
 				}
 				content = {
-					SearchValue: this.pAdd.pUR.useRangeSearch
+					storeName: that.pAdd.pUR.useRangeSearch
 				};
 			}
-			this.loadingShow = true;
-			PostAjax2(this, content, '/Coupon/GetU_UnitSeller', function(data) {
-				if(data.status == "200") {
-					this.loadingShow = false;
-					if(data.obj) {
-						if(data.obj.length > 0) {
-							if(type == 1) {
-								this.useRangeSearchResult = data.obj;
-							} else if(type == 2) {
-								this.pAdd.pUR.useRangeSearchResult = data.obj;
-							}
-							return false;
-						}
-					}
+			that.loadingShow = true;
+			PostAjax(that, 'post', content, '/layer/customstore/nyCustomStore/list', function(data) {
+				console.log(data)
+				that.loadingShow = false;
+				if(data.result.length > 0) {
 					if(type == 1) {
-						this.useRangeSearchResult = [];
+						that.useRangeSearchResult = data.result;
+//						console.log(data.result)
 					} else if(type == 2) {
-						this.pAdd.pUR.useRangeSearchResult = [];
+						console.log(type)
+						that.pAdd.pUR.useRangeSearchResult = data.result;
+					}
+					return false;
+				}else{
+					if(type == 1) {
+						that.useRangeSearchResult = [];
+					} else if(type == 2) {
+						that.pAdd.pUR.useRangeSearchResult = [];
 					}
 					fadeInOut('未找到对应的结果');
-				} else {
-					this.loadingShow = false;
-					fadeInOut(data.msg);
 				}
-			}.bind(this))
-		},
-		GetSearchGoods: function() { //查询商品
-			if(this.pAdd.pG.goodsSearch == "") {
-				fadeInOut("请输入搜索条件");
-				return false;
-			}
-			var content = {
-				UseRangeId: this.pAdd.useRangeId,
-				UnitId: this.pAdd.useRangeResultId,
-				ItemName: this.pAdd.pG.goodsSearch
-			};
-			this.loadingShow = true;
-			PostAjax2(this, content, '/Coupon/GetGoodsList', function(data) {
-				if(data.status == "200") {
-					this.loadingShow = false;
-					if(data.obj) {
-						if(data.obj.length > 0) {
-
-							return false;
-						}
-					}
-					fadeInOut('未找到对应的结果');
-				} else {
-					this.loadingShow = false;
-					fadeInOut(data.msg);
-				}
-			}.bind(this))
+			},function(msg){
+				that.loadingShow = false;
+			})
 		},
 		ShopSelect: function(event, item, type) { //选择单个指定用户
 			if(type == 1) {
-				this.useRangeResult = item.UnitName;
-				this.useRangeResultId = item.UnitId;
+				this.serachData.storeName = item.storeName;
+				this.serachData.storeId = item.id;
 				this.shopNameIsShow = false;
+				this.clearIsShow = true;
 			} else if(type == 2) {
-				this.pAdd.useRangeResult = item.UnitName;
-				this.pAdd.useRangeResultId = item.UnitId;
+				this.pAdd.useRangeResult = item.storeName;
+				this.pAdd.useRangeResultId = item.id;
 				this.pAdd.pUR.shopNameIsShow = false;
 			}
 
@@ -333,12 +259,10 @@ var couponType = new Vue({
 				}
 			}
 		},
-		SelectGoods: function() { //选择商品
-
-		},
 		AddCouponType: function() { //添加或编辑
 			var content = "";
-			var pAdd = this.pAdd;
+			var that = this;
+			var pAdd = that.pAdd;
 			if(pAdd.couponType == 1) { //虚拟券
 				var index = 0;
 				var typeName = pAdd.typeName;
@@ -354,17 +278,17 @@ var couponType = new Vue({
 					index++;
 				}
 				//有效期
-				var validPeriod = this.pAdd.validPeriod;
+				var validPeriod = pAdd.validPeriod;
 				if(validPeriod !== '0' && validPeriod !== 0) {
 					var reg = /^[1-9]+[0-9]*$/;
 					if(!reg.test(validPeriod)) {
-						this.pAdd.validPeriodShow = true;
+						that.pAdd.validPeriodShow = true;
 						index++;
 					} else {
-						this.pAdd.validPeriodShow = false;
+						that.pAdd.validPeriodShow = false;
 					}
 				} else {
-					this.pAdd.validPeriodShow = false;
+					that.pAdd.validPeriodShow = false;
 				}
 				//订单满足条件
 				var conditionValue = parseInt(pAdd.conditionValue);
@@ -381,102 +305,64 @@ var couponType = new Vue({
 				if(index > 0) {
 					return false;
 				} else {
-					if(pAdd.Id === -1) { //添加
+					if(pAdd.id === -1) { //添加
 						content = {
-							TypeName: typeName,
-							ParValue: parValue,
-							UseRange: pAdd.useRangeId == 0 ? pAdd.useRangeId : pAdd.useRangeResultId,
-							ValidPeriod: validPeriod,
-							ConditionValue: conditionValue,
-							IsRepeatable: pAdd.isRepeatable,
-							IsMixable: pAdd.isMixable,
-							CouponType: pAdd.couponType
+							couponTypeName: typeName,
+							parValue: parValue,							
+							couponAssignType: pAdd.useRangeId ,
+							storeId:pAdd.useRangeId == 2 ? pAdd.useRangeResultId : '',
+							validPeriod: validPeriod,
+							conditionValue: conditionValue,
+							isRepeatable: pAdd.isRepeatable,
+							isMixable: pAdd.isMixable,
+							couponType: pAdd.couponType
 						}
 					} else { //编辑
 						content = {
-							Id: pAdd.id,
-							TypeName: typeName,
-							ParValue: parValue,
-							UseRange: pAdd.useRangeId == 0 ? pAdd.useRangeId : pAdd.useRangeResultId,
-							ValidPeriod: validPeriod,
-							ConditionValue: conditionValue,
-							IsRepeatable: pAdd.isRepeatable,
-							IsMixable: pAdd.isMixable,
-							CouponType: pAdd.couponType
+							id: pAdd.id,
+							couponTypeName: typeName,
+							parValue: parValue,							
+							couponAssignType: pAdd.useRangeId,
+							storeId:pAdd.useRangeId == 2 ? pAdd.useRangeResultId : '',
+							validPeriod: validPeriod,
+							conditionValue: conditionValue,
+							isRepeatable: pAdd.isRepeatable,
+							isMixable: pAdd.isMixable,
+							couponType: pAdd.couponType
 						}
 					}
 
 				}
-			} else { //物理券
-				content = {}
 			}
 			this.loadingShow = true;
-			PostAjax2(this, content, '/Coupon/SetCouponType', function(data) {
-				if(data.status == "200") {
-					fadeInOut(data.msg);
-					this.GetCouponTypeList(1);
-					this.pAdd = {
-						uSelect: [{
-							Id: 0,
-							Name: "全场"
-						}, {
-							Id: -1,
-							Name: "单个"
-						}],
-						popupName: '', //添加/编辑
-						popupShow: false, //弹框
-						useRangeId: 0, //优惠券指定类型（Id）
-						pUR: { //使用范围
-							shopNameIsShow: false,
-							useRangeSearch: "", //单个，搜索店铺
-							useRangeSearchResult: [], //搜索结果
-						},
-						useRangeResult: "", //单个：配送商店铺名
-						useRangeResultId: -1, //单个：配送商店铺Id
-						useRangeResultShow: false,
-						id: -1, //编辑Id
-						typeName: "", //优惠券类型名称
-						typeNameShow: "",
-						parValue: "", //优惠券金额
-						parValueShow: false,
-						useRange: "", //使用范围（0 全场 >0 单个配送商Id）
-						validPeriod: 0, //有效期（天）
-						validPeriodShow: false,
-						pG: { //商品
-							goodsNameIsShow: true, //商品
-							goodsSearch: "", //单个，搜索店铺
-							goodsSearchResult: [], //搜索结果
-						},
-						goodsName: "",
-						goodsId: "",
-						goodsNameShow: false,
-						conditionValue: "", //订单总额满足
-						conditionValueShow: false,
-						isRepeatable: 0, //是否可以叠加使用
-						isMixable: 0, //是否混合使用
-						couponType: 1, //优惠券形式
-					}
-					this.fBgIsShow = false;
-				} else {
-					this.loadingShow = false;
-					//					this.fBgIsShow = false;
-					fadeInOut(data.msg);
+			console.log(content)
+			that.pAdd.popupShow = false;
+			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
+				console.log(data);
+				that.loadingShow = false;				
+				if(pAdd.id === -1){					
+					that.formInline.pageNo = 1;				
+					that.getData();
+				}else{		
+					Vue.set(that.couponList, that.pAdd.index, data)
 				}
-			}.bind(this))
+				that.PopupConcel();
+			},'','','','','','',4)
 		},
 		PopupConcel: function() {
 			this.fBgIsShow = false;
 			this.pAdd = {
+				index:'',
 				uSelect: [{
-					Id: 0,
-					Name: "全场"
+					id: 1,
+					name: "全场"
 				}, {
-					Id: -1,
-					Name: "单个"
+					id: 2,
+					name: "单个"
 				}],
 				popupName: '', //添加/编辑
 				popupShow: false, //弹框
-				useRangeId: 0, //优惠券指定类型（Id）
+				useRangeId: 1, //优惠券指定类型（Id）
 				pUR: { //使用范围
 					shopNameIsShow: false,
 					useRangeSearch: "", //单个，搜索店铺
@@ -493,84 +379,59 @@ var couponType = new Vue({
 				useRange: "", //使用范围（0 全场 >0 单个配送商Id）
 				validPeriod: 0, //有效期（天）
 				validPeriodShow: false,
-				pG: { //商品
-					goodsNameIsShow: true, //商品
-					goodsSearch: "", //单个，搜索店铺
-					goodsSearchResult: [], //搜索结果
-				},
-				goodsName: "",
-				goodsId: "",
-				goodsNameShow: false,
 				conditionValue: "", //订单总额满足
 				conditionValueShow: false,
 				isRepeatable: 0, //是否可以叠加使用
 				isMixable: 0, //是否混合使用
 				couponType: 1, //优惠券形式
 			};
-			this.DeleteDisplay = {
-				deleteIsShow: false,
-				index: -1,
-				name: ''
-			};
 		},
-		EditCouponType: function(index) { //编辑
-			var editData = this.searchResult[index];
+		EditCouponType: function(index,data) { //编辑
+			console.log(index)
+			console.log(data)
+			var editData = data;
 			var pAdd = this.pAdd;
+			pAdd.index = index;
 			pAdd.popupName = '编辑';
-			pAdd.id = editData.Id;
-			pAdd.typeName = editData.TypeName;
-			pAdd.couponType = editData.CouponType;
-			pAdd.useRangeId = editData.UseRange == 0 ? editData.UseRange : -1;
-			pAdd.useRangeResult = editData.UseRange == 0 ? '' : editData.UnitName;
-			pAdd.useRangeResultId = editData.UseRange == 0 ? -1 : editData.UseRange;
-			pAdd.parValue = editData.ParValue;
-			pAdd.validPeriod = editData.ValidPeriod;
-			pAdd.conditionValue = editData.ConditionValue;
-			pAdd.isRepeatable = editData.IsRepeatable ? 1 : 0;
-			pAdd.isMixable = editData.IsMixable ? 1 : 0;
+			pAdd.id = editData.id;
+			pAdd.typeName = editData.couponTypeName;
+			pAdd.couponType = 1;
+			pAdd.useRangeId = parseInt(editData.couponAssignType);
+			pAdd.useRangeResult = pAdd.useRangeId == 1 ? '' : editData.nyCustomStore.storeName;
+			pAdd.useRangeResultId = editData.storeId == '' ? -1 : editData.storeId;
+			pAdd.parValue = editData.parValue;
+			pAdd.validPeriod = editData.validPeriod;
+			pAdd.conditionValue = editData.conditionValue;
+			pAdd.isRepeatable = parseInt(editData.isRepeatable);
+			pAdd.isMixable = parseInt(editData.isMixable);
 			this.fBgIsShow = true;
 			pAdd.popupShow = true;
+			console.log(this.pAdd.index)
 		},
-		SetStatusChange: function(index) { //启动/停止
-			var item = this.searchResult[index];
-			item.Status = (item.Status == 1 ? -1 : 1);
-			this.loadingShow = true;
+		changeTypes: function(index,data) { //启动/停止
+			console.log(data)
+			var that = this;			
+			that.pAdd.index = index;
+			that.loadingShow = true;
+			var isUse = data.isUse == 1 ? 0 : 1
 			var content = {
-				Id: item.Id,
-				status: item.Status
+				id: data.id,
+				isUse: isUse,
+				couponTypeName: data.couponTypeName,
+				parValue: data.parValue,							
+				couponAssignType: data.couponAssignType,
+				storeId:data.storeId,
+				validPeriod: data.validPeriod,
+				conditionValue: data.conditionValue,
+				isRepeatable: data.isRepeatable,
+				isMixable: data.isMixable,
+				couponType: data.couponType
 			}
-			PostAjax2(this, content, '/Coupon/SetCouponTypeStatus', function(data) {
-				if(data.status == "200") {
-					fadeInOut(data.msg);
-					this.searchResult[index] = item;
-					this.loadingShow = false;
-				} else {
-					this.loadingShow = false;
-					fadeInOut(data.msg);
-				}
-			}.bind(this))
-		},
-		SetIsDelete: function() { //删除
-			this.loadingShow = true;
-			var content = {
-				Id: this.DeleteDisplay.Id,
-				IsDelete: 1
-			}
-			PostAjax2(this, content, '/Coupon/SetCouponTypeStatus', function(data) {
-				if(data.status == "200") {
-					this.GetCouponTypeList(this.pageNo);
-					fadeInOut(data.msg);
-					this.DeleteDisplay = {
-						deleteIsShow: false,
-						Id: -1,
-						name: ''
-					};
-					this.fBgIsShow = false;
-				} else {
-					this.loadingShow = false;
-					fadeInOut(data.msg);
-				}
-			}.bind(this))
+			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
+				console.log(data);
+				that.loadingShow = false;				
+				Vue.set(that.couponList, that.pAdd.index, data)
+			},'','','','','','',4)
 		},
 		handleCurrentChange: function (val) {
             this.formInline.pageNo = val
@@ -595,15 +456,18 @@ var couponType = new Vue({
 	    },
 	    handleSelect(item) {
         	console.log(item);
-      	}
+	    },
+	    getKeyWords:function(){
+	      	var that = this;
+	      	PostAjax(that, 'post', {"types":"CouponSpecifiedType"}, '/layer/dict/sysDict/listByTypes', function(data) {
+	      		console.log(data)
+				that.serachData.useRange = data.CouponSpecifiedType;
+
+			},'','','','','',1,1)
+	    }
 	},
 	created: function() {
-		var that = this;		
-//		PostAjax(that, 'post', '', '/nycoupon/nyCoupon/list', function(data) {
-//			that.searchResult = data.result
-//		})
-//		PostAjax(that,'get','','/limitoperateflag/tLimitOperateConfig/list',function(data){
-//			
-//		})
+		var that = this;	
+		that.getKeyWords();
 	}
 })

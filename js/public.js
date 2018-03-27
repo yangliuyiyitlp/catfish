@@ -124,7 +124,7 @@ function fadeInOut(msg){
 	var time = null;
 	var time1 = null;
 	var div = document.createElement("div");
-	div.innerHTML = '<p>'+ msg +'</p>';
+	div.innerHTML = '<p id="msgP">'+ msg +'</p>';
 	div.setAttribute('id','integral_fixed');
 	document.body.appendChild(div);
 	var num=0;
@@ -144,13 +144,13 @@ function fadeInOut(msg){
 				        clearInterval(time1);
 				        document.body.removeChild(document.getElementById("integral_fixed"));
 				    }else{					
-				    	document.getElementById("integral_fixed").style.background='rgba(0,0,0,'+(num/400)+')';
+				    	document.getElementById("msgP").style.background='rgba(0,0,0,'+(num/400)+')';
 				    }
 				  },50)
 	        },1000)
 	    }
 	    document.getElementById("integral_fixed").style.display = 'block';
-	    document.getElementById("integral_fixed").style.background='rgba(0,0,0,'+(num/400)+')';
+	    document.getElementById("msgP").style.background='rgba(0,0,0,'+(num/400)+')';
 	    
 	},50)	
 }
