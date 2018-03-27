@@ -9,43 +9,47 @@
 		<link rel="stylesheet" href="../css/public.css" />		
 	</head>
 	<body>
-		<div id="couponType" class="erp_content wp" v-clock v-on:click="shopNameIsShow=false,pAdd.pUR.shopNameIsShow=false,pAdd.pG.goodsNameIsShow=false">
+		<div id="couponType" class="erp_content wp" v-clock  v-on:click="shopNameIsShow=false,pAdd.pUR.shopNameIsShow=false">
 			<!--筛选头部-->
 			<div class="searchPart">
 				<div class="searchItem">
 					<label>优惠劵指定类型：</label>
-					<el-select v-model="coupontype" class="smSelect">
+					<el-select v-model="serachData.couponAssignType" class="smSelect">
 					    <el-option
-					      v-for="item in useRangeSelect"
-					      :key="item.Id"
-					      :label="item.Name"
-					      :value="item.Id">
+					      v-for="item in serachData.useRange"
+					      :key="item.value"
+					      :label="item.label"
+					      :value="item.value">
 					    </el-option>
 					</el-select>
-					<el-autocomplete
-				      class="inline-input"
-				      v-model="useRangeResult"
-				      :fetch-suggestions="querySearch"
-				      placeholder=""
-				      :trigger-on-focus="false"
-				      @select="handleSelect"
-				      :disabled="true"
-				    ></el-autocomplete>
-					<!--<el-input v-model="useRangeResult" ></el-input>-->
+					<div class="el-input">
+						<input class="el-input__inner" v-on:click.stop="SingleClick(1)" readonly="readonly" v-model="serachData.storeName" type="text" name="" id="" value="" />
+					</div>
+					<em class="pa emClear" v-show="clearIsShow" v-on:click="serachData.storeName='',serachData.storeId='',clearIsShow=false">
+						<i class="el-icon-close"></i>
+					</em>	
 				</div>
 				<div class="searchItem">
-					<label>名称：</label> <el-input v-model="typeName"></el-input>
+					<label>名称：</label> <el-input v-model="serachData.couponTypeName"></el-input>
 				</div>
 				<div class="searchItem">
-					<label>金额：</label> <el-input v-model="parValue"></el-input>
-				</div>            	
+					<label>金额：</label> <el-input v-model="serachData.parValue"></el-input>
+				</div> 
+				<div class="shopDiv searchDiv pa" v-show="shopNameIsShow" v-on:click.stop="shopNameIsShow=true" >
+					<h3>
+						<input type="text" placeholder="输入店铺名称" :value="useRangeSearch" v-model="useRangeSearch" v-on:keydown="KeyDownEnter($event,1)" spellcheck="false"/>
+						<el-button type="search" style="width: 80px;" size="small" round v-on:click.stop="GetSearchShop(1)">搜索</el-button>
+					</h3>
+					<ul>
+						<li v-for="item in useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,1)">{{item.storeName}}</li>
+					</ul>
+				</div>
 				<div class="btnPart">
-	                <el-button type="search" round v-on:click="getData">查询</el-button>
-	  				<el-button round>添加</el-button>
+	                <el-button type="search" round @click="getData">查询</el-button>
+	  				<el-button round v-on:click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true">添加</el-button>
 	           </div>
-			</div>
-			
-            <el-table :data="searchResult" border style="margin: 0 auto; width: 97.5%;">
+			</div>			
+            <el-table :data="couponList" border style="margin: 20px auto; width: 97.5%;">
                 <el-table-column
                         align="center"
                         prop="id"
@@ -54,38 +58,46 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeNam"
+                        prop="couponTypeName"
                         label="名称">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeNam"
+                        prop="parValue"
                         label="金额（元）">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeAddr"
+                        prop="validPeriod"
                         label="有效时长（天）">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeTel"
                         label="优惠券指定类型">
+                        <template slot-scope="scope">
+                        	{{serachData.useRange[scope.row.couponAssignType].label !='单个' ? serachData.useRange[scope.row.couponAssignType].label : scope.row.nyCustomStore.storeName}}
+					    </template>
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="conditionValue"
                         label="订单满足条件（元）">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="isRepeatable"
                         label="是否可以叠加">
+                        <template slot-scope="scope">
+                        	{{scope.row.isRepeatable == 0 ? '否' : '是'}}
+					    </template>
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="isMixable"
                         label="是否混合使用">
+                        <template slot-scope="scope">
+                        	{{scope.row.isMixable == 0 ? '否' : '是'}}
+					    </template>
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -93,11 +105,14 @@
                         label="操作"
                         width="120">
                     <template slot-scope="scope">
+                    	<el-button round size="small" @click="EditCouponType(scope.$index,scope.row)">编辑</el-button>
                         <el-switch
-                                v-model="isOn"
-                                active-color="#13ce66"
-                                inactive-color="#ff4949">
-                        </el-switch>
+                                v-model="scope.row.isUse"
+                                active-color="#DB5050"
+                                inactive-color="#4F4D4D"
+                                @change="changeTypes(scope.$index,scope.row)"
+                                >
+                        </el-switch>                        
                     </template>
                 </el-table-column>
             </el-table>
@@ -114,64 +129,77 @@
 			<p class="loading_p" v-show="loadingShow"><img src="../images/loading.gif" /></p>
 			<div id="fixedBg" v-show="fBgIsShow"></div>
 			<div class="popup_public" v-show="pAdd.popupShow" v-on:click="pAdd.pUR.shopNameIsShow=false">
-				<div class="erp_close" v-on:click="PopupConcel()"></div>
 				<h2>{{pAdd.popupName}}</h2>
 				<div class="edit_area pr">
-					<p class="required"><label><em>*</em>名称：</label><input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" /><span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span></p>
+					<p class="required">
+						<label><em>*</em>名称：</label>
+						<input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" />
+						<span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span></p>					
+					<!--<p class="required"><label><em>*</em>名称：</label><input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" /><span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span></p>-->
 					<p class="required"><label><em>*</em>优惠券形式：</label>
-						<select v-model="pAdd.couponType">
-							<option value="1">虚拟券</option>
-							<!--<option value="2">物理券</option>-->
-						</select>
+						<el-select v-model="pAdd.couponType">
+						    <el-option
+						      v-for="item in couponTypeList"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						</el-select>
 					</p>
 					<p class="required"><label><em>*</em>优惠券指定类型：</label>
-						<select v-model="pAdd.useRangeId" style="width: 60px;" v-on:change="changeUseRange($event,2)">
-							<option v-once v-for="item in pAdd.uSelect" :value="item.Id">{{item.Name}}</option>
-						</select>
-						<input type="text" :value="pAdd.useRangeResult" v-on:click.stop="SingleClick(2)" readonly="readonly" style="width: 170px;float: none;display: inline-block;" /><span v-show="pAdd.useRangeResultShow">请选择指定类型</span>
+						<el-select v-model="pAdd.useRangeId" class="smSelect">
+						    <el-option
+						      v-for="item in pAdd.uSelect"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						</el-select>
+						<input class="el-input__inner" v-on:click.stop="SingleClick(2)" readonly="readonly" v-model="pAdd.useRangeResult" type="text" name="" id="" value="" />
+						<span v-show="pAdd.useRangeResultShow">请选择指定类型</span>
 					</p>
 					<p class="required canSearch" v-show="pAdd.couponType==2?true:false"><label><em>*</em>商品名称：</label><input type="text" class="coupon_good" :value="pAdd.goodsName" readonly="readonly" v-on:click.stop="SingleClick(3)" /><span v-show="pAdd.goodsNameShow">请选择商品</span>
 						<span class="nameSearch"></span>
 					</p>
 					<p class="required" v-show="pAdd.couponType==1?true:false"><label><em>*</em>金额：</label><input type="text" class="int" :value="pAdd.parValue" v-model="pAdd.parValue" v-on:blur="BlurValue($event,'parValue')" maxlength="20" /><span v-show="pAdd.parValueShow">请输入正整数</span></p>
 					<p><label>有效天数：</label><input type="text" class="int" value="pAdd.validPeriod" v-model="pAdd.validPeriod" v-on:blur="BlurValue($event,'validPeriod')" maxlength="20" /><em>(注：0为永久)</em><span v-show="pAdd.validPeriodShow">请输入0或正整数</span></p>
-					<div v-show="pAdd.couponType==1?true:false">
-						<p class="required type1"><label><em>*</em>订单满足条件：</label><input type="text" class="int" :value="pAdd.conditionValue" v-model="pAdd.conditionValue" v-on:blur="BlurValue($event,'conditionValue')" maxlength="20" /><span v-show="pAdd.conditionValueShow">请输入正整数</span></p>
-						<p class="required type1">
-							<label><em>*</em>是否叠加：</label>
-							<select v-model="pAdd.isRepeatable">
-								<option value="0">否</option>
-								<option value="1">是</option>
-							</select>
-						</p>
-						<p class="required type1">
-							<label><em>*</em>是否混合使用：</label>
-							<select v-model="pAdd.isMixable">
-								<option value="0">否</option>
-								<option value="1">是</option>
-							</select>
-						</p>
-					</div>
+					<p class="required type1"><label><em>*</em>订单满足条件：</label><input type="text" class="int" :value="pAdd.conditionValue" v-model="pAdd.conditionValue" v-on:blur="BlurValue($event,'conditionValue')" maxlength="20" /><span v-show="pAdd.conditionValueShow">请输入正整数</span></p>
+					<p class="required type1">
+						<label><em>*</em>是否叠加：</label>
+						<el-select v-model="pAdd.isRepeatable" class="smSelect">
+						    <el-option
+						      v-for="item in isRepeatableList"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						</el-select>
+					</p>
+					<p class="required type1">
+						<label><em>*</em>是否混合使用：</label>
+						<el-select v-model="pAdd.isMixable" class="smSelect">
+						    <el-option
+						      v-for="item in isMixableList"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						</el-select>
+					</p>
 					<div class="AddDiv searchDiv pa" v-show="pAdd.pUR.shopNameIsShow" v-on:click.stop="pAdd.pUR.shopNameIsShow=true">
 						<h3>
 							<input type="text" placeholder="输入店铺名称" :value="pAdd.pUR.useRangeSearch" v-model="pAdd.pUR.useRangeSearch" v-on:keydown="KeyDownEnter($event,2)" spellcheck="false"/>
 							<input type="button" value="搜索" v-on:click="GetSearchShop(2)"/>
 						</h3>
 						<ul>
-							<li v-for="item in pAdd.pUR.useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,2)">{{item.UnitName}}</li>
-						</ul>
-					</div>
-					<div class="GoodsDiv searchDiv pa" v-show="pAdd.pG.goodsNameIsShow" v-on:click.stop="pAdd.pG.goodsNameIsShow=true">
-						<h3>
-							<input type="text" placeholder="输入商品名称" :value="pAdd.pG.goodsSearch" v-model="pAdd.pG.goodsSearch" v-on:keydown="KeyDownEnter($event,3)" spellcheck="false"/>
-							<input type="button" value="搜索" v-on:click="GetSearchGoods()"/>
-						</h3>
-						<ul>
-							<li v-for="item in pAdd.pG.goodsSearchResult" v-on:click.stop="ShopSelect($event,item,3)">{{item.UnitName}}</li>
+							<li v-for="item in pAdd.pUR.useRangeSearchResult" v-on:click.stop="ShopSelect($event,item,2)">{{item.storeName}}</li>
 						</ul>
 					</div>
 				</div>
-				<p class="edit_sure_box"><input type="button" class="edit_sure" value="确定" v-on:click="AddCouponType()" /></p>
+				<p class="edit_sure_box">
+					<el-button round @click="PopupConcel">取消</el-button>
+	  				<el-button round type="search" v-on:click="AddCouponType()">确定</el-button>
+				</p>
 			</div>
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
