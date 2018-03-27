@@ -1,11 +1,14 @@
 .el-input{
     width:250px;
-    height:40px;
+    /*height:40px;*/
     background:rgba(255,255,255,1);
     border-radius: 8px ;
 }
 .storeName{
     margin-bottom:50px;
+}
+.redTip{
+    color:red;
 }
 .storeTable{
     padding:20px;
@@ -37,6 +40,11 @@
     outline-style: none;
     cursor: pointer;
 }
+.modify{
+    font: 400 13.3333px Arial;
+    color:#409EFF;
+    cursor: pointer;
+}
 .query{
     color:#fff;
     border:1px solid rgba(219,80,80,1);
@@ -47,8 +55,11 @@
 .storeTop{
     width:70px;
 }
-.storeTime{
-    float:left;
+.storeTime {
+     float:left;
+ }
+.storeTime .el-form-item__error{
+    width:200px;
 }
 .el-date-editor.el-input, .el-date-editor.el-input__inner,.week .el-input{
     width:170px;
@@ -60,11 +71,14 @@
     width:420px;
 }
 .timeDate{
-    width:750px;
-    margin-bottom:22px;
+    width:800px;margin-bottom:22px;
 }
-.weekInput{
-    float:right;
+.weekDate{
+   height:40px;float:right
+}
+.timeTip{
+    height:40px;
+    line-height: 40px;
 }
 .el-cascader .el-input{
     width:325px;
@@ -82,7 +96,6 @@
 }
 
 .avatar-uploader-icon {
-    /*margin-top: 20px;*/
     font-size: 28px;
     color: #8c939d;
     width: 88px;
@@ -130,22 +143,16 @@ textarea{
     -webkit-transform: translateY(0%);
     transform: translateY(0%);
 }
-#demo3 select{
-    /*-webkit-appearance: none;*/
-    /*background-color: #fff;*/
-    /*background-image: none;*/
-    border-radius: 4px;
-    border: 1px solid #dcdfe6;
-    /*-webkit-box-sizing: border-box;*/
-    /*box-sizing: border-box;*/
-    color: #606266;
-    display: inline-block;
-    font-size: inherit;
-    height: 40px;
-    line-height: 40px;
-    /*outline: 0;*/
-    padding: 0 15px;
-    -webkit-transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-    transition: border-color .2s cubic-bezier(.645,.045,.355,1);
-    width: 150px;
-}
+/*#demo3 select{*/
+    /*border-radius: 4px;*/
+    /*border: 1px solid #dcdfe6;*/
+    /*color: #606266;*/
+    /*display: inline-block;*/
+    /*font-size: inherit;*/
+    /*height: 40px;*/
+    /*line-height: 40px;*/
+    /*padding: 0 15px;*/
+    /*-webkit-transition: border-color .2s cubic-bezier(.645,.045,.355,1);*/
+    /*transition: border-color .2s cubic-bezier(.645,.045,.355,1);*/
+    /*width: 150px;*/
+/*}*/

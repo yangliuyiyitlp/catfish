@@ -4,7 +4,7 @@ var store = new Vue({
         return {
             activeName: 'first',
             title: '',
-            storeLongCity: '',
+            reg: false,
             formInline: {
                 pageSize: 30,
                 pageNo: 1,
@@ -33,7 +33,10 @@ var store = new Vue({
                 label: '周日'
             }],
             tableData: [],
-            ruleForm: {},
+            ruleForm: {
+                longitude: '',
+                latitude: '',
+            },
             Weekday: [],
             Token: {},
             iconUrl: '',
@@ -42,20 +45,23 @@ var store = new Vue({
                 storeName: [{required: true, message: '请输入门店名称', trigger: 'blur'},
                     {min: 0, max: 20, message: '长度小于20字符', trigger: 'blur'}],
                 storeTel: {required: true, message: '请输入联系电话', trigger: 'blur'},
-                storeCity: {required: true, message: '请选择区域', trigger: 'blur'},
+                selectedCities: {required: true, message: '请选择区域', trigger: 'blur'},
                 storeAddr: {required: true, message: '请输入详细地址', trigger: 'blur'},
                 storePic1: {required: true, message: '请选择门店照片', trigger: 'blur'},
-                businessTime: {required: true, message: '请选择运营时间', trigger: 'blur'},
+                businessBeginTime: {required: true, message: '请选择运营时间', trigger: 'blur'},
                 Weekday: {required: true, message: '请选择星期', trigger: 'blur'},
                 storeRecommend: {required: true, message: '请输入商家推荐', trigger: 'blur'}
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
             loadingshow: false,
-            allCities:[],
+            allCities: [],
             props: {
-                value: 'label',
+                value: 'value',
+                id: 'label',
                 children: 'children'
-            }
+            },
+            selectedCities: [],
+            cityNames:''
         }
     },
     created: function () {
@@ -155,8 +161,16 @@ var store = new Vue({
                 local.search(myValue);
             }
         },
-        storeBlur: function () {
+        storeBlur: function (val) {
             var that = this
+
+            // that.ruleForm.storeLongCity = that.cityNames+ myValue
+            // console.log(88888,that.ruleForm.storeLongCity);
+            // console.log(444,val);
+
+            // console.log(5555,that.ruleForm.storeAddr);
+            // that.ruleForm.storeLongCity = that.cityNames+ myValue
+            // console.log(88888,that.ruleForm.storeLongCity);
             var marker
             // 点坐标
             // 创建地址解析器实例
@@ -181,6 +195,8 @@ var store = new Vue({
                     that.$message.warning('您选择地址没有解析到坐标')
                 }
             });
+
+
 
             function setPlace() {
                 map.clearOverlays();    //清除地图上所有覆盖物
@@ -207,10 +223,7 @@ var store = new Vue({
         handleClick: function (tab, event) {
             console.log(tab.name)
             if (tab.name = 'second') {
-                this.$refs['ruleForm'].resetFields()
-                this.ruleForm = {}
-                this.title = '新增'
-                this.mapSelect('', '', '')
+                this.setEmptyForm()
             }
         },
         handleSizeChange: function (val) {
@@ -268,9 +281,9 @@ var store = new Vue({
         },
         isOnChange: function (row) {
             var flag
-            if (row.openFlag = '1') {
+            if (row.openFlag == '1') {
                 flag = '0'
-            } else if (row.openFlag = '0') {
+            } else if (row.openFlag == '0') {
                 flag = '1'
             }
             PostAjax(this, 'post', {
@@ -302,8 +315,10 @@ var store = new Vue({
                 that.Weekday = that.ruleForm.businessWeekday.split(',');
 
                 //地区
-                // $('#demo3 select[name="province"]').val('安徽省')
-                that.storeLongCity = '' + that.ruleForm.storeAddr;
+                that.selectedCities =[]
+                that.selectedCities.push(that.ruleForm.storeProvinceid, that.ruleForm.storeCityid, that.ruleForm.storeRegionid, that.ruleForm.storeStreetid)
+                // that.ruleForm.storeLongCity = trim(that.ruleForm.storeProvinceName +that.ruleForm.storeCityName +that.ruleForm.storeRegionName +that.ruleForm.storeStreeName + that.ruleForm.storeAddr);
+                // console.log(666666,that.ruleForm.storeLongCity);
                 //地图
                 that.mapSelect(that.ruleForm.longitude, that.ruleForm.latitude, that.ruleForm.storeAddr)
 
@@ -312,71 +327,133 @@ var store = new Vue({
             })
         },
         addForm: function () {
-            this.$refs['ruleForm'].resetFields()
+            this.setEmptyForm()
             this.activeName = 'second'
-            this.ruleForm = {}
+        },
+        setEmptyForm:function(){
+            this.$refs['ruleForm'].resetFields()
+            this.iconUrl = ''
+            this.cityNames = ''
+            this.selectedCities =[]
+            this.Weekday =[]
             this.title = '新增'
-            this.mapSelect('', '', '')
-            console.log(this.activeName)
+            this.ruleForm = {'longitude': '121.487899', 'latitude': '31.249162','storeTel':'','selectedCities':[]}
+            this.mapSelect(this.ruleForm.longitude, this.ruleForm.latitude, '上海市')
         },
         resetForm: function (formName) {
-            // this.$refs[formName].resetFields();
+            this.$refs[formName].resetFields();
+            this.selectedCities =[]
+            this.iconUrl = ''
+            this.Weekday =[]
+            this.ruleForm.Weekday =[]
             this.ruleForm = {}
             return false;
         },
-        submitForm: function (row) {
+        submitForm: function (ruleForm) {
+            var _this = this
+            _this.ruleForm.businessWeekday = _this.Weekday.join(',')
+            _this.ruleForm.Weekday = _this.Weekday.join(',')
+            // 地区
+            _this.ruleForm.selectedCities =_this.selectedCities
+            console.log(89,_this.selectedCities)
             // 区号合并
-            if (this.ruleForm.storeTop) {
-                this.ruleForm.storeTel = this.ruleForm.storeTop + '-' + this.ruleForm.storeTel
+            console.log(_this.ruleForm.storeTel);
+            if(getpho(_this.ruleForm.storeTel) == false){
+                _this.reg =true
+                return
             }
-            this.ruleForm.businessWeekday=this.Weekday.join(',')
-                console.log(55,this.ruleForm);
-            PostAjax(this,'post',this.ruleForm,'/customstore/nyCustomStore/save',function(data){
-                this.ruleForm.storeTop = ''
-                this.activeName = 'first'
-                this.query()
-            },function(msg){fadeInOut(22,msg)},'','','','','',2)
-
+            if (_this.ruleForm.storeTop) {
+                if(getNumber(_this.ruleForm.storeTop) == false){
+                    _this.reg =true
+                    return
+                }
+                _this.ruleForm.storeTel = _this.ruleForm.storeTop + '-' + _this.ruleForm.storeTel
+            }
+            _this.reg =false
+            _this.$refs[ruleForm].validate(function (valid) {
+                if (valid) {
+                    _this.ruleForm.longitude = String(_this.ruleForm.longitude)
+                    _this.ruleForm.latitude =String(_this.ruleForm.latitude)
+                    PostAjax(_this, 'post', _this.ruleForm, '/layer/customstore/nyCustomStore/save', function (data) {
+                        _this.activeName = 'first'
+                        _this.query()
+                    }, function (msg) {
+                        if (_this.ruleForm.storeTel.indexOf('-') > -1) {
+                            _this.ruleForm.storeTop = _this.ruleForm.storeTel.split('-')[0]
+                            _this.ruleForm.storeTel = _this.ruleForm.storeTel.split('-')[1]
+                        }
+                        fadeInOut(msg)
+                    }, '', '', '', '', '')
+                } else {
+                    return false;
+                }
+            });
         },
         getCity: function () {
-            var _this =this
-            PostAjax(_this,'post','','/layer/position/provices/1',function (data) {
+            var _this = this
+            PostAjax(_this, 'post', '', '/layer/position/provices/1', function (data) {
                 _this.allCities = data
-                _this.allCities=[{
-                    "children": [],
-                    "value": "120",
-                    "label": "天津市"
-                },
-                    {
-                        "children": [],
-                        "value": "130",
-                        "label": "河北省"
-                    }]
-            },function(msg){}, '', '', '', 'application/x-www-form-urlencoded',1, 3)
+            }, function (msg) {
+            }, '', '', '', 'application/x-www-form-urlencoded', 1, 3)
         },
-        handleItemChange:function(val){
-            console.log(8989,val);
-            var _this =this
-            PostAjax(_this,'post','','/layer/position/cities/1',function (data) {
-                for(var i=0;i<_this.allCities.length;i++){
+        handleItemChange: function (val) {
+            var _this = this
+            if (val && val.length == 1) {
+                _this.ruleForm.storeProvinceid = val[0]
+                PostAjax(_this, 'post', '', '/layer/position/cities/' + val[0], function (data) {
+                    for (var i = 0; i < _this.allCities.length; i++) {
+                        if (val == _this.allCities[i].value) {
+                            _this.allCities[i].children = data
+                        }
+                    }
 
-                }
+                }, function (msg) {
+                }, '', '', '', 'application/x-www-form-urlencoded', 1, 3)
+            } else if (val && val.length == 2) {
+                console.log(33, val[0])
+                _this.ruleForm.storeCityid = val[1]
+                PostAjax(_this, 'post', '', '/layer/position/counties/' + val[1], function (data) {
+                    for (var i = 0; i < _this.allCities.length; i++) {
+                        var secondChild = _this.allCities[i].children
+                        if (secondChild.length > 0) {
+                            for (var j = 0; j < secondChild.length; j++) {
+                                if (val[1] == secondChild[j].value) {
+                                    secondChild[j].children = data
+                                }
+                            }
+                        }
+                    }
 
-            },function(msg){}, '', '', '', 'application/x-www-form-urlencoded',1, 3)
+                }, function (msg) {
+                }, '', '', '', 'application/x-www-form-urlencoded', 1, 3)
+            } else if (val && val.length == 3) {
+                console.log(33, val[0])
+                _this.ruleForm.storeRegionid = val[2]
+                PostAjax(_this, 'post', '', '/layer/position/towns/' + val[2], function (data) {
+                    for (var i = 0; i < _this.allCities.length; i++) {
+                        var secondChild = _this.allCities[i].children
+                        if (secondChild.length > 0) {
+                            for (var j = 0; j < secondChild.length; j++) {
+                                var throwChild = secondChild[j].children
+                                if (throwChild.length > 0) {
+                                    for (var k = 0; k < throwChild.length; k++) {
+                                        if (val[2] == throwChild[k].value) {
+                                            throwChild[k].children = data
+                                        }
+                                    }
+                                }
+
+                            }
+                        }
+
+                    }
+
+                }, function (msg) {
+                }, '', '', '', 'application/x-www-form-urlencoded', 1, 3)
+            } else if (val && val.length == 4) {
+                _this.ruleForm.storeStreetid = val[3]
+            }
+
         }
     }
 })
-
-// function searchRole (result, checkedRoles) {
-//     for (var i = 0; i < result.length; i++) {
-//         var item = result[i]
-//         if (item.children !== undefined && item.children.length > 0) {
-//             // 递归
-//             searchRole(item.children, checkedRoles)
-//         }
-//         if (item.roleId && item.roleId) {
-//             var arr = checkedRoles.push(item.id)
-//             return arr
-//         }
-//     }
-// }

@@ -59,6 +59,7 @@
                         label="门店名">
                 </el-table-column>
                 <el-table-column
+                        show-overflow-tooltip="false"
                         align="center"
                         prop="storeAddr"
                         label="联系地址">
@@ -83,12 +84,13 @@
                             启用
                         </button>
                         <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
-                        <el-button
+                        <span
+                                class="modify"
                                 @click="modifyRow(scope.row)"
                                 type="text"
                                 size="small">
                             修改
-                        </el-button>
+                        </span>
                     </template>
                 </el-table-column>
             </el-table>
@@ -111,41 +113,30 @@
                 </el-form-item>
                 <el-form-item label="联系电话：" prop="storeTel">
                     <el-input class='storeTop' v-model="ruleForm.storeTop" placeholder="区号"></el-input>
-                    <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
+                    <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input><span v-show='reg'class="redTip">电话位数请核实</span>
                 </el-form-item>
-                <el-form-item label="所属区域：" prop="storeCity">
-                    <!--<el-cascader-->
-                    <!--expand-trigger="hover"-->
-                    <!--:options="allCitys"-->
-                    <!--v-model="ruleForm.storeCity"-->
-                    <!--@change="handleChange">-->
-                    <!--</el-cascader>-->
+                <el-form-item label="所属区域：" prop="selectedCities">
                     <el-cascader
+                            id="cityName"
                             :options="allCities"
                             @active-item-change="handleItemChange"
                             :props="props"
+                            v-model="selectedCities"
                     ></el-cascader>
-
-                    <!--<div id="demo3" class="citys">-->
-                        <!--<p>-->
-                            <!--<select name="province"></select>-->
-                            <!--<select name="city"></select>-->
-                            <!--<select name="area"></select>-->
-                            <!--<select name="town"></select>-->
-                        <!--</p>-->
-                    <!--</div>-->
                 </el-form-item>
                 <el-form-item label="详细地址：" prop="storeAddr">
-                    <el-input id="suggestId" size="20" class='storeAddr' @blur="storeBlur" v-model="ruleForm.storeAddr"
-                              placeholder="请填写详细地址，以便买家联系（勿重复填写省市区信息）"></el-input>
+                    <el-input id="suggestId" size="20" class='storeAddr' @change="storeBlur"
+                              v-model="ruleForm.storeAddr"
+                              placeholder="请填写详细地址，以便买家联系"></el-input>
                     <div id="searchResultPanel"
                          style="border:1px solid #C0C0C0;width:150px;height:auto; display:none;"></div>
                 </el-form-item>
                 <el-form-item>
-                    <i class="el-icon-location-outline"></i>&nbsp;经度：<span>{{ruleForm.longitude}}</span>&nbsp;&nbsp;纬度：<span>{{ruleForm.latitude}}</span>
+                    <i class="el-icon-location-outline"></i>&nbsp;经度：<input v-model="ruleForm.longitude">纬度：<input
+                        v-model='ruleForm.latitude'>
                 </el-form-item>
 
-                <el-form-item label="地图定位：" prop="storeTel">
+                <el-form-item label="地图定位：">
                     <div id="l-map"></div>
                 </el-form-item>
 
@@ -162,8 +153,7 @@
                 avatar-uploader-icon"></i>
                     </el-upload>
                 </el-form-item>
-                <el-form-item label="运营时间：" prop="businessTime" class="storeTime">
-                    <input v-if=0 v-module="ruleForm.businessTime">
+                <el-form-item label="运营时间：" prop="businessBeginTime" class="storeTime">
                 </el-form-item>
                 <div class="timeDate">
                     <el-time-select
@@ -175,7 +165,7 @@
                                  end: '24:00'
                                }">
                     </el-time-select>
-                    -
+                    <span class=" timeTip">-</span>
                     <el-time-select
                             placeholder="结束时间"
                             v-model="ruleForm.businessEndTime"
@@ -186,7 +176,8 @@
                                      minTime: ruleForm.businessBeginTime
                                    }">
                     </el-time-select>
-                    <el-form-item label="星期：" prop="Weekday" class="weekInput">
+
+                    <el-form-item label="星期：" prop="Weekday" class="weekDate">
                         <el-select v-model="Weekday" multiple class="week">
                             <el-option
                                     v-for="item in weeks"
@@ -225,10 +216,10 @@
 
 <!-- 引入组件库 -->
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<!--<script src="https://cdn.jsdelivr.net/vue.resource/1.0.3/vue-resource.min.js"></script>-->
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
-<script type="text/javascript" src="http://api.map.baidu.com/getscript?v=3.0&ak=IK5AlGXoZ23tDAGjldRalicbhdpsrKwE"></script>
+<script type="text/javascript"
+        src="http://api.map.baidu.com/getscript?v=3.0&ak=IK5AlGXoZ23tDAGjldRalicbhdpsrKwE"></script>
 <script type="text/javascript" src="../js/public.js"></script>
 <script type="text/javascript" src="../js/storeManage.js"></script>
 

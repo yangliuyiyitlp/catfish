@@ -109,7 +109,16 @@ function getParameter(name) {
 	var r = window.location.search.substr(1).match(reg); 
 	if (r!=null) return decodeURIComponent(r[2]); return null;
 }
-
+//校验m-n位的数字
+function getNumber(str){
+   var pattern = /^\d{3,4}$/;
+    return pattern.test(str)
+}
+//校验m-n位的数字
+function getpho(str){
+    var pattern = /^\d{6,11}$/;
+    return pattern.test(str)
+}
 //提示弹框  全局
 function fadeInOut(msg){
 	var time = null;
