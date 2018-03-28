@@ -1,0 +1,169 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width"/>
+    <meta charset="UTF-8">
+    <title>商品分类管理</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/public.css"/>
+    <style>
+        #goods {
+            padding: 50px;
+        }
+
+        .title {
+            margin-bottom: 40px;
+            font-size: 16px;
+            font-family: MicrosoftYaHei;
+            font-weight: 900;
+        }
+
+        /*树模型开始*/
+        .expand {
+            background-color: #fff;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .expand > div {
+            height: 100%;
+            width: 100%;
+            margin: 10px auto;
+            overflow-y: auto;
+        }
+        .titleCenter {
+            width: 100%;
+            text-align: center;
+        }
+        .expand > div::-webkit-scrollbar-track {
+            box-shadow: inset 0 0 6px rgba(0, 0, 0, .3);
+            border-radius: 5px;
+        }
+
+        .expand > div::-webkit-scrollbar-thumb {
+            background-color: rgba(50, 65, 87, 0.5);
+            outline: 1px solid slategrey;
+            border-radius: 5px;
+        }
+
+        .expand > div::-webkit-scrollbar {
+            width: 10px;
+        }
+
+        .expand-tree {
+            border: none;
+            margin-top: 10px;
+        }
+
+        .expand-tree .el-tree-node.is-current,
+        .expand-tree .el-tree-node:hover {
+            overflow: hidden;
+        }
+
+        .expand-tree .is-current > .el-tree-node__content .tree-btn,
+        .expand-tree .el-tree-node__content:hover .tree-btn {
+            display: inline-block;
+        }
+
+        .expand-tree .is-current > .el-tree-node__content .tree-label {
+            font-weight: 600;
+            white-space: normal;
+        }
+
+        .classfiy {
+            font-size: 14px;
+            font-weight: 900;
+            left: 0;
+            margin: 10px 0 0 10px;
+        }
+    </style>
+</head>
+
+<body>
+<div id="goods" v-clock>
+    <el-row :gutter="0">
+        <el-col :span="6">
+            <div class="expand">
+                <div>
+                    <div class="titleCenter">
+                    <button class='smallAddForm' round type="button" @click="handleAddTop">添加</button>
+                    </div>
+                    <div class="classfiy">所有分类</div>
+                    <el-tree ref="expandMenuList" class="expand-tree"
+                             v-if="isLoadingTree"
+                             :data="treeList"
+                             node-key="id"
+                             highlight-current
+                             :props="defaultProps"
+                             :expand-on-click-node="false"
+                             :default-expanded-keys="defaultExpandKeys"
+                             @node-click="handleNodeClick"
+                    >
+                        <span class="custom-tree-node" slot-scope="{ node, data,store }">
+                        <span class="tree-expand">
+	                    	<span class="tree-label" v-show="data.isEdit">
+	                    		<el-input class="edit" size="mini" autofocus
+                                          v-model="data.name"
+                                          :ref="'treeInput'+data.id"
+                                          @click.stop.native="nodeEditFocus"
+                                          @blur.stop="nodeEditPass(store,data,node)"
+                                          @keyup.enter.stop.native="nodeEditPass(store,data,node)"></el-input>
+	                    	</span>
+	                    	<span v-show="!data.isEdit"
+                                  :class="[data.id > expandId ? 'tree-new tree-label' : 'tree-label']">
+	                    		<span>{{data.name}}</span>
+	                    	</span>
+	                    	<span class="tree-btn" v-show="!data.isEdit">
+	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)"></i>
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)"></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)"></i>
+	                    	</span>
+	                    </span>
+                            </span>
+                    </el-tree>
+                </div>
+            </div>
+        </el-col>
+
+        <el-col :span="15" :offsset="1">
+            <div v-if="isForm">
+            <p class="title">基本信息</p>
+            <el-form ref="formClass" :model="formClass" label-width="150px">
+                <el-input v-model="formClass.id" v-if="0"></el-input>
+                <el-form-item label="父级类型：">
+                    <el-input v-model="formClass.id"></el-input>
+                </el-form-item>
+                <el-form-item label="类别名称：">
+                    <el-input v-model="formClass.name" placeholder="不能超过10个字符长度" id="txtChinese"
+                              @blur="query"></el-input>
+                </el-form-item>
+                <el-form-item label="拼音助记词：">
+                    <el-input v-model="formClass.pinyi" disabled></el-input>
+                </el-form-item>
+                <el-form-item label="排序：">
+                    <el-input v-model="formClass.sort"></el-input>
+                </el-form-item>
+            </el-form>
+            <div class="btnBar">
+                <button class='query' round type="button" @click="submitForm">保存</button>
+                <button class="addForm" round type="button" @click="resetForm">取消</button>
+            </div>
+            </div>
+        </el-col>
+    </el-row>
+
+</div>
+
+<!-- 引入组件库 -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
+<script type="text/javascript" src="../js/public.js"></script>
+<script type="text/javascript" src="../js/goodsClassify.js"></script>
+<!--<script type="text/x-template" id="anchored-heading-template">-->
+<!---->
+<!--</script>-->
+</body>
+</html>

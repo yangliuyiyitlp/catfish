@@ -130,3 +130,38 @@ em{font-style:normal;font-weight:normal;}
 .edit_area p label em{color: #ff2929;font-size: 18px;}
 .edit_area p span{margin-left: 10px;font-size: 12px;color: #ff2929;float: left;}
 .edit_area p span.error_msg{display: block;}
+
+/*btnBar 外面的div   addForm白色框  query红色框 smallAddForm  mini框 如：<button class="query" round type="button">取消</button>*/
+.btnBar{
+	width:320px;
+	margin:24px auto;
+}
+.addForm,.query{
+	width:150px;
+	height:50px;
+	border-radius: 52px ;
+	outline-style: none;
+	cursor: pointer;
+}
+.addForm{
+	background:rgba(255,255,255,1);
+	color:#000;
+	border:1px solid #979797;
+}
+.query{
+	color:#fff;
+	border:1px solid rgba(219,80,80,1);
+	margin-right:10px;
+	float:left;
+	background:rgba(219,80,80,1);
+}
+.smallAddForm{
+	width:100px;
+	height:40px;
+	border-radius: 30px ;
+	outline-style: none;
+	cursor: pointer;
+	color:#fff;
+	border:1px solid rgba(219,80,80,1);
+	background:rgba(219,80,80,1);
+}
