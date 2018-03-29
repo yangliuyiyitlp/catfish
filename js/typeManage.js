@@ -117,15 +117,7 @@ var couponType = new Vue({
 				pageNo:that.formInline.pageNo				
 			}
 			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/list', function(data) {
-//				var newA = [];
-//				for (var i = 0;i<data.result.length;i++) {				
-//					var li = data.result[i];
-//					console.log(li)
-//					li.isRepeatable = li.isRepeatable == 0 ? '否': '是';
-//					li.isMixable = li.isMixable == 0 ? '否': '是';
-//					li.couponAssignType = that.serachData.useRange[li.couponAssignType].label
-//					newA[i] = li;			
-//				}
+				console.log(data)
 				that.couponList = data.result;
 				that.formInline.pageNo ++;
 			},'','','','','','',4)
@@ -334,12 +326,13 @@ var couponType = new Vue({
 
 				}
 			}
-			this.loadingShow = true;
+//			this.loadingShow = true;
 			console.log(content)
 			that.pAdd.popupShow = false;
+			that.fBgIsShow = false;
 			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
 				console.log(data);
-				that.loadingShow = false;				
+//				that.loadingShow = false;				
 				if(pAdd.id === -1){					
 					that.formInline.pageNo = 1;				
 					that.getData();
@@ -413,7 +406,7 @@ var couponType = new Vue({
 			var that = this;			
 			that.pAdd.index = index;
 			that.loadingShow = true;
-			var isUse = data.isUse == 1 ? 0 : 1
+			var isUse = data.isUse == true ? 0 : 1;
 			var content = {
 				id: data.id,
 				isUse: isUse,
