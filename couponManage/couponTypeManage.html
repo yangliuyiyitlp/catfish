@@ -59,7 +59,8 @@
                 <el-table-column
                         align="center"
                         prop="couponTypeName"
-                        label="名称">
+                        label="名称"
+                        width="200">
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -101,18 +102,15 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        fixed="right"
                         label="操作"
-                        width="120">
+                        width="150"
+                        >
                     <template slot-scope="scope">
                     	<el-button round size="small" @click="EditCouponType(scope.$index,scope.row)">编辑</el-button>
-                        <el-switch
-                                v-model="scope.row.isUse"
-                                active-color="#DB5050"
-                                inactive-color="#4F4D4D"
-                                @change="changeTypes(scope.$index,scope.row)"
-                                >
-                        </el-switch>                        
+                    	<span class="changeId pr" :class="scope.row.isUse == 1 ? 'checked':''" @click="changeTypes(scope.$index,scope.row)">
+                    		<em class="pa"></em>
+                    		{{scope.row.isUse == 1 ? '开启':'关闭'}}
+                    	</span>
                     </template>
                 </el-table-column>
             </el-table>
@@ -126,7 +124,6 @@
                     :total="pagination.count">
             </el-pagination>
 			<!--描述：弹窗-->
-			<p class="loading_p" v-show="loadingShow"><img src="../images/loading.gif" /></p>
 			<div id="fixedBg" v-show="fBgIsShow"></div>
 			<div class="popup_public" v-show="pAdd.popupShow" v-on:click="pAdd.pUR.shopNameIsShow=false">
 				<h2>{{pAdd.popupName}}</h2>

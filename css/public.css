@@ -85,6 +85,39 @@ em{font-style:normal;font-weight:normal;}
 .el-table .el-button{
 	width: 60px;
 }
+/*开启关闭按钮*/
+.changeId{
+	width: 60px;
+	background: #4F4D4D;
+	height:20px;
+	line-height: 20px;
+	display: inline-block;
+	color: #fff;
+	font-size: 12px;
+	border-radius: 15px;
+	text-align: center;
+	text-indent: 15px;
+	cursor: pointer;
+	box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.1) 
+}
+.changeId em{
+	display: block;
+	width:25px;
+	height: 25px;
+	left: -2px;
+	top: -2px;
+	background: #fff;
+	border-radius: 100%;
+	box-shadow: 0px 2px 5px 0px rgba(0,0,0,0.1) 
+}
+.changeId.checked{
+	background: #DB5050;
+	text-indent: 10px;
+	text-align: left;
+}
+.checked em{
+	left: 40px;
+}
 /*错误弹窗*/
 #integral_fixed{
 	position: fixed;
@@ -202,3 +235,6 @@ em{font-style:normal;font-weight:normal;}
 .AddDiv ul{
 	height: 150px;
 }
+/*loading*/
+#loading_p{position:fixed;top: 0;left: 0;bottom: 0;right: 0;background: none;margin: 0;height: 100%;}
+#loading_p img{display: block;margin: 0px auto;position: absolute;top: 50%;left: 50%;margin-left: -25px;margin-top: -27px;}

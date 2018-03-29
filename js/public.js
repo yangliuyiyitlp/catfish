@@ -20,6 +20,7 @@ if(adminId != null){
 //ContentType 内容类型   默认 application/json  还有 form-data , application/x-www-form-urlencoded
 //fadeIn 弹框是否显示    传1  不显示
 // urlDr
+//loadingFun();
 function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn,urlDr){
 	console.log(type)
     var netLink = 'http://192.168.0.164:8080';
@@ -37,7 +38,7 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 	var ConType = ContentType ? ContentType : 'application/json'
     console.log(content);
     if(showLod != 1){
-    	who.loadingshow = true;
+    	loadingFun();
     }
     axios({
 		method: type,
@@ -89,10 +90,10 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 			return false;
 		}
 		if(hideloa != 1) {
-			who.loadingshow = false;
+			document.body.removeChild(document.getElementById("loading_p"));
 		}
 	}).catch( function(error) {
-		who.loadingshow = false;
+		document.body.removeChild(document.getElementById("loading_p"));
 		fadeInOut('请检查网络连接');
 		console.log(error);
 	})
@@ -153,6 +154,14 @@ function fadeInOut(msg){
 	    document.getElementById("msgP").style.background='rgba(0,0,0,'+(num/400)+')';
 	    
 	},50)	
+}
+//加载框
+//提示弹框  全局
+function loadingFun(){
+	var div = document.createElement("p");
+	div.innerHTML = '<img src="../images/loading.gif" />';
+	div.setAttribute('id','loading_p');
+	document.body.appendChild(div);	
 }
 //JS生成GUID函数,类似.net中的NewID();
 function S4(){   
