@@ -472,7 +472,7 @@ var store = new Vue({
         getTreeList: function () {
             var _this = this
             PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/tree', function (data) {
-                _this.treeList = data
+                _this.treeList= data
                 _this.treeName =data[0].name
             }, function (msg) {
                 fadeInOut(msg);

@@ -23,7 +23,8 @@ if(adminId != null){
 //loadingFun();
 function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,showLod,ContentType,fadeIn,urlDr){
 	console.log(type)
-    var netLink = 'http://192.168.0.164:8080';
+    // var netLink = 'http://192.168.0.164:8080';
+    var netLink = 'http://192.168.0.216:10005';
 	if(urlDr == 1){
         netLink = 'http://192.168.0.167:10013';
 	}else if(urlDr == 2){

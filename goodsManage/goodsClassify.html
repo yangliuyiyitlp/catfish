@@ -127,7 +127,7 @@
 	                    	</span>
 	                    	<span class="tree-btn" >
 	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level ==1?false:true'></i>
-	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)"></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level ==1?false:true'></i>
 	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)"></i>
 	                    	</span>
 	                    </span>
