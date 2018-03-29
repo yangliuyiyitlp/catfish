@@ -80,9 +80,11 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 						failCallBack(data.data.msg)
 				}
 
-			} else {
-				fadeInOut('请检查网络连接');
+			} else if(data.data.code == 0 && data.data.data.length <=0){
+				fadeInOut('符合条件的数据为空');
 				console.log(data);
+			}else{
+                fadeInOut('请检查网络连接');
 			}
 		} else {
 			fadeInOut('请检查网络连接');
