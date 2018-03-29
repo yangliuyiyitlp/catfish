@@ -4,14 +4,15 @@ var store = new Vue({
         return {
             formClass: {catOrder:'0'},
             initials:'',
-            expandId: 0,
+            treeName:'',
+            // expandId: 0,
             treeList: [],
             isLoadingTree: false,//是否加载节点树
             defaultProps: {
                 children: 'children',
                 label: 'name'
             },
-            defaultExpandKeys: [],//默认展开节点列表
+            // defaultExpandKeys: [],//默认展开节点列表
             isForm: false,
             rules: {
                 name: [
@@ -37,7 +38,7 @@ var store = new Vue({
             var str = trim(document.getElementById("txtChinese").value);
             if (str == "") return;
             this.formClass.initials = this.makePy(str);
-            this.initials = this.makePy(str);
+            this.initials = this.formClass.initials
         },
         mkRslt: function (arr) {
             var arrRslt = [""];
@@ -46,7 +47,6 @@ var store = new Vue({
                 var strstrlen = str.length;
                 if (strstrlen == 1) {
                     for (var k = 0; k < arrRslt.length; k++) {
-                        console.log(33,str);
                         arrRslt[k] += str;
                     }
                 } else {
@@ -59,12 +59,10 @@ var store = new Vue({
                         for (var j = 0; j < tmp.length; j++) {
                             tmp[j] += str.charAt(k);
                         }
-                        console.log(44,arrRslt);
 //把复制并修改后的数组连接到arrRslt上
                         arrRslt = arrRslt.concat(tmp);
                     }
                 }
-                console.log(55,arrRslt);
             }
             return arrRslt;
         },
@@ -475,6 +473,7 @@ var store = new Vue({
             var _this = this
             PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/tree', function (data) {
                 _this.treeList = data
+                _this.treeName =data[0].name
             }, function (msg) {
                 fadeInOut(msg);
             }, '', '', '', '', 1)
@@ -490,13 +489,15 @@ var store = new Vue({
             this.isForm = true
             this.formClass ={}
             this.formClass.parent = null
-            this.formClass.parentName = '无'
+            this.formClass.parentName = this.treeName||'无'
             this.formClass.catOrder = '0'
+            this.formClass.initials = ''
+            this.initials = ''
 
         },
         handleAdd: function (s, d, n) {//增加节点
             if (n.level >= 3) {
-                this.$message.error("最多只支持三级！")
+                this.$message.warning("最多只支持三级！")
                 return false;
             }
             this.isForm = true
@@ -520,15 +521,14 @@ var store = new Vue({
                 _this.initials =  _this.formClass.initials
             }, function (msg) {
                 fadeInOut(msg);
-            })
+            }, '', '', '', '', 1)
 
         },
         handleDelete: function (s, d, n) {//删除节点
-            console.log(s, d, n)
             var _this=this
             //有子级不删除
             if (d.children && d.children.length !== 0) {
-                _this.$message.error("此分类有子级，不可删除！")
+                _this.$message.warning("此分类有子级，请先删子级！")
                 return false;
             } else {
                 isDel()
@@ -564,7 +564,6 @@ var store = new Vue({
             var _this = this
             this.formClass.initials = this.initials.join(',')
             this.initials = this.initials.join(',')
-            console.log(_this.formClass);
             PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/save', function (data) {
                 _this.getTreeList()
                 _this.isForm = false

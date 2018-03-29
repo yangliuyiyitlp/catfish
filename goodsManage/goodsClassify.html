@@ -96,7 +96,7 @@
             <div class="expand">
                 <div>
                     <div class="titleCenter">
-                    <button class='smallAddForm' round type="button" @click="handleAddTop">添加</button>
+                    <button class='smallAddForm' round type="button" @click="handleAddTop" >添加</button>
                     </div>
                     <div class="classfiy">所有分类</div>
                     <el-tree ref="expandMenuList" class="expand-tree"
@@ -106,7 +106,7 @@
                              highlight-current
                              :props="defaultProps"
                              :expand-on-click-node="false"
-                             :default-expanded-keys="defaultExpandKeys"
+                             default-expand-all
                              @node-click="handleNodeClick"
                     >
                         <span class="custom-tree-node" slot-scope="{ node, data,store }">
@@ -126,7 +126,7 @@
 	                    		<span>{{data.name}}</span>
 	                    	</span>
 	                    	<span class="tree-btn" >
-	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)"></i>
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level ==1?false:true'></i>
 	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)"></i>
 	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)"></i>
 	                    	</span>
