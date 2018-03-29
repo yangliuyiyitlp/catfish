@@ -270,10 +270,7 @@ em{font-style:normal;font-weight:normal;}
 .AddDiv ul{
 	height: 150px;
 }
-<<<<<<< HEAD
 /*loading*/
 #loading_p{position:fixed;top: 0;left: 0;bottom: 0;right: 0;background: none;margin: 0;height: 100%;}
 #loading_p img{display: block;margin: 0px auto;position: absolute;top: 50%;left: 50%;margin-left: -25px;margin-top: -27px;}
-=======
 
->>>>>>> 79c6a98cbc79bc1a636c20cb85aab2df610024c1
