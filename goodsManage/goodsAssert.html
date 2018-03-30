@@ -17,15 +17,15 @@
         <el-tab-pane label="商品列表" name="first">
             <el-form ref="formInline" :model="formInline" class="storeTable">
                 <label>名称：</label>
-                <el-input v-model="formInline.storeName"></el-input>
+                <el-input v-model="formInline.goodsName"></el-input>
                 <label>分类：</label>
-                <el-input v-model="formInline.customName"></el-input>
+                <el-button class="searchBtn" icon="el-icon-search" @click="searchMechanism">{{filterText}}</el-button>
                 <label>SKUID：</label>
-                <el-input v-model="formInline.customName"></el-input>
+                <el-input v-model="formInline.skuId"></el-input>
                 <label>条形码：</label>
-                <el-input v-model="formInline.customName"></el-input>
+                <el-input v-model="formInline.sn"></el-input>
                 <label>状态：</label>
-                <el-select v-model="formInline.value" placeholder="请选择">
+                <el-select v-model="formInline.openFlag" placeholder="请选择">
                     <el-option
                             v-for="item in isOpen"
                             :key="item.value"
@@ -34,6 +34,13 @@
                     </el-option>
                 </el-select>
             </el-form>
+            <form action="" v-if="0" ref="exportForm">
+                <el-input v-model="exportForm.goodsName"></el-input>
+                <el-input v-model="exportForm.goodsCatId"></el-input>
+                <el-input v-model="exportForm.skuId"></el-input>
+                <el-input v-model="exportForm.sn"></el-input>
+                <el-input v-model="exportForm.openFlag"></el-input>
+            </form>
             <div class="btnBar">
                 <button class="query" round @click="query" type="button">查询</button>
                 <button class="addForm" round  @click="exportForm" type="button">导出</button>
@@ -45,64 +52,63 @@
                     style="width: 100%">
                 <el-table-column
                         align="center"
+                        label="序号"
+                        type="index"
+                        width="60">
+                </el-table-column>
+
+                <el-table-column
+                        align="center"
+                        label="商品列表图">
+                    <template slot-scope="scope">
+                        <img :src="scope.row.thumbnail">
+                    </template>
+                </el-table-column>
+
+                <el-table-column
+                        align="center"
                         prop="id"
-                        label="id"
-                        v-if=0>
-                </el-table-column>
-                <el-table-column
-                        align="center"
-                        prop="custom.customName"
-                        label="商品主图">
-                </el-table-column>
-                <el-table-column
-                        align="center"
-                        prop="storeName"
                         label="商品ID">
                 </el-table-column>
                 <el-table-column
                         show-overflow-tooltip="false"
                         align="center"
-                        prop="storeAddr"
+                        prop="skuId"
                         label="SKUID">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="storeTel"
+                        prop="sn"
                         label="条形码">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="goodsName"
                         label="名称">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
-                        label="规格">
-                </el-table-column>
-                <el-table-column
-                        align="center"
-                        prop="businessTime"
+                        prop="goodsFrom"
                         label="商品来源">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="goodsCatName"
                         label="分类">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="goodsIndex"
                         label="排序">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="updateBy.name"
                         label="最后修改人">
                 </el-table-column>
                 <el-table-column
                         align="center"
-                        prop="businessTime"
+                        prop="updateDate"
                         label="最后修改时间">
                 </el-table-column>
                 <el-table-column
@@ -131,9 +137,30 @@
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="pagination.count">
             </el-pagination>
+            <!--模态框-->
+            <el-dialog :title="title" size="tiny" :visible.sync="cityVisible" center>
+                <el-tree
+                        ref="tree"
+                        highlight-current
+                        :data="secondSection"
+                        class="searchTree"
+                        accordion
+                        :filter-node-method="filterNode"
+                        @node-click="handleNode"
+                        :props="defaultProps">
+                </el-tree>
+                <div slot="footer" class="dialog-footer">
+                    <el-button @click="modifyCancel">取 消</el-button>
+                    <el-button type="primary" @click="doModify">确 定</el-button>
+                </div>
+            </el-dialog>
         </el-tab-pane>
-        <el-tab-pane label="商品配置" name="second">
 
+
+        <el-tab-pane :label='title' name="second">
+            <div><i>1</i>基本信息</div>
+            <div><i>2</i>属性</div>
+            <div><i>3</i>SKU设置</div>
 
         </el-tab-pane>
     </el-tabs>

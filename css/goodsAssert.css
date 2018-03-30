@@ -13,5 +13,15 @@ body {
 }
 
 .storeTable {
-    padding: 20px;
+    padding: 10px;
+}
+.storeTable>.el-input{
+    margin:5px ;
+}
+.cell>img{
+width:30px;height:30px;
+}
+.searchBtn{
+width:200px;
+    text-align: left;
 }

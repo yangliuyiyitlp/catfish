@@ -3,22 +3,31 @@ var store = new Vue({
     data: function () {
         return {
             activeName: 'first',
-            title: '',
+            title:'添加商品',
             formInline: {
                 pageSize: 30,
                 pageNo: 1,
             },
-            isOpen:[{
+            defaultProps: {
+                children: 'children',
+                label: 'name'
+            },
+            exportForm: {},
+            isOpen: [{
                 value: '0',
                 label: '启用'
             }, {
                 value: '1',
                 label: '停用'
-            }, ],
-            tableData: [{'id':'1'}],
+            },],
+            tableData: [],
             ruleForm: {},
             Token: {},
             iconUrl: '',
+            cityVisible:false,
+            filterText:'',
+            filterId:'',
+            secondSection:[],
             rules: {
                 storeName: [{required: true, message: '请输入门店名称', trigger: 'blur'},
                     {min: 0, max: 20, message: '长度小于20字符', trigger: 'blur'}]
@@ -27,6 +36,7 @@ var store = new Vue({
         }
     },
     created: function () {
+        this.searchArea()
     },
     methods: {
         handleClick: function (tab, event) {
@@ -74,20 +84,92 @@ var store = new Vue({
         handleAvatarSuccess: function () {
             this.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
         },
-        isChangeBest:function(){},
-        query: function () {
-            PostAjax(this, 'post', this.formInline, '/layer/customstore/nyCustomStore/list', function (data) {
-                this.tableData = data.result
-                for (var i = 0; i < this.tableData.length; i++) {
-
-                }
-                this.pagination.count = data.total
-
-            }.bind(this), function (msg) {
-                fadeInOut(msg)
-            })
+        searchMechanism :function (){
+            this.cityVisible = true
+            this.filterText = ''
         },
-        exportForm:function(){},
+        searchArea:function(){
+            var _this=this
+            PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/tree', function (data) {
+              _this.secondSection = data
+
+            }, function (msg) {
+                fadeInOut(msg)
+            },'','','','',1)
+        },
+        doModify:function () {
+            this.cityVisible = false
+            this.formInline.goodsCatId = this.filterId
+        },
+        modifyCancel:function () {
+            this.cityVisible = false
+        },
+        filterNode:function (value, data) {
+            if (!value) return true
+            return data.name.indexOf(value) !== -1
+        },
+        handleNode :function(data) {
+            this.filterText = data.name // 弹框树模型点击输入值
+            this.filterId = data.id
+        },
+        query: function () {
+            var _this = this
+            _this.exportForm.goodsName = _this.formInline.goodsName
+            PostAjax(_this, 'post', this.formInline, '/layer/goods/nyGoods/list', function (data) {
+                _this.tableData = data.result
+                _this.pagination.count = data.total
+                fadeInOut('符合条件的数据为空')
+            }, function (msg) {
+                fadeInOut(msg)
+            },'','','','',1)
+        },
+        isOnChange: function (row) {//开启关闭
+            var _this = this
+            if (row.openFlag == '1') {
+                var openFlag = '0'
+            } else {
+                openFlag = '1'
+            }
+            PostAjax(_this, 'post', {
+                'id': row.id,
+                'openFlag': openFlag
+            }, '/layer/customstore/nyCustomStore/list', function (data) {
+                _this.query()
+            }, function (msg) {
+                fadeInOut(msg)
+            }, '', '', '', '', 1)
+        },
+        isChangeBest: function (row) { // 地图推荐
+            var _this = this
+            if (row.openFlag == '1') {
+                var openFlag = '0'
+            } else {
+                openFlag = '1'
+            }
+            PostAjax(_this, 'post', {
+                'id': row.id,
+                'openFlag': openFlag
+            }, '/layer/customstore/nyCustomStore/list', function (data) {
+                _this.query()
+            }, function (msg) {
+                fadeInOut(msg)
+            }, '', '', '', '', 1)
+        },
+        exportForm: function () {
+            var _this = this
+            _this.exportForm.pageSize = ''
+            _this.exportForm.pageNo = ''
+            _this.$confirm('确定导出?', '提示', {
+                confirmButtonText: '确定',
+                cancelButtonText: '取消',
+                type: 'warning'
+            }).then(function () {
+                _this.$refs.exportForm.action = ''
+            }).catch(function () {
+                return
+            });
+
+        },
         modifyRow: function (row) {
             this.activeName = 'second'
             this.title = '提交修改'
@@ -100,7 +182,7 @@ var store = new Vue({
             this.setEmptyForm()
             this.activeName = 'second'
         },
-        setEmptyForm:function(){
+        setEmptyForm: function () {
             // this.$refs['ruleForm'].resetFields()
         },
         resetForm: function (formName) {

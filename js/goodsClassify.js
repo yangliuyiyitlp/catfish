@@ -496,8 +496,8 @@ var store = new Vue({
 
         },
         handleAdd: function (s, d, n) {//增加节点
-            if (n.level >= 3) {
-                this.$message.warning("最多只支持三级！")
+            if (n.level >= 2) {
+                this.$message.warning("最多只支持二级！")
                 return false;
             }
             this.isForm = true
@@ -562,8 +562,10 @@ var store = new Vue({
         },
         submitForm: function () {
             var _this = this
-            this.formClass.initials = this.initials.join(',')
-            this.initials = this.initials.join(',')
+            if(typeof(_this.initials)=='object' ){
+                _this.formClass.initials = _this.initials.join(',')
+                _this.initials = _this.initials.join(',')
+            }
             PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/save', function (data) {
                 _this.getTreeList()
                 _this.isForm = false
