@@ -247,7 +247,7 @@ var store = new Vue({
             //         that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
             //     console.log(9696,that.Token);
             //
-            // },function(data){fadeInOut(data.msg);},'','','','application/json','',1)
+            // },function(data){fadeInOut(data);},'','','','application/json','',1)
 
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
@@ -258,7 +258,7 @@ var store = new Vue({
                     resolve()
 
                 }, function (data) {
-                    fadeInOut(data.msg);
+                    fadeInOut(data);
                 }, '', '', '', 'application/json', '', 1)
             })
         },
@@ -275,8 +275,8 @@ var store = new Vue({
                 }
                 this.pagination.count = data.total
 
-            }.bind(this), function (data) {
-                fadeInOut(data.msg)
+            }.bind(this), function (msg) {
+                fadeInOut(msg)
             })
         },
         isOnChange: function (row) {
@@ -292,7 +292,7 @@ var store = new Vue({
             }, '/layer/customstore/nyCustomStore/save', function (data) {
                 this.query()
             }.bind(this), function (data) {
-                fadeInOut(data.msg)
+                fadeInOut(data)
             }, '', '', '', '', 1)
         },
         modifyRow: function (row) {
@@ -323,7 +323,7 @@ var store = new Vue({
                 that.mapSelect(that.ruleForm.longitude, that.ruleForm.latitude, that.ruleForm.storeAddr)
 
             }.bind(this), function (data) {
-                fadeInOut(data.msg)
+                fadeInOut(data)
             })
         },
         addForm: function () {

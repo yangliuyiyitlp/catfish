@@ -9,7 +9,7 @@
     <link rel="stylesheet" href="../css/public.css"/>
     <style>
         #goods {
-            padding: 50px;
+            padding: 30px;
         }
 
         .title {
@@ -78,6 +78,14 @@
             left: 0;
             margin: 10px 0 0 10px;
         }
+        .isForm{
+            margin-left:20px;
+        }
+        .isForm>form{
+            background-color: #fff;
+            margin-top:20px;
+            padding:20px 0;
+        }
     </style>
 </head>
 
@@ -88,7 +96,7 @@
             <div class="expand">
                 <div>
                     <div class="titleCenter">
-                    <button class='smallAddForm' round type="button" @click="handleAddTop">添加</button>
+                    <button class='smallAddForm' round type="button" @click="handleAddTop" >添加</button>
                     </div>
                     <div class="classfiy">所有分类</div>
                     <el-tree ref="expandMenuList" class="expand-tree"
@@ -98,27 +106,29 @@
                              highlight-current
                              :props="defaultProps"
                              :expand-on-click-node="false"
-                             :default-expanded-keys="defaultExpandKeys"
+                             default-expand-all
                              @node-click="handleNodeClick"
                     >
                         <span class="custom-tree-node" slot-scope="{ node, data,store }">
                         <span class="tree-expand">
-	                    	<span class="tree-label" v-show="data.isEdit">
-	                    		<el-input class="edit" size="mini" autofocus
-                                          v-model="data.name"
-                                          :ref="'treeInput'+data.id"
-                                          @click.stop.native="nodeEditFocus"
-                                          @blur.stop="nodeEditPass(store,data,node)"
-                                          @keyup.enter.stop.native="nodeEditPass(store,data,node)"></el-input>
-	                    	</span>
-	                    	<span v-show="!data.isEdit"
-                                  :class="[data.id > expandId ? 'tree-new tree-label' : 'tree-label']">
+	                    	<!--<span class="tree-label" v-show="data.isEdit">-->
+	                    		<!--<el-input class="edit" size="mini" autofocus-->
+                                          <!--v-model="data.name"></el-input>-->
+                                	<!--<el-input class="edit" size="mini" autofocus-->
+                                              <!--v-model="data.name"-->
+                                              <!--:ref="'treeInput'+data.id"-->
+                                              <!--@click.stop.native="nodeEditFocus"-->
+                                              <!--@blur.stop="nodeEditPass(store,data,node)"-->
+                                              <!--@keyup.enter.stop.native="nodeEditPass(store,data,node)"></el-input>-->
+	                    	<!--</span>-->
+	                    	<span>
+                                <!--<span  :class="[data.id > expandId ? 'tree-new tree-label' : 'tree-label']">-->
 	                    		<span>{{data.name}}</span>
 	                    	</span>
-	                    	<span class="tree-btn" v-show="!data.isEdit">
+	                    	<span class="tree-btn" >
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level ==1?false:true'></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level ==1?false:true'></i>
 	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)"></i>
-	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)"></i>
-	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)"></i>
 	                    	</span>
 	                    </span>
                             </span>
@@ -127,23 +137,24 @@
             </div>
         </el-col>
 
-        <el-col :span="15" :offsset="1">
-            <div v-if="isForm">
-            <p class="title">基本信息</p>
-            <el-form ref="formClass" :model="formClass" label-width="150px">
+        <el-col :span="18" :offsset="1">
+            <div v-if="isForm" class="isForm">
+            <a class="title">基本信息</a>
+            <el-form ref="formClass" :model="formClass" label-width="150px" :rules="rules" ref="formClass">
                 <el-input v-model="formClass.id" v-if="0"></el-input>
+                <el-input v-model="formClass.parent" v-if="0"></el-input>
                 <el-form-item label="父级类型：">
-                    <el-input v-model="formClass.id"></el-input>
+                    <el-input v-model="formClass.parentName" disabled></el-input>
                 </el-form-item>
-                <el-form-item label="类别名称：">
+                <el-form-item label="类别名称："prop="name">
                     <el-input v-model="formClass.name" placeholder="不能超过10个字符长度" id="txtChinese"
-                              @blur="query"></el-input>
+                              @blur.stop="query()"></el-input>
                 </el-form-item>
                 <el-form-item label="拼音助记词：">
-                    <el-input v-model="formClass.pinyi" disabled></el-input>
+                    <el-input disabled v-model="initials"></el-input>
                 </el-form-item>
-                <el-form-item label="排序：">
-                    <el-input v-model="formClass.sort"></el-input>
+                <el-form-item label="排序："prop="catOrder">
+                    <el-input v-model="formClass.catOrder" placeholder="请输入数字" type="number" ></el-input>
                 </el-form-item>
             </el-form>
             <div class="btnBar">

@@ -84,13 +84,9 @@
                             启用
                         </button>
                         <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
-                        <span
-                                class="modify"
-                                @click="modifyRow(scope.row)"
-                                type="text"
-                                size="small">
+                        <button @click="modifyRow(scope.row)" class="modifyBtn">
                             修改
-                        </span>
+                        </button>
                     </template>
                 </el-table-column>
             </el-table>

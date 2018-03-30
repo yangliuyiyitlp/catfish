@@ -2,31 +2,43 @@ var store = new Vue({
     el: '#goods',
     data: function () {
         return {
-            formClass: {},
-            expandId: 44,
+            formClass: {catOrder:'0'},
+            initials:'',
+            treeName:'',
+            // expandId: 0,
             treeList: [],
             isLoadingTree: false,//是否加载节点树
             defaultProps: {
                 children: 'children',
                 label: 'name'
             },
-            defaultExpandKeys: [],//默认展开节点列表
-            isForm: false
+            // defaultExpandKeys: [],//默认展开节点列表
+            isForm: false,
+            rules: {
+                name: [
+                    {required: true, message: '请输入类别名称', trigger: 'blur'},
+                    { min: 1, max: 10, message: '长度在 1 到 10个字符', trigger: 'blur' }
+                ],
+                catOrder: [
+                    {required: true, message: '请输入排序', trigger: 'blur'}
+                ]
+            }
         }
     },
     created: function () {
         this.getTreeList()
     },
     mounted: function () {
-        // console.log(api)
         this.initExpand()
     },
     methods: {
         query: function () {
-            this.formClass.pinyi = ''
+            this.formClass.initials = ''
+            this.initials = ''
             var str = trim(document.getElementById("txtChinese").value);
             if (str == "") return;
-            this.formClass.pinyi = this.makePy(str);
+            this.formClass.initials = this.makePy(str);
+            this.initials = this.formClass.initials
         },
         mkRslt: function (arr) {
             var arrRslt = [""];
@@ -456,22 +468,12 @@ var store = new Vue({
             return _this.mkRslt(arrResult);
         },
         //树模型开始
-        // 下面方法点击编辑按钮树上直接编辑名称功能取消
-        handleNodeClick: function (d, n, s) {//点击节点
-            console.log(89, d)
-            // d.isEdit = false;//放弃编辑状态
-        },
-        nodeEditPass: function (s, d, n) {//编辑完成
-            // d.isEdit = false;
-        },
-        nodeEditFocus: function () {
-            //阻止点击节点的事件冒泡
-        },
-        //上面方法不用
+        handleNodeClick:function(){},
         getTreeList: function () {
             var _this = this
             PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/tree', function (data) {
-                _this.treeList = data
+                _this.treeList= data
+                _this.treeName =data[0].name
             }, function (msg) {
                 fadeInOut(msg);
             }, '', '', '', '', 1)
@@ -484,76 +486,62 @@ var store = new Vue({
             this.isLoadingTree = true;
         },
         handleAddTop: function () {
-            var _this = this
-            _this.isForm = true
-            // this.treeList.push({
-            //     id: ++this.expandId,
-            //     name: '新分类',
-            //     children: []
-            // })
+            this.isForm = true
+            this.formClass ={}
+            this.formClass.parent = null
+            this.formClass.parentName = this.treeName||'无'
+            this.formClass.catOrder = '0'
+            this.formClass.initials = ''
+            this.initials = ''
+
         },
         handleAdd: function (s, d, n) {//增加节点
-            console.log(s, d, n)
-            if (n.level >= 3) {
-                this.$message.error("最多只支持三级！")
+            if (n.level >= 2) {
+                this.$message.warning("最多只支持二级！")
                 return false;
             }
             this.isForm = true
-            // //添加数据
-            // d.children.push({
-            //     id: ++this.expandId,
-            //     name: '新分类',
-            //     children: []
-            // });
-            // //展开节点
-            // if (!n.expanded) {
-            //     n.expanded = true;
-            // }
+            this.formClass ={}
+            this.formClass.parent = d.id
+            this.formClass.parentName = d.name
+            this.formClass.catOrder = '0'
         },
         handleEdit: function (s, d, n) {//编辑节点
             this.isForm = true
-            console.log(n.parent.data.name)
-            console.log(n.parent.data.id)
-            console.log(d.id)
             var _this = this
-            //获取详情
-            PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/tree', function (data) {
+            PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/form/'+d.id, function (data) {
                 _this.formClass = data
+                if (n.parent.data.id) {
+                    _this.formClass.parent = n.parent.data.id
+                    _this.formClass.parentName = n.parent.data.name
+                }  else {
+                    _this.formClass.parent = null
+                    _this.formClass.parentName = '无'
+                }
+                _this.initials =  _this.formClass.initials
             }, function (msg) {
                 fadeInOut(msg);
-            })
-            //     d.isEdit = true;
-            //     this.$nextTick(function() {
-            //         this.$refs['treeInput'+d.id].$refs.input.focus()
-            // })
-            //     console.log(s,d,n)
+            }, '', '', '', '', 1)
+
         },
         handleDelete: function (s, d, n) {//删除节点
-            console.log(s, d, n)
-            var that = this;
+            var _this=this
             //有子级不删除
             if (d.children && d.children.length !== 0) {
-                this.$message.error("此节点有子级，不可删除！")
+                _this.$message.warning("此分类有子级，请先删子级！")
                 return false;
             } else {
+                isDel()
                 //新增节点直接删除，否则要询问是否删除
-                var delNode = function () {
-                    var list = n.parent.data.children || n.parent.data,//节点同级数据
-                        _index = 99999;//要删除的index
-                    /*if(!n.parent.data.children){//删除顶级节点，无children
-                      list = n.parent.data
-                    }*/
-                    list.map(function (c, i) {
-                        if (d.id == c.id) {
-                            _index = i;
-                        }
-                    })
-                    var k = list.splice(_index, 1);
-                    //console.log(_index,k)
-                    this.$message.success("删除成功！")
+               function delNode () {
+                   PostAjax(_this, 'post','', '/layer/goods/nyGoodsCat/delete/'+d.id, function (data) {
+                       _this.getTreeList()
+                   }, function (msg) {
+                       fadeInOut(msg);
+                   })
                 }
-                var isDel = function () {
-                    that.$confirm("是否删除此节点？", "提示", {
+              function isDel() {
+                  _this.$confirm("是否删除此类别？", "提示", {
                         confirmButtonText: "确认",
                         cancelButtonText: "取消",
                         type: "warning"
@@ -563,17 +551,23 @@ var store = new Vue({
                         return false;
                     })
                 }
-                //判断是否新增
-                d.id > this.expandId ? delNode() : isDel()
 
             }
         },
         resetForm: function () {
-            this.formClass={}
+            this.formClass.name =''
+            this.formClass.initials =''
+            this.initials =''
+            this.formClass.catOrder ='0'
         },
         submitForm: function () {
             var _this = this
-            PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/tree', function (data) {
+            if(typeof(_this.initials)=='object' ){
+                _this.formClass.initials = _this.initials.join(',')
+                _this.initials = _this.initials.join(',')
+            }
+            PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/save', function (data) {
+                _this.getTreeList()
                 _this.isForm = false
             }, function (msg) {
                 fadeInOut(msg);

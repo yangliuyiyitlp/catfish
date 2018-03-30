@@ -1,0 +1,27 @@
+html {
+    height: 100%
+}
+
+body {
+    height: 100%;
+    margin: 0px;
+    padding: 0px
+}
+
+.btnBar {
+    width: 480px;
+}
+
+.storeTable {
+    padding: 10px;
+}
+.storeTable>.el-input{
+    margin:5px ;
+}
+.cell>img{
+width:30px;height:30px;
+}
+.searchBtn{
+width:200px;
+    text-align: left;
+}
