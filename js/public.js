@@ -59,7 +59,7 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
       	},
 		withCredentials:false
 	}).then(function(data) { //es5写法
-		// console.log(data);
+		 console.log(data);
 		if(data.status == 200) {
 			if(data.data != '' && data.data.data != '') {
 				var dataL = data.data.data;
