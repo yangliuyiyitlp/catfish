@@ -202,8 +202,28 @@ em{font-style:normal;font-weight:normal;}
 	border:1px solid rgba(219,80,80,1);
 	background:rgba(219,80,80,1);
 }
-
-
+/*列表页面  开启 停用 修改 按钮*/
+.isOn,.isOff{
+	outline-style: none;
+	border:1px solid #fff;
+	border-radius: 10px;
+	color:#fff;
+	cursor:pointer;
+}
+.isOn{
+	background-color: #13ce66;
+}
+.isOff{
+	background-color: #ff4949;
+}
+.modifyBtn{
+	font: 400 13.3333px Arial;
+	background-color: #fff;
+	outline-style: none;
+	border:1px solid #ccc;
+	border-radius: 10px;
+	cursor:pointer;
+}
 .edit_area p em{margin-left: 10px;font-size: 12px;color: #000;}
 .edit_area p strong{font-weight: normal;color: #333;display: inline-block;}
 /*.edit_area p input{}*/

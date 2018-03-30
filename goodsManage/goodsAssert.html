@@ -1,10 +1,153 @@
-<!DOCTYPE html>
-<html lang="en">
+<html>
+
 <head>
+    <meta name="viewport" content="width=device-width"/>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>商户维护</title>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/public.css"/>
+    <link rel="stylesheet" href="../css/goodsAssert.css"/>
+
 </head>
+
 <body>
+<div id="goodsAssert" v-clock>
+    <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
+        <el-tab-pane label="商品列表" name="first">
+            <el-form ref="formInline" :model="formInline" class="storeTable">
+                <label>名称：</label>
+                <el-input v-model="formInline.storeName"></el-input>
+                <label>分类：</label>
+                <el-input v-model="formInline.customName"></el-input>
+                <label>SKUID：</label>
+                <el-input v-model="formInline.customName"></el-input>
+                <label>条形码：</label>
+                <el-input v-model="formInline.customName"></el-input>
+                <label>状态：</label>
+                <el-select v-model="formInline.value" placeholder="请选择">
+                    <el-option
+                            v-for="item in isOpen"
+                            :key="item.value"
+                            :label="item.label"
+                            :value="item.value">
+                    </el-option>
+                </el-select>
+            </el-form>
+            <div class="btnBar">
+                <button class="query" round @click="query" type="button">查询</button>
+                <button class="addForm" round  @click="exportForm" type="button">导出</button>
+                <button class='addForm' @click="addForm" round type="button">添加商品</button>
+            </div>
+            <el-table
+                    :data="tableData"
+                    border
+                    style="width: 100%">
+                <el-table-column
+                        align="center"
+                        prop="id"
+                        label="id"
+                        v-if=0>
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="custom.customName"
+                        label="商品主图">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeName"
+                        label="商品ID">
+                </el-table-column>
+                <el-table-column
+                        show-overflow-tooltip="false"
+                        align="center"
+                        prop="storeAddr"
+                        label="SKUID">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="storeTel"
+                        label="条形码">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="名称">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="规格">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="商品来源">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="分类">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="排序">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="最后修改人">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="businessTime"
+                        label="最后修改时间">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        fixed="right"
+                        label="操作"
+                        width="180">
+                    <template slot-scope="scope">
+                        <button @click="isChangeBest(scope.row)" class="modifyBtn">
+                            地图推荐
+                        </button>
+                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">
+                            启用
+                        </button>
+                        <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
+                        <button @click="modifyRow(scope.row)" class="modifyBtn">修改</button>
+                    </template>
+                </el-table-column>
+            </el-table>
+            <el-pagination
+                    @size-change="handleSizeChange"
+                    @current-change="handleCurrentChange"
+                    :current-page="pagination.pageNo"
+                    :page-sizes="pagination.pageSizes"
+                    :page-size="pagination.pageSize"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    :total="pagination.count">
+            </el-pagination>
+        </el-tab-pane>
+        <el-tab-pane label="商品配置" name="second">
+
+
+        </el-tab-pane>
+    </el-tabs>
+
+</div>
+
+<!-- 引入组件库 -->
+<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
+<script type="text/javascript" src="../js/public.js"></script>
+<script type="text/javascript" src="../js/goodsAssert.js"></script>
+
 
 </body>
+
 </html>
