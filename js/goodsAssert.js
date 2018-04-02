@@ -28,11 +28,21 @@ var store = new Vue({
             filterText:'',
             filterId:'',
             secondSection:[],
+            goodsTitle: ['基本信息', '属性', 'SKU设置'],
+            activeClass:'',
+            formBasic:{},
+            basicInfo:{},
+            BasicInfoArr:[],
+            BasicInfoObj:{},
+            radio:'',
+            SKUData:[{'rank':'2'}],
+            fallList:[{'label':'口味','tasteObj':{'辣的':'1'},'tasteArr':[],},{'label':'尺寸'}],
             rules: {
                 storeName: [{required: true, message: '请输入门店名称', trigger: 'blur'},
                     {min: 0, max: 20, message: '长度小于20字符', trigger: 'blur'}]
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
+            paginate: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
         }
     },
     created: function () {
@@ -55,25 +65,23 @@ var store = new Vue({
             this.pagination.pageNo = val
             this.query()
         },
+        handleSize: function (val) {
+            this.SKUData.pageSize = val
+            this.paginate.pageSize = val
+        },
+        handleCurrent: function (val) {
+            this.SKUData.pageNo = val
+            this.paginate.pageNo = val
+        },
         // 获取oss秘钥
         beforeAvatarUpload: function (file) {
             var that = this;
-            // PostAjax(that, 'post',{'user_dir':'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
-            //     console.log(data);
-            //         that.Token = data
-            //         that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
-            //         that.Token.OSSAccessKeyId = that.Token.accessid
-            //         that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
-            //     console.log(9696,that.Token);
-            //
-            // },function(data){fadeInOut(data.msg);},'','','','application/json','',1)
-
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
                     that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
                     that.Token.OSSAccessKeyId = that.Token.accessid
-                    that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+                    that.basicInfo.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
                     resolve()
 
                 }, function (data) {
@@ -83,6 +91,9 @@ var store = new Vue({
         },
         handleAvatarSuccess: function () {
             this.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
+        },
+        selected: function(gameName) {
+            this.activeClass = gameName
         },
         searchMechanism :function (){
             this.cityVisible = true
@@ -190,6 +201,26 @@ var store = new Vue({
         },
         submitForm: function (ruleForm) {
             var _this = this
+        },
+        tasteAdd:function(){
+            var _this=this
+            if (_this.formBasic.name.trim() === '') {
+                _this.$message.warning('请填写新标签')
+                return false
+            } else if (_this.formBasic.name.trim() !== '') {
+                var valueLabel = new Date().getTime()
+
+
+            }
+        },
+        tasteDelete:function(){},
+        basicCancel:function(){},
+        basicNext:function(){
+            this.formBasic ={}
+        },
+        addNext:function(){
+            var _this=this
+            _this.fallList.push({'label':'颜色'})
         }
     }
 })
