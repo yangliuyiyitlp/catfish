@@ -25,3 +25,131 @@ width:30px;height:30px;
 width:200px;
     text-align: left;
 }
+.goodsAssert{
+    height:100%;
+}
+.goodsTitle{
+    height:52px;
+}
+.formBasic{
+    margin:30px 10px 0;
+}
+.goodsTitle{
+    margin-left:20px;
+}
+.goodsTitle li{
+    cursor: pointer;
+    font-weight: 800;
+    float:left;
+    width:150px;
+    height:50px;
+    line-height: 50px;
+    border:1px solid #ccc;
+    border-radius: 100px ;
+    margin-right:10px;
+    text-align: right;
+    padding-right:30px;
+    padding-left:10px;
+    box-sizing: border-box;
+    background-color: #fff;
+}
+.goodsTitle a{
+    margin-top:4px;
+    display: inline-block;
+    width:42px;
+    height:42px;
+    line-height: 42px;
+    float:left;
+    text-align: center;
+    border-radius: 50%;
+    background-color:rgba(244,244,244,1);
+}
+.activeClick{
+    border:1px solid rgba(219,80,80,1)!important;
+    background-color:rgba(219,80,80,1) !important;
+    color:#fff!important;
+}
+.activeClick>a{
+    background-color: #fff ;
+    color:rgba(219,80,80,1);
+}
+.basicAdd{
+    width:100px;
+    height:30px;
+    background:rgba(255,255,255,1);
+    border:1px solid #ccc;
+    border-radius: 52px;
+    outline-style: none;
+    cursor:pointer;
+}
+.smallAddForm{
+    margin-left:145px;
+}
+.el-checkbox-group{
+    display: inline-block;
+}
+.basicInfo{
+    width:320px;
+    left:50%;
+    margin:40px 0 0 160px;
+}
+.basicName{
+    width:80px;
+}
+.basicInput{
+    margin-bottom: 10px;
+}
+.SKUConfig{
+    width:90px;
+}
+.SKUConfig input,.barCode input{
+    text-align: center;
+}
+.SKUBtn{
+    margin-top:40px;
+    height:50px;
+    position: absolute;
+    width: 310px;
+    left: 50%;
+    margin-left: -155px;
+}
+.goodsForm{
+    position: relative;
+    margin-bottom: 140px;
+}
+.showTime label{
+    margin-bottom:20px;
+    display:inline-block;
+}
+.avatar-uploader .el-upload {
+    border: 1px dashed #d9d9d9;
+    border-radius: 6px;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+}
+
+.avatar-uploader .el-upload:hover {
+    border-color: #409EFF;
+}
+
+.avatar-uploader-icon {
+    font-size: 28px;
+    color: #8c939d;
+    width: 88px;
+    height: 88px;
+    line-height: 88px;
+    text-align: center;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+    border-radius: 5px;
+    -webkit-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+    -moz-box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+    box-shadow: 0 2px 10px 0 rgba(0, 0, 0, 0.15);
+}
+
+.avatar {
+    width: 88px;
+    height: 88px;
+    display: block;
+}
