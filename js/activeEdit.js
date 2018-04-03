@@ -1,6 +1,31 @@
 var couponType = new Vue({
-	el: "#activeList",
+	el: "#activeEdit",
 	data: {
+		showPart:2,
+		activeData:'',
+		winningList:'',
+		tabList:[
+			{
+				id:1,
+				img:'../images/im.png',
+				showImg:'../images/erp_popup_close.jpg',
+				label:'活动设置'
+			},
+			{
+				id:2,
+				img:'../images/im.png',
+				showImg:'../images/erp_popup_close.jpg',
+				label:'活动奖品'
+			},{
+				id:3,
+				img:'../images/im.png',
+				showImg:'../images/erp_popup_close.jpg',
+				label:'中间名单'
+			}
+		],
+		settingData:{
+			
+		},
 		serachData:{
 			activeStateVal:'',
 			activityFormVal:'',
@@ -37,7 +62,7 @@ var couponType = new Vue({
 			}]
 		},
 		formInline: {
-            pageSize: 30,
+            pageSize: 10,
             pageNo: 1,
             storeName: ''
        	},
@@ -48,7 +73,6 @@ var couponType = new Vue({
 			pageNo: 1
 		},		
 		pageNo: 1,
-		loadingShow: false, //loading
 		pAdd: {
 			activityForm: [{//活动表现形式
 				value: 1,
@@ -76,7 +100,6 @@ var couponType = new Vue({
 			showTime:'',
 			failureTime:''			
 		},
-		couponList: [],
 		fBgIsShow: false,
 		addPopupShow:false
 	},
@@ -84,16 +107,33 @@ var couponType = new Vue({
 		getData:function(){
 			var that = this;
 			var content = {
-				eventTypeId: '',
-				eventManId: '',
-				newEventStatus: '',							
+				id: '122891091fa949628d0e5350c84d28ed'
+			}
+			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/form', function(data) {
+				console.log(data)
+				that.activeData = data;
+			},'','','','','','',4)
+		},
+		submitData:function(){//提交基础设置
+			var that = this;
+			var content = {
+				id: '122891091fa949628d0e5350c84d28ed'
+			}
+			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/form', function(data) {
+				console.log(data)
+				that.activeData = data;
+			},'','','','','','',4)
+		},
+		getWinningList:function(){
+			var that = this;
+			var content = {
+				eventId: '002891091fa949628d0e5350c84d28ed',
 				pageSize: 30,
 				pageNo:1
 			}
-			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/list', function(data) {
+			PostAjax(that, 'post', content, '/layer/nyeventwinners/nyEventWinners/list', function(data) {
 				console.log(data)
-//				that.couponList = data.result;
-//				that.formInline.pageNo ++;
+				that.winningList = data.result;
 			},'','','','','','',4)
 		},
 		BlurValue: function(event, name) { //失去焦点
@@ -233,7 +273,7 @@ var couponType = new Vue({
 	          type: 'warning',
 	          center: true
 	        }).then(() => {
-	          	PostAjax(that, 'post', {'id':'002891091fa949628d0e5350c84d28ed'}, '/layer/nyevent/nyEvent/delete', function(data) {
+	          	PostAjax(that, 'post', {'id':'002891091fa949628d0e5350c84d28ed'}, '/layer/nyevent/nyEvent/delete/002891091fa949628d0e5350c84d28ed', function(data) {
 					console.log(data);
 				},'','','','','','',4)
 	        }).catch(() => {
@@ -268,16 +308,15 @@ var couponType = new Vue({
 	        });
 	    },
 	    changeFun(){
-	    	alert(1)
 	    	var that = this;
 	    	var content={
-	    		'id':'002891091fa949628d0e5350c84d28ed',	    		
+	    		'id':'002891091fa949628d0e5350c84d28ed',
+	    		
 	    	}
-	    	PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/status', function(data) {
+	    	PostAjax(that, 'post', {}, '/layer/nyevent/nyEvent/delete/002891091fa949628d0e5350c84d28ed', function(data) {
 					console.log(data);
-			},'','','','','','',4)
+				},'','','','','','',4)
 	    },
-	    ///layer/nyevent/nyEvent/status
 	    getKeyWords:function(){
 	      	var that = this;
 	      	PostAjax(that, 'post', {"types":"activityType,activeState,activityForm"}, '/layer/dict/sysDict/listByTypes', function(data) {
@@ -287,10 +326,17 @@ var couponType = new Vue({
 				that.serachData.activityType = data.activityType;				
 
 			},'','','','','',1,1)
+	    },
+	    changeShow:function(id){
+	    	this.showPart = id;
+	    	if(id == 3){
+	    		this.getWinningList()
+	    	}
 	    }
 	},
 	created: function() {
 		var that = this;	
 		that.getKeyWords();
+		that.getData();
 	}
 })

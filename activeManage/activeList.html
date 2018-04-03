@@ -8,98 +8,7 @@
 		<link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
 		<link rel="stylesheet" href="../css/public.css" />		
 		<style type="text/css">
-			.activeList .el-row{
-				background: #fff;
-				padding:20px 0;
-				margin: 0 auto; 
-				width: 97.5%;
-				border-bottom: solid 1px #D8D8D8;
-			}
-			.activeList img,.activeList div.one{
-				display:block;
-				float: left;
-				margin-left: 20px;
-			}
-			.activeList div.one h2{
-				font-size: 14px;
-				color: #333;
-				line-height: 30px;
-			}
-			.activeList div.one a{
-				margin-left: 20px;
-				color: #333;
-				border-radius: 5px;
-				border: solid 1px #D4D4D4;
-				padding: 3px 5px;
-				font-size: 12px;
-			}
-			.activeList div.one p{
-				line-height: 25px;
-			}
-			.activeList .pt55{
-				padding-top: 55px;
-				line-height: 25px;
-			}
-			.activeList .type span {
-				display: block;
-				width: 11px;
-				height: 11px;
-				background: #FF892F;
-				border-radius: 100%;
-				margin: 30px auto 10px;
-			}
-			.activeList .type span.underway{/*正在进行*/
-				background: #31CC97;
-			}
-			.activeList .type span.end{/*已结束*/
-				background: #333333;
-			}
-			.activeList .type span.toBeAudited{/*待审核*/
-				background: #6CC1EF;
-			}
-			.activeList .type span.pause{/*暂停中*/
-				background: #EABE17;
-			}
-			.activeList .type span.audit{/*审核中*/
-				background: #5D945B;
-			}
 			
-			.activeList .type,.funbtn{
-				font-size: 12px;
-				color: #979797;
-				
-			}
-			.funbtn{
-				flex: 1;
-			}
-			.funbtn i{
-				margin-top: 25px;
-				font-size: 24px;
-				
-				display: block;
-				margin-bottom: 5px;
-			}
-			.activeList .el-button { 
-				width: 60px;
-				height: 33px;
-				margin: 25px auto 0;
-				padding: 0;
-			}
-			.activePopup .edit_area  p {
-				margin-bottom: 10px;
-			}
-			.el-picker-panel .el-input{
-				width: 100%;
-			}
-			.el-button.confirm{
-				border-radius: 20px;
-				padding: 9px 15px;
-				background: #DB5050;
-				border-color:#DB5050;
-			}
-			.el-button.confirm:hover{
-				color: #fff;
-			}
 		</style>
 	</head>
 	<body>
@@ -141,7 +50,7 @@
 				</div> 
 				<div class="btnPart">
 	                <el-button type="search" round @click="getData">查询</el-button>
-	  				<el-button round v-on:click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true">添加</el-button>
+	  				<el-button round @click="addPopupShow=true,fBgIsShow=true">添加</el-button>
 	           	</div>
 			</div>	
 			
@@ -150,7 +59,7 @@
 				  	<el-col :span="10">
 					  	<img src="../images/im.png"/>
 					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
+					  		<h2>优惠券活动<a href="activeEdit.html?activeId=1">查看详情</a></h2>
 					  		<p>全场</p>
 					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
 				  		</div>				  	
@@ -162,7 +71,7 @@
 				  		<div class="type"><span></span>未开始</div>
 				    </el-col>
 				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn"><i class="el-icon-delete"></i>开启</p>
+					  	<p class="funbtn" @click="changeFun"><i class="el-icon-delete"></i>开启</p>
 					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
 					  	<el-button round size="small">审核</el-button>-->
 				    </el-col>
@@ -184,7 +93,7 @@
 				  		<div class="type"><span class="underway"></span>正在进行</div>
 				    </el-col>
 				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn"><i class="el-icon-delete"></i>暂停</p>
+					  	<p class="funbtn" @click="changeFun"><i class="el-icon-delete"></i>暂停</p>
 					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
 					  	<el-button round size="small">审核</el-button>-->
 				    </el-col>
@@ -320,7 +229,8 @@
 						    </el-option>
 						</el-select>
 					</p>					
-					<p class="required"><label><em>*</em>活动类型：</label>
+					<p class="required">
+						<label><em>*</em>活动类型：</label>
 						<el-select v-model="pAdd.couponType">
 						    <el-option
 						      v-for="item in pAdd.activityType"

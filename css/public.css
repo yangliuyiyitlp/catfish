@@ -17,7 +17,7 @@ em{font-style:normal;font-weight:normal;}
 /*清除浮动*/
 .clear:after { display: block; content: ' '; font-size: 0; height: 0; clear: both;width: 0;}
 .clear { *zoom:1; }
-.wp{width: 100%;min-width: 960px;margin: 0px auto;}
+.wp{width: 100%;min-width: 1000px;margin: 0px auto;}
 
 /*分页*/
 .el-pagination{
@@ -294,3 +294,96 @@ em{font-style:normal;font-weight:normal;}
 #loading_p{position:fixed;top: 0;left: 0;bottom: 0;right: 0;background: none;margin: 0;height: 100%;}
 #loading_p img{display: block;margin: 0px auto;position: absolute;top: 50%;left: 50%;margin-left: -25px;margin-top: -27px;}
 
+/*活动管理*/
+.activeList .el-row{
+	background: #fff;
+	padding:17px 0;
+	margin: 0 auto; 
+	width: 97.5%;
+	border-bottom: solid 1px #D8D8D8;
+}
+.activeList img,.activeList div.one{
+	display:block;
+	float: left;
+	margin-left: 20px;
+}
+.activeList div.one h2{
+	font-size: 14px;
+	color: #333;
+	line-height: 30px;
+}
+.activeList div.one a{
+	margin-left: 20px;
+	color: #333;
+	border-radius: 5px;
+	border: solid 1px #D4D4D4;
+	padding: 3px 5px;
+	font-size: 12px;
+}
+.activeList div.one p{
+	line-height: 25px;
+}
+.activeList .pt55{
+	padding-top: 55px;
+	line-height: 25px;
+}
+.activeList .type span {
+	display: block;
+	width: 11px;
+	height: 11px;
+	background: #FF892F;
+	border-radius: 100%;
+	margin: 30px auto 10px;
+}
+.activeList .type span.underway{/*正在进行*/
+	background: #31CC97;
+}
+.activeList .type span.end{/*已结束*/
+	background: #333333;
+}
+.activeList .type span.toBeAudited{/*待审核*/
+	background: #6CC1EF;
+}
+.activeList .type span.pause{/*暂停中*/
+	background: #EABE17;
+}
+.activeList .type span.audit{/*审核中*/
+	background: #5D945B;
+}
+
+.activeList .type,.funbtn{
+	font-size: 12px;
+	color: #979797;
+	
+}
+.funbtn{
+	flex: 1;
+}
+.funbtn i{
+	margin-top: 25px;
+	font-size: 24px;
+	
+	display: block;
+	margin-bottom: 5px;
+}
+.activeList .el-button { 
+	width: 60px;
+	height: 33px;
+	margin: 25px auto 0;
+	padding: 0;
+}
+.activePopup .edit_area  p {
+	margin-bottom: 10px;
+}
+.el-picker-panel .el-input{
+	width: 100%;
+}
+.el-button.confirm{
+	border-radius: 20px;
+	padding: 9px 15px;
+	background: #DB5050;
+	border-color:#DB5050;
+}
+.el-button.confirm:hover{
+	color: #fff;
+}
