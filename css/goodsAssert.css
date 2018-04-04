@@ -34,6 +34,9 @@ width:200px;
 .formBasic{
     margin:30px 10px 0;
 }
+.formSKU{
+    margin:30px 10px 0 50px;
+}
 .goodsTitle{
     margin-left:20px;
 }
@@ -54,6 +57,7 @@ width:200px;
     background-color: #fff;
 }
 .goodsTitle a{
+    color:#000;
     margin-top:4px;
     display: inline-block;
     width:42px;
@@ -84,6 +88,9 @@ width:200px;
 }
 .smallAddForm{
     margin-left:145px;
+}
+.demoProp{
+    margin-bottom:10px;
 }
 .el-checkbox-group{
     display: inline-block;
@@ -152,4 +159,17 @@ width:200px;
     width: 88px;
     height: 88px;
     display: block;
+}
+.radioClass{
+    padding-top:13px;
+}
+.goodsPic{
+    float:left;
+    margin-right:10px;
+}
+.iconDelete{
+    cursor: pointer;
+}
+.iconTaste{
+    margin-right:10px;
 }
