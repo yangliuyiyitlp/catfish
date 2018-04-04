@@ -8,7 +8,13 @@
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
     <link rel="stylesheet" href="../css/public.css"/>
     <link rel="stylesheet" href="../css/goodsAssert.css"/>
-
+    <!--富文本-->
+    <!--<link rel="stylesheet" href="../js/editor/quill.core.css"/>-->
+    <!--<link rel="stylesheet" href="../js/editor/quill.snow.css"/>-->
+    <!--<link rel="stylesheet" href="../js/editor/quill.bubble.css"/>-->
+    <!--<link href="http://cdn.quilljs.com/1.3.4/quill.snow.css" rel="stylesheet">-->
+    <!--<link href="http://cdn.quilljs.com/1.3.4/quill.bubble.css" rel="stylesheet">-->
+    <!--<link href="http://cdn.quilljs.com/1.3.4/quill.core.css" rel="stylesheet">-->
 </head>
 
 <body>
@@ -34,16 +40,9 @@
                     </el-option>
                 </el-select>
             </el-form>
-            <form action="" v-if="0" ref="exportForm">
-                <el-input v-model="exportForm.goodsName"></el-input>
-                <el-input v-model="exportForm.goodsCatId"></el-input>
-                <el-input v-model="exportForm.skuId"></el-input>
-                <el-input v-model="exportForm.sn"></el-input>
-                <el-input v-model="exportForm.openFlag"></el-input>
-            </form>
             <div class="btnBar">
                 <button class="query" round @click="query" type="button">查询</button>
-                <button class="addForm" round @click="exportForm" type="button">导出</button>
+                <button class="addForm" round @click.stop="exportAll" type="button">导出</button>
                 <button class='addForm' @click="addForm" round type="button">添加商品</button>
             </div>
             <el-table
@@ -57,6 +56,7 @@
                         width="60">
                 </el-table-column>
 
+
                 <el-table-column
                         align="center"
                         label="商品列表图">
@@ -64,12 +64,13 @@
                         <img :src="scope.row.thumbnail">
                     </template>
                 </el-table-column>
-
                 <el-table-column
+
                         align="center"
                         prop="id"
                         label="商品ID">
                 </el-table-column>
+
                 <el-table-column
                         show-overflow-tooltip="false"
                         align="center"
@@ -117,13 +118,20 @@
                         label="操作"
                         width="180">
                     <template slot-scope="scope">
-                        <button @click="isChangeBest(scope.row)" class="modifyBtn">
+                        <!--<button @click="isChangeBest(scope.row)" class="modifyBtn">-->
+                        <!--地图推荐-->
+                        <!--</button>-->
+
+                        <button @click="isChangeBest(scope.row)" v-if=(scope.row.recommendFlag)==='1'?true:false
+                                class="isOff">
                             地图推荐
                         </button>
-                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">
+                        <button @click="isChangeBest(scope.row)" v-else class="isOn">取消推荐</button>
+
+                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOff">
                             启用
                         </button>
-                        <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
+                        <button @click="isOnChange(scope.row)" v-else class="isOn">停用</button>
                         <button @click="modifyRow(scope.row)" class="modifyBtn">修改</button>
                     </template>
                 </el-table-column>
@@ -138,7 +146,7 @@
                     :total="pagination.count">
             </el-pagination>
             <!--模态框-->
-            <el-dialog :title="title" size="tiny" :visible.sync="cityVisible" center>
+            <el-dialog title="商品分类" size="tiny" :visible.sync="cityVisible" center>
                 <el-tree
                         ref="tree"
                         highlight-current
@@ -169,114 +177,194 @@
 
             <div class="formBasic" v-if="activeClass =='基本信息'?true:false">
                 <el-form :model="basicInfo" :rules="rules" ref="basicInfo" label-width="150px">
-                    <el-form-item label="商品分类选择：" prop="name">
-                        <el-input v-model="basicInfo.name"></el-input>
+
+                    <input type="text" v-if="0" v-model="basicInfo.id">
+                    <el-form-item label="商品分类选择：" prop="goodsCatId">
+                        <input type="text" v-if="0" v-model="basicInfo.goodsCatId">
+                        <el-button class="searchBtn" icon="el-icon-search" @click="searchMechanism">{{filterText}}
+                        </el-button>
                     </el-form-item>
-                    <el-form-item label="名称：" prop="name">
-                        <el-input v-model="basicInfo.name" placeholder="最多输入30个字符"></el-input>
+
+                    <el-form-item label="名称：" prop="goodsName">
+                        <el-input v-model="basicInfo.goodsName" placeholder="最多输入30个字符" id="txtChinese"
+                                  @blur.stop="getPinYi()"></el-input>
                     </el-form-item>
                     <el-form-item label="拼音助记词：">
-                        <el-input v-model="basicInfo.name" disabled></el-input>
+                        <el-input v-model="pinyin" disabled></el-input>
                     </el-form-item>
-                    <el-form-item label="排序：" >
-                        <el-input v-model="basicInfo.name"></el-input>
+                    <el-form-item label="排序：">
+                        <el-input v-model="basicInfo.goodsIndex"></el-input>
                     </el-form-item>
-                    <el-form-item label="分享描述：" >
-                        <el-input v-model="basicInfo.name"></el-input>
-                        <i>（微信分享给好友时会显示，建议36个字符内）</i>
-                    </el-form-item>
-                    <el-form-item label="标签：" >
-                        <el-input v-model="basicInfo.name"></el-input>
+
+                    <el-form-item label="标签：">
+                        <el-input v-model="basicInfo.goodsTaste"></el-input>
                         <button class='basicAdd' round type="button" @click.stop="tasteAdd">添加</button>
-                        <el-checkbox-group v-model="BasicInfoArr">
-                            <el-checkbox v-for="(val, key) in BasicInfoObj" :key="val" :label="key">{{key}} <i
-                                    class="el-icon-close" @click="tasteDelete(val)"></i></el-checkbox>
-                        </el-checkbox-group>
+                        <a v-for="val in goodsLableArr" :key="val" class="iconTaste">{{val}} <i
+                                class="el-icon-close iconDelete" @click.stop="tasteDelete(val)"></i></a>
                     </el-form-item>
-                    <el-form-item label="商品列表图：" >
+
+                    <el-form-item label="可预约天数：">
+                        <el-input v-model="basicInfo.appointmentDays" placeholder="请输入预约天数"></el-input>
+                    </el-form-item>
+
+                    <el-form-item label="可约最近时间：">
+                        <el-radio-group v-model="basicInfo.lastAppointment" class="radioClass">
+                            <el-radio v-for="item in laterTime" :label="item.value">{{item.label}}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+
+                    <el-form-item label="时间间隔：">
+                        <el-radio-group v-model="basicInfo.intervalTime" class="radioClass">
+                            <el-radio v-for="(item,index) in gapTime" :label="item.value">{{item.label}}</el-radio>
+                        </el-radio-group>
+                    </el-form-item>
+
+                    <el-form-item label="商品列表图：">
                         <el-upload
                                 class="avatar-uploader"
                                 action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
                                 :data="Token"
                                 :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload">
-                            <img v-if="iconUrl" :src="iconUrl" class="avatar">
+                                :on-success="handleAvatarThumbnail"
+                                :before-upload="beforeAvatarThumbnail">
+                            <div v-if="thumbnail"><img :src="thumbnail" class="avatar">
+                                <i class="el-icon-close " @click.stop="removeThumbnail"></i></div>
                             <i v-else class="el-icon-plus
                 avatar-uploader-icon"></i>
                         </el-upload>
                         <i>（图片大小：150k內 长=1.65宽 如：132*80 347*210）</i>
                     </el-form-item>
-                    <el-form-item label="商品轮播图：" >
+                    <el-form-item label="商品轮播图：">
                         <el-upload
-                                multiple
+                                class="avatar-uploader goodsPic"
+                                action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                                :data="Token"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess1"
+                                :before-upload="beforeAvatarUpload1">
+                            <div v-if="goodsPic1"><img :src="goodsPic1" class="avatar">
+                                <i class="el-icon-close " @click.stop="removeAvatarSuccess1"></i></div>
+                            <i v-else class="el-icon-plus
+                avatar-uploader-icon"></i>
+                        </el-upload>
+                        <el-upload
+                                class="avatar-uploader goodsPic"
+                                action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                                :data="Token"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess2"
+                                :before-upload="beforeAvatarUpload2">
+                            <div v-if="goodsPic2"><img :src="goodsPic2" class="avatar">
+                                <i class="el-icon-close " @click.stop="removeAvatarSuccess2"></i></div>
+                            <i v-else class="el-icon-plus
+                avatar-uploader-icon"></i>
+                        </el-upload>
+                        <el-upload
+                                class="avatar-uploader goodsPic"
+                                action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                                :data="Token"
+                                :show-file-list="false"
+                                :on-success="handleAvatarSuccess3"
+                                :before-upload="beforeAvatarUpload3">
+                            <div v-if="goodsPic3"><img :src="goodsPic3" class="avatar">
+                                <i class="el-icon-close " @click.stop="removeAvatarSuccess3"></i></div>
+                            <i v-else class="el-icon-plus
+                avatar-uploader-icon"></i>
+                        </el-upload>
+                        <el-upload
                                 class="avatar-uploader"
                                 action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
                                 :data="Token"
                                 :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload">
-                            <img v-if="iconUrl" :src="iconUrl" class="avatar">
+                                :on-success="handleAvatarSuccess4"
+                                :before-upload="beforeAvatarUpload4">
+                            <div v-if="goodsPic4"><img :src="goodsPic4" class="avatar">
+                                <i class="el-icon-close " @click.stop="removeAvatarSuccess4"></i></div>
                             <i v-else class="el-icon-plus
                 avatar-uploader-icon"></i>
                         </el-upload>
-                        <i>（图片大小：150k內 长=宽 如：800*800）</i>
+                        <p>（图片大小：150k內 长=宽 如：800*800）</p>
                     </el-form-item>
 
-                    <el-form-item  label="商品详情图：" >
+                    <el-form-item label="商品详情图：">
                         <i>（单张图片大小：200k内）</i>
-                        <el-upload
-                                class="avatar-uploader"
-                                action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
-                                :data="Token"
-                                :show-file-list="false"
-                                :on-success="handleAvatarSuccess"
-                                :before-upload="beforeAvatarUpload">
-                            <img v-if="iconUrl" :src="iconUrl" class="avatar">
-                            <i v-else class="el-icon-plus
-                avatar-uploader-icon"></i>
-                        </el-upload>
+                        <div>
+
+
+                        </div>
                     </el-form-item>
                     <el-form-item label="上架时间：" class="showTime">
-                        <el-radio v-model="radio" label="1">立即上架售卖</el-radio>
-                        <br>
-                        <el-radio v-model="radio" label="2">自定义上架时间</el-radio>&nbsp;&nbsp;<el-date-picker
-                            v-model="radio"
-                            type="datetime"
-                            placeholder="选择日期时间">
-                    </el-date-picker>   <br>
-                        <el-radio v-model="radio" label="3">暂不售卖，放入仓库</el-radio>   <br>
+                        <el-radio-group v-model="timeSelect">
+                            <el-radio :label="1">自定义上架时间</el-radio>
+                            <el-date-picker
+                                    @change="releaseTimeChange"
+                                    v-model="basicInfo.releaseTime"
+                                    type="datetime"
+                                    placeholder="选择日期时间">
+                            </el-date-picker>
+                            <br>
+                            <el-radio :label="2">暂不售卖，放入仓库</el-radio>
+                            <br>
+                        </el-radio-group>
                     </el-form-item>
                     <div class="SKUBtn">
-                        <button class="query" round  type="button">下一步</button>
-                        <button class="addForm" round  type="button">取消</button>
+                        <button class="query" round type="button" @click.stop="basicNext">下一步</button>
+                        <button class="addForm" round type="button">取消</button>
                     </div>
                 </el-form>
+                <!--模态框-->
+                <el-dialog title="商品分类" size="tiny" :visible.sync="cityVisible" center>
+                    <el-tree
+                            ref="tree"
+                            highlight-current
+                            :data="secondSection"
+                            class="searchTree"
+                            accordion
+                            :filter-node-method="filterNode"
+                            @node-click="handleNode"
+                            :props="defaultProps">
+                    </el-tree>
+                    <div slot="footer" class="dialog-footer">
+                        <el-button @click="modifyCancel">取 消</el-button>
+                        <el-button type="primary" @click="doModify">确 定</el-button>
+                    </div>
+                </el-dialog>
             </div>
 
-            <div class="formBasic" v-if="activeClass =='属性'?true:false">
-                <el-form ref="formBasic" :model="formBasic" label-width="100px">
+            <div class="formSKU" v-if="activeClass =='属性'?true:false">
+                <el-form ref="formBasic" :model="formBasic" label-width="150px">
+                    <div class="demoProp">
+                        <p>例：</p>
+                        <el-input disabled class="basicName" placeholder="颜色"></el-input>
+                        <el-input disabled></el-input>
+                        <button class='basicAdd' round type="button" disabled>添加</button>
+                        <el-checkbox-group>
+                            <el-checkbox>绿色<i class="el-icon-close"></i></el-checkbox>
+                            <el-checkbox>黄色<i class="el-icon-close"></i></el-checkbox>
+                            <el-checkbox>粉色<i class="el-icon-close"></i></el-checkbox>
+                        </el-checkbox-group>
+                    </div>
                     <div v-for="(item,index) in fallList" :key="index" class="basicInput">
                         <el-input v-model="item.label" class="basicName"></el-input>
                         <el-input v-model="item.name"></el-input>
                         <button class='basicAdd' round type="button" @click.stop="tasteAdd">添加</button>
                         <el-checkbox-group v-model="item.tasteArr">
-                            <el-checkbox v-for="(val, key) in item.tasteObj" :key="val" :label="key">{{key}} <i
+                            <el-checkbox v-for="(val, key) in item.tasteObj" :key="val" :label="key">{{key}}<i
                                     class="el-icon-close" @click="tasteDelete(val)"></i></el-checkbox>
                         </el-checkbox-group>
                     </div>
 
-                    <button class='smallAddForm' round type="button" @click="addNext">添加属性</button>
+                    <button class='smallAddForm' round type="button" @click="addProperty">添加属性</button>
                     <br>
                     <div class="SKUBtn">
-                        <button class='addForm' round type="button" @click="basicCancel">取消</button>
-                        <button class='query' round type="button" @click="basicNext">下一步</button>
+                        <button class='addForm' round type="button" @click="PropertyCancel">取消</button>
+                        <button class='query' round type="button" @click="PropertyNext">下一步</button>
                     </div>
                 </el-form>
 
             </div>
 
-            <div v-if="activeClass =='SKU设置'?true:false" class="formBasic">
+            <div v-if="activeClass =='SKU设置'?true:false" class="formSKU">
                 <el-table
                         :data="SKUData"
                         stripe
@@ -307,7 +395,7 @@
                             label="价格"
                             prop="rank">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank class="SKUConfig" ></el-input>
+                            <el-input v-model=scope.row.rank class="SKUConfig"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -316,7 +404,7 @@
                             label="条形码"
                             prop="rank">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank  class="barCode" ></el-input>
+                            <el-input v-model=scope.row.rank class="barCode"></el-input>
                         </template>
                     </el-table-column>
                     <el-table-column
@@ -325,7 +413,7 @@
                             label="库存"
                             prop="rank">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank  class="SKUConfig" ></el-input>
+                            <el-input v-model=scope.row.rank class="SKUConfig"></el-input>
                         </template>
                     </el-table-column>
 
@@ -334,7 +422,7 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button  type="text" size="small">删除</el-button>
+                            <el-button type="text" size="small">删除</el-button>
                         </template>
                     </el-table-column>
 
@@ -349,8 +437,8 @@
                         :total="paginate.count">
                 </el-pagination>
                 <div class="SKUBtn">
-                    <button class="query" round  type="button">保存</button>
-                    <button class="addForm" round  type="button">取消</button>
+                    <button class="query" round type="button">保存</button>
+                    <button class="addForm" round type="button">取消</button>
                 </div>
 
             </div>
@@ -361,11 +449,14 @@
 </div>
 
 <!-- 引入组件库 -->
+
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>
 <script type="text/javascript" src="../js/public.js"></script>
 <script type="text/javascript" src="../js/goodsAssert.js"></script>
+<script type="text/javascript" src="../js/timeChange.js"></script>
+<!--<script src="../js/editor/quill.js"></script>-->
 
 
 </body>
