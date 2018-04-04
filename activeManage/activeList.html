@@ -17,7 +17,7 @@
 			<div class="searchPart">
 				<div class="searchItem">
 					<label>活动状态：</label>
-					<el-select v-model="serachData.activeStateVal">
+					<el-select clearable v-model="serachData.activeStateVal">
 					    <el-option
 					      v-for="item in serachData.activeState"
 					      :key="item.value"
@@ -28,7 +28,7 @@
 				</div>
 				<div class="searchItem">
 					<label>活动表现形式：</label>
-					<el-select v-model="serachData.activityFormVal">
+					<el-select clearable v-model="serachData.activityFormVal">
 					    <el-option
 					      v-for="item in serachData.activityForm"
 					      :key="item.value"
@@ -39,7 +39,7 @@
 				</div>
 				<div class="searchItem">
 					<label>活动类型：</label>
-					<el-select v-model="serachData.activityTypeVal">
+					<el-select clearable v-model="serachData.activityTypeVal">
 					    <el-option
 					      v-for="item in serachData.activityType"
 					      :key="item.value"
@@ -55,154 +55,38 @@
 			</div>	
 			
 			<div class="activeList" style="">
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
+				<el-row v-for="(item, index) in activeList">
+				  	<el-col :span="12">
+				  		<img :src="item.nyEventMan.eventManPic"/>
 					  	<div class="one">
-					  		<h2>优惠券活动<a href="activeEdit.html?activeId=1">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
+					  		<h2>{{item.eventName}}<a :href="'activeEdit.html?activeId='+ item.id">查看详情</a></h2>
+					  		<p>{{item.eventTypeId}}</p>
+					  		<p><i class="el-icon-time"></i>{{item.beginTime}} 至 {{item.endTime}}</p>
+				  		</div>					  				  	
 				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
+					<el-col :span="3"><div class="pt55">剩余数量：{{item.nyEventPrizes != undefined ? item.nyEventPrizes.countLeft : ''}}</div></el-col>
+					<el-col :span="3"><div class="pt55">中奖数量：{{item.nyEventPrizes != undefined ? item.nyEventPrizes.countWinning : ''}}</div></el-col>
+					<el-col :span="1"><div class="pt55"></div></el-col>
 					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span></span>未开始</div>
+						<div class="type" v-if="item.newEventStatus == 0"><span class="toBeAudited"></span>待审核</div>
+						<div class="type" v-if="item.newEventStatus == 1"><span class="audit"></span>审核中</div>
+				  		<div class="type" v-if="item.newEventStatus == 2">
+				  			<span></span>{{item.auditComment}}
+				  		</div>
+				  		<div class="type" v-if="item.newEventStatus == 3"><span></span>未开始</div>
+				  		<div class="type" v-if="item.newEventStatus == 4"><span class="underway"></span>正在进行</div>
+				  		<div class="type" v-if="item.newEventStatus == 5"><span class="pause"></span>暂停中</div>
+				  		<div class="type" v-if="item.newEventStatus == 6"><span class="end"></span>已结束</div>
 				    </el-col>
 				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn" @click="changeFun"><i class="el-icon-delete"></i>开启</p>
-					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<el-button round size="small">审核</el-button>-->
+					  	<p class="funbtn" v-if="item.newEventStatus == 5" @click="changeFun(index)"><i class="el-icon-delete"></i>开启</p>
+					  	<p class="funbtn" v-if="item.newEventStatus == 4" @click="changeFun(index)"><i class="el-icon-delete"></i>暂停</p>
+					  	<p class="funbtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 2"><i class="el-icon-edit-outline"></i>编辑</p>
+					  	<p class="funbtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 6 || item.newEventStatus == 2" @click="delectFun(index)"><i class="el-icon-delete"></i>删除</p>
+					  	<el-button round v-if="item.newEventStatus == 1" size="small">审核</el-button>
+					  	<el-button round v-if="item.newEventStatus == 0" size="small" @click="updataFun()">提交审核</el-button>
 				    </el-col>
-				    <!--未开始、正在进行、已结束、待审核、审核中、审核失败、暂停中-->
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span class="underway"></span>正在进行</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn" @click="changeFun"><i class="el-icon-delete"></i>暂停</p>
-					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<el-button round size="small">审核</el-button>-->
-				    </el-col>
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span class="end"></span>已结束</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn" @click="delectFun()"><i class="el-icon-delete"></i>删除</p>
-					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<el-button round size="small">审核</el-button>-->
-				    </el-col>
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span class="toBeAudited"></span>待审核</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<!--<p class="funbtn"><i class="el-icon-delete"></i>删除</p>
-					  	<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>-->
-					  	<el-button round size="small" @click="updataFun()">提交审核</el-button>
-				    </el-col>
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span class="audit"></span>审核中</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<!--<p class="funbtn"><i class="el-icon-delete"></i>删除</p>
-					  	<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>-->
-					  	<!--<el-button round size="small" @click="audit()">审核</el-button>-->
-				    </el-col>
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span></span>审核失败</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn"><i class="el-icon-delete"></i>删除</p>
-					  	<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<!--<el-button round size="small">审核</el-button>-->
-				    </el-col>
-				</el-row>
-				<el-row>
-				  	<el-col :span="10">
-					  	<img src="../images/im.png"/>
-					  	<div class="one">
-					  		<h2>优惠券活动<a href="#">查看详情</a></h2>
-					  		<p>全场</p>
-					  		<p><i class="el-icon-time"></i>2018.01.12 09:12 至 2018.02.12 12:12</p>
-				  		</div>				  	
-				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：200</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：800</div></el-col>
-					<el-col :span="3"><div class="pt55"></div></el-col>
-					<el-col :span="2" style="text-align: center;">
-				  		<div class="type"><span class="pause"></span>暂停中</div>
-				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn" @click="changeFun()"><i class="el-icon-delete"></i>开启</p>
-					  	<!--<p class="funbtn"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<el-button round size="small">审核</el-button>-->
-				    </el-col>
-				</el-row>
+				</el-row>				
 			</div>
 			<el-pagination
                     @size-change="handleSizeChange"
@@ -217,12 +101,60 @@
 			<div id="fixedBg" v-show="fBgIsShow"></div>
 			<div class="popup_public activePopup" v-show="addPopupShow" >
 				<h2>添加新活动</h2>
+				<!--<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
+				  <el-form-item label="活动名称" prop="name">
+				    <el-input v-model="ruleForm.name"></el-input>
+				  </el-form-item>
+				  <el-form-item label="活动区域" prop="region">
+				    <el-select v-model="ruleForm.region" placeholder="请选择活动区域">
+				      <el-option label="区域一" value="shanghai"></el-option>
+				      <el-option label="区域二" value="beijing"></el-option>
+				    </el-select>
+				  </el-form-item>
+				  <el-form-item label="活动时间" required>
+				    <el-col :span="11">
+				      <el-form-item prop="date1">
+				        <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
+				      </el-form-item>
+				    </el-col>
+				    <el-col class="line" :span="2">-</el-col>
+				    <el-col :span="11">
+				      <el-form-item prop="date2">
+				        <el-time-picker type="fixed-time" placeholder="选择时间" v-model="ruleForm.date2" style="width: 100%;"></el-time-picker>
+				      </el-form-item>
+				    </el-col>
+				  </el-form-item>
+				  <el-form-item label="即时配送" prop="delivery">
+				    <el-switch v-model="ruleForm.delivery"></el-switch>
+				  </el-form-item>
+				  <el-form-item label="活动性质" prop="type">
+				    <el-checkbox-group v-model="ruleForm.type">
+				      <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
+				      <el-checkbox label="地推活动" name="type"></el-checkbox>
+				      <el-checkbox label="线下主题活动" name="type"></el-checkbox>
+				      <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
+				    </el-checkbox-group>
+				  </el-form-item>
+				  <el-form-item label="特殊资源" prop="resource">
+				    <el-radio-group v-model="ruleForm.resource">
+				      <el-radio label="线上品牌商赞助"></el-radio>
+				      <el-radio label="线下场地免费"></el-radio>
+				    </el-radio-group>
+				  </el-form-item>
+				  <el-form-item label="活动形式" prop="desc">
+				    <el-input type="textarea" v-model="ruleForm.desc"></el-input>
+				  </el-form-item>
+				  <el-form-item>
+				    <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
+				    <el-button @click="resetForm('ruleForm')">重置</el-button>
+				  </el-form-item>
+				</el-form>-->
 				<div class="edit_area pr">
 					<p class="required">
 						<label><em>*</em>活动表现形式：</label>
-						<el-select v-model="pAdd.couponType">
+						<el-select v-model="pAdd.activityForm">
 						    <el-option
-						      v-for="item in pAdd.activityForm"
+						      v-for="item in serachData.activityForm"
 						      :key="item.value"
 						      :label="item.label"
 						      :value="item.value">
@@ -231,9 +163,9 @@
 					</p>					
 					<p class="required">
 						<label><em>*</em>活动类型：</label>
-						<el-select v-model="pAdd.couponType">
+						<el-select v-model="pAdd.activityType">
 						    <el-option
-						      v-for="item in pAdd.activityType"
+						      v-for="item in serachData.activityType"
 						      :key="item.value"
 						      :label="item.label"
 						      :value="item.value">
@@ -252,7 +184,7 @@
 					      type="datetime"
 					      placeholder="选择日期时间">
 					    </el-date-picker>
-						<!--<span v-show="pAdd.parValueShow">请输入正整数</span>-->
+						<span v-show="pAdd.parValueShow">请选择开始时间</span>
 					</p>
 					<p class="required">
 						<label><em>*</em>结束时间：</label>
@@ -261,7 +193,7 @@
 					      type="datetime"
 					      placeholder="选择日期时间">
 					    </el-date-picker>
-						<!--<span v-show="pAdd.parValueShow">请输入正整数</span>-->
+						<span v-show="pAdd.parValueShow">请选择结束时间</span>
 					</p>
 					<p class="required">
 						<label><em>*</em>展示时间：</label>
@@ -270,7 +202,7 @@
 					      type="datetime"
 					      placeholder="选择日期时间">
 					    </el-date-picker>
-						<!--<span v-show="pAdd.parValueShow">请输入正整数</span>-->
+						<span v-show="pAdd.parValueShow">请选择展示时间</span>
 					</p>
 					<p class="required">
 						<label><em>*</em>失效时间：</label>
@@ -279,7 +211,7 @@
 					      type="datetime"
 					      placeholder="选择日期时间">
 					    </el-date-picker>
-						<!--<span v-show="pAdd.parValueShow">请输入正整数</span>-->
+						<span v-show="pAdd.parValueShow">请选择失效时间</span>
 					</p>
 				</div>
 				<p class="edit_sure_box">

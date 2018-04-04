@@ -2,42 +2,15 @@ var couponType = new Vue({
 	el: "#activeList",
 	data: {
 		serachData:{
-			activeStateVal:'',
-			activityFormVal:'',
-			activityTypeVal:'',
-			activeState: [{//活动状态
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
-			activityForm: [{//活动表现形式
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
-			activityType: [{//活动类型
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}]
+			activeStateVal:'',//活动状态值
+			activityFormVal:'',//活动表现形式值
+			activityTypeVal:'',//活动类型值
+			activeState: '',//活动状态列表
+			activityForm: '',//活动表现形式列表
+			activityType: ''//活动类型列表
 		},
 		formInline: {
-            pageSize: 30,
+            pageSize: 10,
             pageNo: 1,
             storeName: ''
        	},
@@ -46,54 +19,36 @@ var couponType = new Vue({
 			pageSize: 10, 
 			count: 0, 
 			pageNo: 1
-		},		
-		pageNo: 1,
+		},
 		loadingShow: false, //loading
 		pAdd: {
-			activityForm: [{//活动表现形式
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
-			activityType: [{//活动类型
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
+			activityForm: '',
+			activityType: '',
 			activeName:'',
 			startTime:'',
 			endTime:'',
 			showTime:'',
 			failureTime:''			
 		},
-		couponList: [],
+		activeList: [],
 		fBgIsShow: false,
 		addPopupShow:false
 	},
 	methods: {
 		getData:function(){
 			var that = this;
+			that.formInline.pageNo = 1;
 			var content = {
-				eventTypeId: '',
-				eventManId: '',
-				newEventStatus: '',							
-				pageSize: 30,
-				pageNo:1
+				eventTypeId: that.serachData.activityTypeVal,
+				eventManId: that.serachData.activityFormVal,
+				newEventStatus: that.serachData.activeStateVal,							
+				pageSize: that.formInline.pageSize,
+				pageNo:that.formInline.pageNo
 			}
 			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/list', function(data) {
 				console.log(data)
-//				that.couponList = data.result;
-//				that.formInline.pageNo ++;
+				that.activeList = data.result;
+				that.formInline.pageNo ++;
 			},'','','','','','',4)
 		},
 		BlurValue: function(event, name) { //失去焦点
@@ -223,18 +178,22 @@ var couponType = new Vue({
             this.pagination.pageSize = val
             this.query()
         },
-        delectFun() {
+        delectFun(index) {
         	var that = this;
-	        that.$confirm('确定删除“7474747”?', '', {
+        	var oldList = that.activeList;
+        	var list = oldList[index];
+        	var textC = '确定删除"'+ list.eventName +'"吗？';
+	        that.$confirm(textC, '', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',
 	          confirmButtonClass:'confirm',
 	          cancelButtonClass	:'is-round',
 	          type: 'warning',
 	          center: true
-	        }).then(() => {
-	          	PostAjax(that, 'post', {'id':'002891091fa949628d0e5350c84d28ed'}, '/layer/nyevent/nyEvent/delete', function(data) {
-					console.log(data);
+	        }).then(() => {        	
+	          	PostAjax(that, 'post', {'id':list.id}, '/layer/nyevent/nyEvent/delete', function(data) {					
+					that.activeList.splice(index,1);
+					console.log(that.activeList)
 				},'','','','','','',4)
 	        }).catch(() => {
 	          	

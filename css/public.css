@@ -303,6 +303,10 @@ i{ font-style:normal}
 	width: 97.5%;
 	border-bottom: solid 1px #D8D8D8;
 }
+.activeList img{
+	width: 80px;
+	height: 80px;
+}
 .activeList img,.activeList div.one{
 	display:block;
 	float: left;

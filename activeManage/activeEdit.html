@@ -5,6 +5,8 @@
 		<meta charset="UTF-8">
 		<title>活动详情</title>
 		<link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
+		<!--<link rel="stylesheet" href="../css/quill.core.css" />-->
+		<link rel="stylesheet" href="../css/quill.snow.css" />
 		<link rel="stylesheet" href="../css/public.css" />		
 		<style type="text/css">		
 			.activeEditTop{				
@@ -60,7 +62,7 @@
 				background: #DB5050;
 				color: #fff;
 			}
-			.activeDetail{
+			.activeDetail,.allContent{
 				width: 97.5%;
 				margin: 20px auto;
 				background: #fff;
@@ -94,22 +96,95 @@
 				float: left;
 				line-height: 45px;
 			}
-			.activeTips textarea{
-				width: 622px;
-				padding: 10px;
-				height: 120px;
-				resize: none;
-				border-radius: 8px;
-				border: solid 1px #D4D4D4;
-				display: block;
-				float: left;
-				outline-style: none;
+			.activeTips > div{
+				width: 642px;
+			}
+			#editor{
+				height: 150px;
 			}
 			.bgf4{
 				background: #F4F4F4;
 			}
 			.pd20{
 				padding: 20px 0;
+			}
+			/*活动商品*/
+			.fs14{
+				font-size: 14px;
+				font-weight: bold;
+			}
+			.activeGoodsList{
+				background: #fff;
+				margin-bottom: 20px;
+			}
+			.activeGoodsList > li{
+				padding: 20px;
+			}
+			.activeGoodsImg .el-button,.activeGoodscont .el-button{
+				width: 80px;
+			}
+			.activeGoodscont{
+				padding-left: 100px;
+			}
+			.activeGoodscont > h2{
+				border-bottom: solid 1px #D4D4D4;
+				padding: 10px 0;
+				margin-bottom: 10px;
+				height: 40px;
+				line-height: 40px;
+				overflow: hidden;
+			}
+
+			.activeGoodscont > h2 span{
+				display:block;
+				width: 40px;
+				height: 40px;
+				margin-right: 10px;
+				background:url(../images/activeGoodsFun1.png) no-repeat center;
+				cursor: pointer;
+			}
+			.activeGoodscont > h2 span.delete:hover{
+				background-image: url(../images/activeGoodsFun1-1.png);
+			}
+			.activeGoodscont > h2 span.sortDown{
+				background-image: url(../images/activeGoodsFun3.png);
+			}
+			.activeGoodscont > h2 span.sortDown:hover{
+				background-image: url(../images/activeGoodsFun3-1.png);
+			}
+			.activeGoodscont > h2 span.sortUp{
+				background-image: url(../images/activeGoodsFun2.png);
+			}
+			.activeGoodscont > h2 span.sortUp:hover{
+				background-image: url(../images/activeGoodsFun2-1.png);
+			}
+			.activeGoodscont ul{
+				width: 560px;
+			}
+			.activeGoodscont li{
+				float: left;
+				width: 280px;
+				padding: 5px 0;
+				color: #333;
+			}
+			.activeGoodscont li span{
+				display: inline-block;
+				width: 80px;
+				text-align: right;
+				color: #828282;
+			}
+			.activeGoodscont li:nth-child(2n) span{
+				width: 150px;
+			}
+			.activeGoodscont li:last-child{
+				width: 100%;
+			}
+			.el-button:hover{
+				color: #fff;
+				background: #DB5050;
+			}
+			.activeGoodscont .el-button{
+				margin: 0;
 			}
 		</style>
 	</head>
@@ -122,12 +197,12 @@
 					  	<img src="../images/im.png"/>
 					  	<div class="one">
 					  		<h2>{{activeData.eventName}}</h2>
-					  		<p>{{}}</p>
+					  		<p>{{activeData.eventTypeId}}</p>
 					  		<p><i class="el-icon-time"></i>{{activeData.beginTime}} 至 {{activeData.endTime}}</p>
 				  		</div>				  	
 				  	</el-col>
-					<el-col :span="3"><div class="pt55">剩余数量：{{}}</div></el-col>
-					<el-col :span="3"><div class="pt55">中奖数量：{{}}</div></el-col>					
+					<el-col :span="3"><div class="pt55">剩余数量：{{activeData.nyEventPrizes != undefined ? activeData.nyEventPrizes.countTotal : ''}}</div></el-col>
+					<el-col :span="3"><div class="pt55">中奖数量：{{activeData.nyEventPrizes != undefined ? activeData.nyEventPrizes.countLeft :''}}</div></el-col>					
 					<el-col :span="2" style="text-align: center;">
 				  		<div class="pt55 editType"><span>●</span>未开始</div>
 				    </el-col>
@@ -251,25 +326,79 @@
 				</ul>
 				<div class="activeTips clear">
 					<label>活动描述：</label>
-					<textarea ></textarea>
-				</div>
+					<!--<textarea ></textarea>-->
+					<div class="fl">
+						<div id="editor">
+						  <p>Hello World!</p>
+						  <p>Some initial <strong>bold</strong> text</p>
+						  <p><br></p>
+						</div>
+					</div>
+					
+				</div>				
 				<div class="btnPart bgf4 pd20">
 	                <el-button type="search" round @click="submitData">确定</el-button>
 	           </div>
 				
 			</div>
 			<!--活动奖品-->
-			<div v-if="showPart == 2">
-				<div class="clear">
+			<div class="allContent bgf4" v-if="showPart == 2">
+				<div class="clear bgf4 pd20">
 					<div class="btnPart bgf4 fr">
-		                <el-button type="search" round @click="submitData">确定</el-button>
-		                <el-button type="search" round @click="submitData">确定</el-button>
-		                <el-button type="search" round @click="submitData">确定</el-button>
+		                <el-button round @click="exportPrizePool">导出奖品池</el-button>
+		                <!--<el-button round @click="setPrizePool">设置奖品池</el-button>
+		                <el-button round @click="addGoods">添加奖品</el-button>-->
 		           	</div>
-					<h2 class="fl">奖品设置</h2>
+					<h2 class="fl fs14">奖品设置</h2>
 				</div>
-				
-				
+				<ul class="activeGoodsList">
+					<li class="clear">
+						<div class="activeGoodsImg fl">
+							<img src="../images/im.png"/>
+							<el-upload
+	                            class="avatar-uploader"
+	                            action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+	                            :data="Token"
+	                            :show-file-list="false"
+	                            :on-success="handleAvatarSuccess"
+	                            :before-upload="beforeAvatarUpload">
+		                        <el-button round size="small" type="search">上传图片</el-button>
+	                    	</el-upload>
+						</div>
+						<div class="activeGoodscont">
+							<h2 class="fs14 clear">
+								<span class="fr sortDown"></span>
+								<span class="fr sortUp"></span>
+								<span class="fr delete" @click="delectFun"></span>
+								100元优惠券									
+							</h2>
+							<div class="clear">
+								<div class="fr">
+									<el-button round size="small" @click="downloadTemplate">下载模板</el-button>
+									<el-button round size="small">导入券码</el-button>
+									<el-button round size="small">编辑</el-button>
+								</div>
+								<ul class="fl">
+									<li><span>奖品名称：</span>100元优惠券</li>
+									<li><span>奖品类型：</span>100元优惠券</li>
+									<li><span>奖品数量：</span>6000</li>
+									<li><span>优惠券指定类型：</span>100元优惠券</li>
+									<li><span>奖品描述：</span>100元优惠券100元优惠券100元优惠券100元优惠券100元优惠券</li>
+								</ul>
+							</div>
+							
+						</div>
+					</li>
+				</ul>
+				<!--<el-pagination style="margin-bottom: 20px;" 
+					@size-change="handleSizeChange" 
+					@current-change="handleCurrentChange" 
+					:current-page="pagination.pageNo" 
+					:page-sizes="pagination.pageSizes" 
+					:page-size="pagination.pageSize" 
+					layout="total, sizes, prev, pager, next, jumper" 
+					:total="pagination.count">
+				</el-pagination>-->
 				
 			</div>
 			<!--中奖名单-->
@@ -292,14 +421,23 @@
 					</el-table-column>
 				</el-table>
 				<!--描述：分页-->
-				<el-pagination style="margin-bottom: 20px;" @size-change="handleSizeChange" @current-change="handleCurrentChange" :current-page="pagination.pageNo" :page-sizes="pagination.pageSizes" :page-size="pagination.pageSize" layout="total, sizes, prev, pager, next, jumper" :total="pagination.count">
+				<el-pagination style="margin-bottom: 20px;" 
+					@size-change="handleSizeChange" 
+					@current-change="handleCurrentChange" 
+					:current-page="pagination.pageNo" 
+					:page-sizes="pagination.pageSizes" 
+					:page-size="pagination.pageSize" 
+					layout="total, sizes, prev, pager, next, jumper" 
+					:total="pagination.count">
 				</el-pagination>
 			</div>			
 			<!--描述：弹窗-->
 			<div id="fixedBg" v-show="fBgIsShow"></div>
 
 		</div>
+		<script type="text/javascript" src="../js/quill.js" ></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
+<!--		<script type="text/javascript" src="../js/quill.core.js" ></script>-->
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>		
 		<script type="text/javascript" src="../js/public.js"></script>

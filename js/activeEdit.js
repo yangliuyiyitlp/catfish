@@ -1,65 +1,35 @@
 var couponType = new Vue({
 	el: "#activeEdit",
 	data: {
-		showPart:2,
+		showPart:1,
 		activeData:'',
 		winningList:'',
+		goodsList:'',
+		detailContent:'',
 		tabList:[
 			{
 				id:1,
-				img:'../images/im.png',
-				showImg:'../images/erp_popup_close.jpg',
+				img:'../images/aciveTab1.png',
+				showImg:'../images/aciveTab1-1.png',
 				label:'活动设置'
 			},
 			{
 				id:2,
-				img:'../images/im.png',
-				showImg:'../images/erp_popup_close.jpg',
+				img:'../images/aciveTab2.png',
+				showImg:'../images/aciveTab2-1.png',
 				label:'活动奖品'
 			},{
 				id:3,
-				img:'../images/im.png',
-				showImg:'../images/erp_popup_close.jpg',
+				img:'../images/aciveTab3.png',
+				showImg:'../images/aciveTab3-1.png',
 				label:'中间名单'
 			}
 		],
 		settingData:{
 			
 		},
-		serachData:{
-			activeStateVal:'',
-			activityFormVal:'',
-			activityTypeVal:'',
-			activeState: [{//活动状态
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
-			activityForm: [{//活动表现形式
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}],
-			activityType: [{//活动类型
-				value: 1,
-				label: "不限"
-			}, {
-				value: 0,
-				label: "全场"
-			}, {
-				value: -1,
-				label: "单个"
-			}]
+		Token: {},
+		serachData:{			
 		},
 		formInline: {
             pageSize: 10,
@@ -101,13 +71,13 @@ var couponType = new Vue({
 			failureTime:''			
 		},
 		fBgIsShow: false,
-		addPopupShow:false
+		addPopupShow:false		
 	},
 	methods: {
 		getData:function(){
 			var that = this;
 			var content = {
-				id: '122891091fa949628d0e5350c84d28ed'
+				id: '102891091fa949628d0e5350c84d28ed'
 			}
 			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/form', function(data) {
 				console.log(data)
@@ -124,7 +94,7 @@ var couponType = new Vue({
 				that.activeData = data;
 			},'','','','','','',4)
 		},
-		getWinningList:function(){
+		getWinningList:function(){//获取中奖名单
 			var that = this;
 			var content = {
 				eventId: '002891091fa949628d0e5350c84d28ed',
@@ -136,40 +106,27 @@ var couponType = new Vue({
 				that.winningList = data.result;
 			},'','','','','','',4)
 		},
-		BlurValue: function(event, name) { //失去焦点
-			if(name == 'typeName') { //类型名称
-				var reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
-				if(!reg.test(this.pAdd.typeName)) {
-					this.pAdd.typeNameShow = true;
-				} else {
-					this.pAdd.typeNameShow = false;
-				}
-			} else if(name == 'parValue') { //类型金额
-				var reg = /^[1-9]+[0-9]*$/;
-				if(!reg.test(this.pAdd.parValue)) {
-					this.pAdd.parValueShow = true;
-				} else {
-					this.pAdd.parValueShow = false;
-				}
-			} else if(name == 'validPeriod') { //有效期
-				if(this.pAdd.validPeriod !== '0' && this.pAdd.validPeriod !== 0) {
-					var reg = /^[1-9]+[0-9]*$/;
-					if(!reg.test(this.pAdd.validPeriod)) {
-						this.pAdd.validPeriodShow = true;
-					} else {
-						this.pAdd.validPeriodShow = false;
-					}
-				} else {
-					this.pAdd.validPeriodShow = false;
-				}
-			} else if(name == 'conditionValue') { //满足条件金额
-				var reg = /^[1-9]+[0-9]*$/;
-				if(!reg.test(this.pAdd.conditionValue)) {
-					this.pAdd.conditionValueShow = true;
-				} else {
-					this.pAdd.conditionValueShow = false;
-				}
+		getGoodsList:function(){//获取中奖名单
+			var that = this;
+			var content = {
+				id: '002891091fa949628d0e5350c84d28ed'
 			}
+			PostAjax(that, 'post', content, '/layer/nyeventprizes/nyEventPrizes/list', function(data) {
+				console.log(data)
+				that.goodsList = data.result;
+			},'','','','','','',5)
+		},
+		downloadTemplate:function(){
+			PostAjax(this, 'post', '', '/layer/nyeventprizes/nyEventPrizes/import/template', function(data) {
+//				console.log(data)
+				window.location.href = 'http://192.168.0.124:10005'+data;
+			},'','','','','','',5)
+		},
+		exportPrizePool:function(){
+			PostAjax(this, 'post', '', '/layer/nyeventprizespool/nyEventPrizesPool/exportAll', function(data) {
+//				console.log(data)
+				window.location.href = 'http://192.168.0.124:10005' + data;
+			},'','','','','','',5)
 		},
 		AddActive: function() { //添加
 			var content = "";
@@ -228,31 +185,6 @@ var couponType = new Vue({
 				failureTime:''
 			};
 		},
-		changeTypes: function(index,data) { //启动/停止
-			console.log(data)
-			var that = this;			
-			that.pAdd.index = index;
-			that.loadingShow = true;
-			var isUse = data.isUse == true ? 0 : 1;
-			var content = {
-				id: data.id,
-				isUse: isUse,
-				couponTypeName: data.couponTypeName,
-				parValue: data.parValue,							
-				couponAssignType: data.couponAssignType,
-				storeId:data.storeId,
-				validPeriod: data.validPeriod,
-				conditionValue: data.conditionValue,
-				isRepeatable: data.isRepeatable,
-				isMixable: data.isMixable,
-				couponType: data.couponType
-			}
-			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
-				console.log(data);
-				that.loadingShow = false;				
-				Vue.set(that.couponList, that.pAdd.index, data)
-			},'','','','','','',4)
-		},
 		handleCurrentChange: function (val) {
             this.formInline.pageNo = val
             this.pagination.pageNo = val
@@ -294,28 +226,14 @@ var couponType = new Vue({
 	          
 	        });
 	    },
-	    audit(){
-	    	 this.$prompt('请输入邮箱', '提示', {
-	          confirmButtonText: '确定',
-	          cancelButtonText: '取消',
-	          inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-	          inputErrorMessage: '邮箱格式不正确',
-	          center: true
-	        }).then(({ value }) => {
-	          
-	        }).catch(() => {
-	               
-	        });
-	    },
 	    changeFun(){
 	    	var that = this;
 	    	var content={
-	    		'id':'002891091fa949628d0e5350c84d28ed',
-	    		
+	    		'id':'002891091fa949628d0e5350c84d28ed',	    		
 	    	}
 	    	PostAjax(that, 'post', {}, '/layer/nyevent/nyEvent/delete/002891091fa949628d0e5350c84d28ed', function(data) {
-					console.log(data);
-				},'','','','','','',4)
+				console.log(data);
+			},'','','','','','',4)
 	    },
 	    getKeyWords:function(){
 	      	var that = this;
@@ -327,16 +245,75 @@ var couponType = new Vue({
 
 			},'','','','','',1,1)
 	    },
-	    changeShow:function(id){
+	    changeShow:function(id){//tab切换
 	    	this.showPart = id;
 	    	if(id == 3){
 	    		this.getWinningList()
+	    	}else if(id == 2){
+	    		this.getGoodsList()
 	    	}
-	    }
+	    },
+	    // 获取oss秘钥
+        beforeAvatarUpload: function (file) {
+            var that = this;
+            return new Promise(function (resolve) {
+                PostAjax(that, 'post', {'user_dir': 'activeManage'}, '/layer/oss/ossUtil/policy', function (data) {
+                    that.Token = data
+                    that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
+                    that.Token.OSSAccessKeyId = that.Token.accessid
+                    that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+                    resolve()
+
+                }, function (data) {
+                    fadeInOut(data);
+                })
+            })
+        },
+        handleAvatarSuccess: function () {
+            this.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
+        },
 	},
 	created: function() {
 		var that = this;	
 		that.getKeyWords();
 		that.getData();
+		
 	}
 })
+var options = {
+  	debug: 'info',
+	modules: {
+	    toolbar: {
+		    container: [
+		      ['bold', 'italic', 'underline', 'strike'],
+		      ['blockquote', 'code-block'],
+		      [{ 'header': 1 }, { 'header': 2 }],
+		      [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+		      [{ 'script': 'sub' }, { 'script': 'super' }],
+		      [{ 'indent': '-1' }, { 'indent': '+1' }],
+		      [{ 'direction': 'rtl' }],
+		      [{ 'size': ['small', false, 'large', 'huge'] }],
+		      [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+		      [{ 'font': [] }],
+		      [{ 'color': [] }, { 'background': [] }],
+		      [{ 'align': [] }],
+		      ['clean'],
+		      ['link', 'image', 'video']
+		    ],  // 工具栏
+	      	handlers: {
+		        'image': function (value) {
+		        	 alert(1)
+		          if (value) {
+		            alert(1)
+//			            document.querySelector('#quill-upload').click()
+		          } else {
+		          	alert('ddd')
+//			            this.quill.format('image', false);
+		          }
+		        }
+	      	},
+	    }			    
+	},
+  	theme: 'snow'
+}
+var editor = new Quill('#editor', options);
