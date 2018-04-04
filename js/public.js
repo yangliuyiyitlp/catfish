@@ -33,7 +33,10 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
         netLink = 'http://192.168.0.164:10005';
     }else if(urlDr == 4){
         netLink = 'http://192.168.0.123:8080';
+	}else if(urlDr == 5){
+        netLink = 'http://192.168.0.124:10005';
 	}
+
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
 	var ConType = ContentType ? ContentType : 'application/json'
