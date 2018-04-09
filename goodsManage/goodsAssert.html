@@ -124,13 +124,13 @@
                         <!--地图推荐-->
                         <!--</button>-->
 
-                        <button @click="isChangeBest(scope.row)" v-if=(scope.row.recommendFlag)==='1'?true:false
+                        <button @click="isChangeBest(scope.row)" v-if=(scope.row.recommendFlag)==='0'?true:false
                                 class="isOff">
                             地图推荐
                         </button>
                         <button @click="isChangeBest(scope.row)" v-else class="isOn">取消推荐</button>
 
-                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOff">
+                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='0'?true:false class="isOff">
                             启用
                         </button>
                         <button @click="isOnChange(scope.row)" v-else class="isOn">停用</button>

@@ -14,10 +14,10 @@ var store = new Vue({
             },
             exportForm: {},
             isOpen: [{
-                value: '0',
+                value: '1',
                 label: '启用'
             }, {
-                value: '1',
+                value: '0',
                 label: '停用'
             }],
             tableData: [],
@@ -315,9 +315,10 @@ var store = new Vue({
         },
         isOnChange: function (row) {//开启关闭
             var _this = this
+            var openFlag =''
             if (row.openFlag == '1') {
-                var openFlag = '0'
-            } else {
+                openFlag = '0'
+            } else if (row.openFlag == '0'){
                 openFlag = '1'
             }
             PostAjax(_this, 'post', {
@@ -337,6 +338,7 @@ var store = new Vue({
             } else if (row.recommendFlag == '0') {
                 url = '/layer/goods/nyGoods/recommend/insert/' + row.id
             }
+            console.log(url);
             PostAjax(_this, 'post', '', url, function (data) {
                 _this.query()
             }, function (msg) {
@@ -880,6 +882,8 @@ var store = new Vue({
             _this.basicInfo.goodsLable = _this.goodsLableArr.join(',')
             _this.basicInfo.goodsCatName = _this.filterText
             _this.basicInfo.pinyin = _this.pinyin
+            _this.basicInfo.openFlag = '1'
+            _this.basicInfo.recommendFlag = '0'
             _this.basicInfo.updateDate = convertDate(new Date().getTime())
             _this.basicInfo.customId = '1' //todo 目前写死是登陆后传给前端的商户id
             if (_this.timeSelect == 2) {
@@ -893,6 +897,7 @@ var store = new Vue({
                     PostAjax(_this, 'post', _this.basicInfo, '/layer/goods/nyGoods/save', function (data) {
                         _this.activeClass = '属性'
                         _this.formId = data.id
+                        _this.query()
                         //获取属性详情
                         _this.propertyList()
                     }, function (msg) {
