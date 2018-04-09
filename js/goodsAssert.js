@@ -19,7 +19,7 @@ var store = new Vue({
             }, {
                 value: '1',
                 label: '停用'
-            },],
+            }],
             tableData: [],
             ruleForm: {},
             Token: {},
@@ -29,8 +29,12 @@ var store = new Vue({
             goodsPic4: '',
             thumbnail: '',
             cityVisible: false,
+            cityVisibleCity: false,
+            skuRight:false,
             filterText: '',
+            filterCity: '',
             filterId: '',
+            filterIdCity: '',
             secondSection: [],
             goodsTitle: ['基本信息', '属性', 'SKU设置'],
             laterTime: [],
@@ -42,8 +46,10 @@ var store = new Vue({
             goodsLableArr: [],
             pinyin: '',
             timeSelect: '',
-            formId:'',
+            formId: '',
             SKUData: [],
+            SKUForm:{pageSize: 30,
+                pageNo: 1,},
             fallList: [],
             rules: {
                 goodsCatId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
@@ -65,9 +71,15 @@ var store = new Vue({
         // 列表开始
         handleClick: function (tab, event) {
             console.log(tab.name)
-            if (tab.name = 'second') {
+            if (tab.name == 'second') {
                 this.setEmptyForm()
                 this.title = '添加商品'
+                this.activeClass = '基本信息'
+            } else if (tab.name == 'first') {
+                // this.setEmptyForm()
+                this.formInline = {}
+                this.title = '添加商品'
+                this.activeClass = '基本信息'
             }
         },
         handleSizeChange: function (val) {
@@ -81,12 +93,14 @@ var store = new Vue({
             this.query()
         },
         handleSize: function (val) {
-            this.SKUData.pageSize = val
+            this.SKUForm.pageSize = val
             this.paginate.pageSize = val
+            this.SKUList()
         },
         handleCurrent: function (val) {
-            this.SKUData.pageNo = val
+            this.SKUForm.pageNo = val
             this.paginate.pageNo = val
+            this.SKUList()
         },
         // 基本信息开始
         //获取字典数据
@@ -236,12 +250,14 @@ var store = new Vue({
             this.goodsPic4 = ''
             this.basicInfo.goodsPic4 = ''
         },
-        selected: function (gameName) {
-            this.activeClass = gameName
-        },
+        // selected: function (gameName) {
+        //     this.activeClass = gameName
+        // },
         searchMechanism: function () {
             this.cityVisible = true
-            this.filterText = ''
+        },
+        searchMechanismCity: function () {
+            this.cityVisibleCity = true
         },
         searchArea: function () {
             var _this = this
@@ -254,19 +270,31 @@ var store = new Vue({
         },
         doModify: function () {
             this.cityVisible = false
-            this.formInline.goodsCatId = this.filterId
             this.basicInfo.goodsCatId = this.filterId
+        },
+        doModifyCity: function () {
+            this.cityVisibleCity = false
+            this.formInline.goodsCatId = this.filterIdCity
         },
         modifyCancel: function () {
             this.cityVisible = false
+        },
+        modifyCancelCity: function () {
+            this.cityVisibleCity = false
+            this.formInline.goodsCatId = ''
+            this.filterCity = ''
         },
         filterNode: function (value, data) {
             if (!value) return true
             return data.name.indexOf(value) !== -1
         },
         handleNode: function (data) {
-            this.filterText = data.name // 弹框树模型点击输入值
+            this.filterText = data.name
             this.filterId = data.id
+        },
+        handleNodeCity: function (data) {
+            this.filterCity = data.name
+            this.filterIdCity = data.id
         },
         query: function () {
             var _this = this
@@ -336,11 +364,13 @@ var store = new Vue({
         },
         modifyRow: function (row) {
             this.activeName = 'second'
+            this.activeClass = '基本信息'
             this.title = '提交修改'
             this.moreInfo(row)
         },
         moreInfo: function (row) {
             var _this = this
+            _this.$refs.basicInfo.resetFields()
             PostAjax(_this, 'post', {'id': row.id}, '/layer/goods/nyGoods/form', function (data) {
                 _this.basicInfo = data
                 _this.filterText = _this.basicInfo.goodsCatName
@@ -349,7 +379,10 @@ var store = new Vue({
                 _this.goodsPic2 = _this.basicInfo.goodsPic2
                 _this.goodsPic3 = _this.basicInfo.goodsPic3
                 _this.goodsPic4 = _this.basicInfo.goodsPic4
-                _this.goodsLableArr = _this.basicInfo.goodsLable.split(',')
+                if(_this.basicInfo.goodsLable.length>0){
+                    _this.goodsLableArr =_this.basicInfo.goodsLable.split(',')
+                }
+                _this.pinyin = _this.basicInfo.pinyin
                 if (_this.basicInfo.releaseTime == null) {
                     _this.timeSelect = 2
                 } else {
@@ -366,6 +399,7 @@ var store = new Vue({
         },
         setEmptyForm: function () {
             this.basicInfo = {}
+            this.formBasic = {}
             this.$refs.basicInfo.resetFields()
             this.goodsPic1 = ''
             this.goodsPic2 = ''
@@ -373,26 +407,15 @@ var store = new Vue({
             this.goodsPic4 = ''
             this.thumbnail = ''
             this.timeSelect = ''
+            this.filterText = ''
+            this.pinyin = ''
+            this.goodsLableArr = []
         },
         resetForm: function (formName) {
             this.setEmptyForm()
         },
         releaseTimeChange: function (val) {
             this.basicInfo.releaseTime = convertDate(val.getTime())
-        },
-        basicNext: function (ruleForm) {
-            var _this = this
-            _this.basicInfo.goodsLable = _this.goodsLableArr.join(',')
-            _this.basicInfo.goodsCatName = _this.filterText
-            if (_this.timeSelect == 2) {
-                _this.basicInfo.releaseTime = null
-            }
-            PostAjax(_this, 'post', _this.basicInfo, '/layer/goods/nyGoods/save', function (data) {
-                _this.activeClass = '属性'
-                _this.formId=data.id
-            }, function (msg) {
-                fadeInOut(msg)
-            })
         },
         //pinyin 开始
         getPinYi: function () {
@@ -852,13 +875,149 @@ var store = new Vue({
             }
 
         },
+        basicNext: function (ruleForm) {
+            var _this = this
+            _this.basicInfo.goodsLable = _this.goodsLableArr.join(',')
+            _this.basicInfo.goodsCatName = _this.filterText
+            _this.basicInfo.pinyin = _this.pinyin
+            _this.basicInfo.updateDate = convertDate(new Date().getTime())
+            _this.basicInfo.customId = '1' //todo 目前写死是登陆后传给前端的商户id
+            if (_this.timeSelect == 2) {
+                _this.basicInfo.releaseTime = null
+            } else if (_this.timeSelect == 1 && !_this.basicInfo.releaseTime) {
+                _this.$message.warning('“自定义上架时间”请选择时间')
+                return
+            }
+            _this.$refs[ruleForm].validate((valid) => {
+                if (valid) {
+                    PostAjax(_this, 'post', _this.basicInfo, '/layer/goods/nyGoods/save', function (data) {
+                        _this.activeClass = '属性'
+                        _this.formId = data.id
+                        //获取属性详情
+                        _this.propertyList()
+                    }, function (msg) {
+                        fadeInOut(msg)
+                    })
+                } else {
+                    return false;
+                }
+            })
+
+        },
         // 属性开始
+        propertyList: function () {
+            var _this = this
+            PostAjax(_this, 'post', {'goodsId': _this.formId}, '/layer/goods/nyGoodsProperty/list', function (data) {
+                _this.fallList = data.result
+                for (var i = 0; i < _this.fallList.length; i++) {
+                    _this.fallList[i].label = _this.fallList[i].name
+                }
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
+        propertyAdd: function (propertyId, propertyValue, index) {
+            var _this = this
+            if (propertyValue && trim(propertyValue).length > 0) {
+                PostAjax(_this, 'post', {
+                    'propertyId': propertyId,
+                    'propertyValue': propertyValue
+                }, '/layer/goods/nyGoodsPropertyValue/save', function (data) {
+                    //添加属性值成功
+                    _this.propertyList()
+                }, function (msg) {
+                    fadeInOut(msg)
+                })
+            } else {
+                _this.$message.warning('请填写属性值')
+                return
+            }
+        },
+        lineDelete: function (id) {
+            var _this = this
+            PostAjax(_this, 'post', {
+                'id': id
+            }, '/layer/goods/nyGoodsProperty/delete', function (data) {
+                //删除属性值成功
+                _this.propertyList()
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
+        propertyDelete: function (id) {
+            var _this = this
+            PostAjax(_this, 'post', {
+                'id': id
+            }, '/layer/goods/nyGoodsPropertyValue/delete', function (data) {
+                //删除属性值成功
+                _this.propertyList()
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
         PropertyCancel: function () {
+            this.formBasic = {}
+        },
+        addList: function (propertyValue, index) {
+            var _this = this
+            PostAjax(_this, 'post', {
+                'name': propertyValue, 'goodsId': _this.formId
+            }, '/layer/goods/nyGoodsProperty/save', function (data) {
+                _this.fallList[index].label = _this.fallList[index].name
+                //添加属性成功
+                _this.propertyList()
+            }, function (msg) {
+                fadeInOut(msg)
+            })
         },
         addProperty: function () {
             var _this = this
-            _this.fallList.push({'label': '颜色'})
+            _this.fallList.push({'propertyValue': '', 'name': ''})
         },
-        PropertyNext:function(){}
+        PropertyNext: function () {
+            this.activeClass = 'SKU设置'
+            this.SKUList()
+        },
+        //sku
+        SKUList: function () {
+            var _this = this
+            _this.SKUForm.goodsId = _this.formId
+            PostAjax(_this, 'post',_this.SKUForm , '/layer/goods/nyGoodsSku/list', function (data) {
+                _this.paginate.count = data.total
+                _this.SKUData = data.result
+                if(_this.SKUData[0].propertyString){
+                    _this.SKUData.propertyARR =[]
+                    var propertyData = _this.SKUData[0].propertyString
+                    for(var key in propertyData){
+                        _this.SKUData.propertyARR.push(key)
+                    }
+                }
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
+        skuDelete: function (id) {
+            var _this = this
+            PostAjax(_this, 'post', {'id': id}, '/layer/goods/nyGoodsSku/delete', function (data) {
+                _this.SKUList()
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
+        skuSubmit:function(){
+            var _this = this
+            PostAjax(_this, 'post',_this.SKUData, '/layer/goods/nyGoodsSku/updateAll', function (data) {
+                _this.activeName='first'
+                _this.query()
+            }, function (msg) {
+                fadeInOut(msg)
+            })
+        },
+        allUpdate:function(){
+            this.skuRight = true
+        },
+        skuCancel:function(){
+            this.SKUList()
+        }
     }
 })
