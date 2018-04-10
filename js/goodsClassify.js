@@ -496,8 +496,8 @@ var store = new Vue({
 
         },
         handleAdd: function (s, d, n) {//增加节点
-            if (n.level >= 2) {
-                this.$message.warning("最多只支持二级！")
+            if (n.level >= 5) {
+                this.$message.warning("最多只支持五级！")
                 return false;
             }
             this.isForm = true

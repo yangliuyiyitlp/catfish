@@ -990,6 +990,10 @@ var store = new Vue({
             PostAjax(_this, 'post',_this.SKUForm , '/layer/goods/nyGoodsSku/list', function (data) {
                 _this.paginate.count = data.total
                 _this.SKUData = data.result
+
+                for(var i=0;i<_this.SKUData.length;i++){
+                        _this.SKUData[i].price='￥'+ _this.SKUData[i].price/100
+                }
                 if(_this.SKUData[0].propertyString){
                     _this.SKUData.propertyARR =[]
                     var propertyData = _this.SKUData[0].propertyString
@@ -1011,6 +1015,9 @@ var store = new Vue({
         },
         skuSubmit:function(){
             var _this = this
+            for(var i=0;i<_this.SKUData.length;i++){
+                _this.SKUData[i].price=(_this.SKUData[i].price.split('￥')[1])/100
+            }
             PostAjax(_this, 'post',_this.SKUData, '/layer/goods/nyGoodsSku/updateAll', function (data) {
                 _this.activeName='first'
                 _this.query()

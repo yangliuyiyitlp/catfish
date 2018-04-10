@@ -95,10 +95,10 @@
         <el-col :span="6">
             <div class="expand">
                 <div>
-                    <div class="titleCenter">
-                    <button class='smallAddForm' round type="button" @click="handleAddTop" >添加</button>
-                    </div>
-                    <div class="classfiy">所有分类</div>
+                    <!--<div class="titleCenter">-->
+                    <!--<button class='smallAddForm' round type="button" @click="handleAddTop" >添加</button>-->
+                    <!--</div>-->
+                    <div class="classfiy">商品分类</div>
                     <el-tree ref="expandMenuList" class="expand-tree"
                              v-if="isLoadingTree"
                              :data="treeList"
@@ -126,9 +126,9 @@
 	                    		<span>{{data.name}}</span>
 	                    	</span>
 	                    	<span class="tree-btn" >
-	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level ==1?false:true'></i>
-	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level ==1?false:true'></i>
-	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)"></i>
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
+	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
 	                    	</span>
 	                    </span>
                             </span>
