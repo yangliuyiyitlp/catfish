@@ -35,7 +35,9 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
         netLink = 'http://192.168.0.123:8080';
 	}else if(urlDr == 5){
         netLink = 'http://192.168.0.124:10005';
-	}
+	}else if(urlDr == 6){
+        netLink = 'http://192.168.0.164:8080';
+    }
 
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');

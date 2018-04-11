@@ -25,13 +25,14 @@
                 <label>名称：</label>
                 <el-input v-model="formInline.goodsName"></el-input>
                 <label>分类：</label>
-                <el-button class="searchBtn" icon="el-icon-search" @click="searchMechanism">{{filterText}}</el-button>
+                <el-button class="searchBtn" icon="el-icon-search" @click="searchMechanismCity">{{filterCity}}
+                </el-button>
                 <label>SKUID：</label>
                 <el-input v-model="formInline.skuId"></el-input>
                 <label>条形码：</label>
                 <el-input v-model="formInline.sn"></el-input>
                 <label>状态：</label>
-                <el-select v-model="formInline.openFlag" placeholder="请选择">
+                <el-select v-model="formInline.openFlag" clearable placeholder="请选择">
                     <el-option
                             v-for="item in isOpen"
                             :key="item.value"
@@ -65,7 +66,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column
-
+                        show-overflow-tooltip="false"
                         align="center"
                         prop="id"
                         label="商品ID">
@@ -108,6 +109,7 @@
                         label="最后修改人">
                 </el-table-column>
                 <el-table-column
+                        show-overflow-tooltip="false"
                         align="center"
                         prop="updateDate"
                         label="最后修改时间">
@@ -122,13 +124,13 @@
                         <!--地图推荐-->
                         <!--</button>-->
 
-                        <button @click="isChangeBest(scope.row)" v-if=(scope.row.recommendFlag)==='1'?true:false
+                        <button @click="isChangeBest(scope.row)" v-if=(scope.row.recommendFlag)==='0'?true:false
                                 class="isOff">
                             地图推荐
                         </button>
                         <button @click="isChangeBest(scope.row)" v-else class="isOn">取消推荐</button>
 
-                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOff">
+                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='0'?true:false class="isOff">
                             启用
                         </button>
                         <button @click="isOnChange(scope.row)" v-else class="isOn">停用</button>
@@ -146,7 +148,7 @@
                     :total="pagination.count">
             </el-pagination>
             <!--模态框-->
-            <el-dialog title="商品分类" size="tiny" :visible.sync="cityVisible" center>
+            <el-dialog title="商品分类" size="tiny" :visible.sync="cityVisibleCity" center>
                 <el-tree
                         ref="tree"
                         highlight-current
@@ -154,12 +156,12 @@
                         class="searchTree"
                         accordion
                         :filter-node-method="filterNode"
-                        @node-click="handleNode"
+                        @node-click="handleNodeCity"
                         :props="defaultProps">
                 </el-tree>
                 <div slot="footer" class="dialog-footer">
-                    <el-button @click="modifyCancel">取 消</el-button>
-                    <el-button type="primary" @click="doModify">确 定</el-button>
+                    <el-button @click="modifyCancelCity">取 消</el-button>
+                    <el-button type="primary" @click="doModifyCity">确 定</el-button>
                 </div>
             </el-dialog>
         </el-tab-pane>
@@ -168,13 +170,16 @@
         <el-tab-pane :label="title" name="second" class="goodsForm">
             <div class="goodsTitle">
                 <ul>
-                    <li href="#!" v-for='(val,idx) in goodsTitle' :class="{activeClick: activeClass == val}"
-                        @click="selected(val)">
+                    <li href="#!" v-for='(val,idx) in goodsTitle' :class="{activeClick: activeClass == val}">
                         <a href="#!">{{idx+1}}</a>{{val}}
                     </li>
+                    <!--<li href="#!" v-for='(val,idx) in goodsTitle' :class="{activeClick: activeClass == val}"-->
+                    <!--@click="selected(val)">-->
+                    <!--<a href="#!">{{idx+1}}</a>{{val}}-->
+                    <!--</li>-->
                 </ul>
             </div>
-
+            <!--基本信息-->
             <div class="formBasic" v-if="activeClass =='基本信息'?true:false">
                 <el-form :model="basicInfo" :rules="rules" ref="basicInfo" label-width="150px">
 
@@ -192,19 +197,27 @@
                     <el-form-item label="拼音助记词：">
                         <el-input v-model="pinyin" disabled></el-input>
                     </el-form-item>
-                    <el-form-item label="排序：">
-                        <el-input v-model="basicInfo.goodsIndex"></el-input>
+
+                    <el-form-item
+                            label="排序"
+                            prop="goodsIndex"
+                            :rules="[{ type: 'number', message: '排序必须为数字值'}]">
+                        <el-input type="age" v-model.number="basicInfo.goodsIndex" auto-complete="off"></el-input>
                     </el-form-item>
 
                     <el-form-item label="标签：">
                         <el-input v-model="basicInfo.goodsTaste"></el-input>
                         <button class='basicAdd' round type="button" @click.stop="tasteAdd">添加</button>
                         <a v-for="val in goodsLableArr" :key="val" class="iconTaste">{{val}} <i
-                                class="el-icon-close iconDelete" @click.stop="tasteDelete(val)"></i></a>
+                                class="el-icon-circle-close-outline
+ iconDelete" @click.stop="tasteDelete(val)"></i></a>
                     </el-form-item>
 
-                    <el-form-item label="可预约天数：">
-                        <el-input v-model="basicInfo.appointmentDays" placeholder="请输入预约天数"></el-input>
+                    <el-form-item
+                            label="可预约天数"
+                            prop="appointmentDays"
+                            :rules="[{ type: 'number', message: '天数必须为数字值'}]">
+                        <el-input type="age" v-model.number="basicInfo.appointmentDays" auto-complete="off"></el-input>
                     </el-form-item>
 
                     <el-form-item label="可约最近时间：">
@@ -285,7 +298,7 @@
                         </el-upload>
                         <p>（图片大小：150k內 长=宽 如：800*800）</p>
                     </el-form-item>
-
+                    <!--todo 富文本-->
                     <el-form-item label="商品详情图：">
                         <i>（单张图片大小：200k内）</i>
                         <div>
@@ -308,7 +321,7 @@
                         </el-radio-group>
                     </el-form-item>
                     <div class="SKUBtn">
-                        <button class="query" round type="button" @click.stop="basicNext">下一步</button>
+                        <button class="query" round type="button" @click.stop="basicNext('basicInfo')">下一步</button>
                         <button class="addForm" round type="button">取消</button>
                     </div>
                 </el-form>
@@ -330,41 +343,51 @@
                     </div>
                 </el-dialog>
             </div>
-
+            <!--属性-->
             <div class="formSKU" v-if="activeClass =='属性'?true:false">
                 <el-form ref="formBasic" :model="formBasic" label-width="150px">
-                    <div class="demoProp">
-                        <p>例：</p>
-                        <el-input disabled class="basicName" placeholder="颜色"></el-input>
+                    <div class="demoProp" v-if="fallList.length>0?false:true">
+                        <i class="basicName">例 => 颜色：</i>
                         <el-input disabled></el-input>
-                        <button class='basicAdd' round type="button" disabled>添加</button>
-                        <el-checkbox-group>
-                            <el-checkbox>绿色<i class="el-icon-close"></i></el-checkbox>
-                            <el-checkbox>黄色<i class="el-icon-close"></i></el-checkbox>
-                            <el-checkbox>粉色<i class="el-icon-close"></i></el-checkbox>
-                        </el-checkbox-group>
+                        <button class='basicAdd demoList' round type="button">添加</button>
+                        <a>绿色<i class="el-icon-circle-close-outline"></i></a>
+                        <a>黄色<i class="el-icon-circle-close-outline"></i></a>
+                        <a>粉色<i class="el-icon-circle-close-outline"></i></a>
+                        <button class='basicDel demoList' round type="button">删除
+                        </button>
                     </div>
                     <div v-for="(item,index) in fallList" :key="index" class="basicInput">
-                        <el-input v-model="item.label" class="basicName"></el-input>
-                        <el-input v-model="item.name"></el-input>
-                        <button class='basicAdd' round type="button" @click.stop="tasteAdd">添加</button>
-                        <el-checkbox-group v-model="item.tasteArr">
-                            <el-checkbox v-for="(val, key) in item.tasteObj" :key="val" :label="key">{{key}}<i
-                                    class="el-icon-close" @click="tasteDelete(val)"></i></el-checkbox>
-                        </el-checkbox-group>
+                        <input type="text" v-model="item.id" v-if="0">
+                        <input type="text" v-model="item.goodsId" v-if="0">
+                        <i v-if="item.label" class="basicName">{{item.name}}：</i>
+                        <el-input v-model="item.name" class="basicName" @blur="addList(item.name,index)"
+                                  v-else></el-input>
+                        <el-input v-model="item.propertyValue"></el-input>
+                        <button class='basicAdd' round type="button"
+                                @click.stop="propertyAdd(item.id,item.propertyValue,index)">添加
+                        </button>
+
+                        <a v-for="(val, key) in item.values" :key="val.propertyId" :label="val.propertyValue">
+                            {{val.propertyValue}}<i class="el-icon-circle-close-outline iconDelete"
+                                                    @click="propertyDelete(val.id)"></i></a>
+                        <button class='basicDel' round type="button"
+                                @click.stop="lineDelete(item.id)">删除
+                        </button>
                     </div>
 
                     <button class='smallAddForm' round type="button" @click="addProperty">添加属性</button>
                     <br>
                     <div class="SKUBtn">
-                        <button class='addForm' round type="button" @click="PropertyCancel">取消</button>
+                        <!--<button class='addForm' round type="button" @click="PropertyCancel">取消</button>-->
                         <button class='query' round type="button" @click="PropertyNext">下一步</button>
                     </div>
                 </el-form>
 
             </div>
+            <!--SKU设置-->
+            <div v-if="activeClass =='SKU设置'?true:false" class="SKUData">
+               <button class="addForm floatRight" round type="button" @click.stop="allUpdate">批量修改</button>
 
-            <div v-if="activeClass =='SKU设置'?true:false" class="formSKU">
                 <el-table
                         :data="SKUData"
                         stripe
@@ -375,54 +398,66 @@
                             label="id"
                             v-if=0>
                     </el-table-column>
+                    <el-table-column
+                            prop="goodsId"
+                            label="goodsId"
+                            v-if=0>
+                    </el-table-column>
+
+                    <div v-for="(sku,index) in SKUData.propertyARR">
+                        <el-table-column
+                                header-align="center"
+                                align="center"
+                                :label="sku"
+                                prop="price">
+                            <template slot-scope="scope">
+                                <a href="#!">{{scope.row.propertyString[sku]}}</a>
+                            </template>
+                        </el-table-column>
+                    </div>
 
 
                     <el-table-column
-                            header-align="center"
-                            align="center"
-                            label="规格"
-                            prop="rank">
-                    </el-table-column>
-                    <el-table-column
-                            header-align="center"
-                            align="center"
-                            label="房屋面积"
-                            prop="rank">
-                    </el-table-column>
-                    <el-table-column
+                            fixed="right"
                             header-align="center"
                             align="center"
                             label="价格"
-                            prop="rank">
+                            prop="price">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank class="SKUConfig"></el-input>
+                            <el-input v-if='skuRight' v-model=scope.row.price class="SKUConfig"></el-input>
+                            <a href="#!" v-else>{{scope.row.price}}</a>
                         </template>
                     </el-table-column>
                     <el-table-column
+                            fixed="right"
                             header-align="center"
                             align="center"
                             label="条形码"
-                            prop="rank">
+                            prop="sn">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank class="barCode"></el-input>
+                            <el-input v-if='skuRight' v-model=scope.row.sn class="barCode"></el-input>
+                            <a href="#!" v-else>{{scope.row.sn}}</a>
                         </template>
                     </el-table-column>
                     <el-table-column
+                            fixed="right"
                             header-align="center"
                             align="center"
                             label="库存"
-                            prop="rank">
+                            prop="stock">
                         <template slot-scope="scope">
-                            <el-input v-model=scope.row.rank class="SKUConfig"></el-input>
+                            <el-input v-if='skuRight' v-model=scope.row.stock class="SKUConfig"></el-input>
+                            <a href="#!" v-else>{{scope.row.stock}}</a>
                         </template>
                     </el-table-column>
 
                     <el-table-column
+                            fixed="right"
                             header-align="center"
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <el-button type="text" size="small">删除</el-button>
+                            <i  class='skuDel' @click.stop="skuDelete(scope.row.id)">删除</i>
                         </template>
                     </el-table-column>
 
@@ -437,8 +472,8 @@
                         :total="paginate.count">
                 </el-pagination>
                 <div class="SKUBtn">
-                    <button class="query" round type="button">保存</button>
-                    <button class="addForm" round type="button">取消</button>
+                    <button class="query" round type="button" @click.stop="skuSubmit">保存</button>
+                    <button class="addForm" round type="button" @click.stop="skuCancel">取消</button>
                 </div>
 
             </div>
