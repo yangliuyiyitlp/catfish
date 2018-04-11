@@ -21,6 +21,27 @@
 				overflow: hidden;
 				color: #FF892F;
 			}
+			.editType span{				
+				font-size: 20px;
+				height: 25px;
+				overflow: hidden;
+				color: #FF892F;
+			}
+			.editType span.underway{/*正在进行*/
+				color: #31CC97;
+			}
+			.editType span.end{/*已结束*/
+				color: #333333;
+			}
+			.editType span.toBeAudited{/*待审核*/
+				color: #6CC1EF;
+			}
+			.editType span.pause{/*暂停中*/
+				color: #EABE17;
+			}
+			.editType span.audit{/*审核中*/
+				color: #5D945B;
+			}
 			.activeEditTop a{
 				display: block;
 				width: 100px;
@@ -113,18 +134,19 @@
 				font-size: 14px;
 				font-weight: bold;
 			}
-			.activeGoodsList{
-				background: #fff;
+			.activeGoodsList{				
 				margin-bottom: 20px;
 			}
 			.activeGoodsList > li{
 				padding: 20px;
+				margin-bottom: 20px;
+				background: #fff;
 			}
 			.activeGoodsImg .el-button,.activeGoodscont .el-button{
 				width: 80px;
 			}
 			.activeGoodscont{
-				padding-left: 100px;
+				padding-left: 110px;
 			}
 			.activeGoodscont > h2{
 				border-bottom: solid 1px #D4D4D4;
@@ -186,26 +208,46 @@
 			.activeGoodscont .el-button{
 				margin: 0;
 			}
+			.activeGoodsImg img{
+				height: 100px;
+				width: 100px;
+			}
+			.goodsSerachPart{
+				height:700px;
+				margin-top: -350px;
+			}
+			.goodsSerachPart div.top .el-input{
+				width: 145px;
+			}
 		</style>
 	</head>
 	<body>
 		<div id="activeEdit" class="erp_content wp" v-clock >
 			<!--头部-->
-			<div class="activeList activeEditTop">
+			<div class="activeList activeEditTop" v-if="serachData.activityType != ''">
 				<el-row>
 				  	<el-col :span="11">
 					  	<img src="../images/im.png"/>
 					  	<div class="one">
 					  		<h2>{{activeData.eventName}}</h2>
-					  		<p>{{activeData.eventTypeId}}</p>
+					  		<p>{{serachData.activityType[activeData.eventTypeId].label}}</p>
 					  		<p><i class="el-icon-time"></i>{{activeData.beginTime}} 至 {{activeData.endTime}}</p>
 				  		</div>				  	
 				  	</el-col>
 					<el-col :span="3"><div class="pt55">剩余数量：{{activeData.nyEventPrizes != undefined ? activeData.nyEventPrizes.countTotal : ''}}</div></el-col>
 					<el-col :span="3"><div class="pt55">中奖数量：{{activeData.nyEventPrizes != undefined ? activeData.nyEventPrizes.countLeft :''}}</div></el-col>					
 					<el-col :span="2" style="text-align: center;">
-				  		<div class="pt55 editType"><span>●</span>未开始</div>
-				    </el-col>
+				  		<!--<div class="pt55 editType"><span>●</span>未开始</div>-->
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 2"><span class="toBeAudited">●</span>待审核</div>
+						<div class="pt55 editType" v-if="activeData.newEventStatus == 1"><span class="audit">●</span>审核中</div>
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 0">
+				  			<p>审核不通过<br>{{activeData.auditComment}}</p>
+				  		</div>
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 5"><span>●</span>未开始</div>
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 4"><span class="underway">●</span>正在进行</div>
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 3"><span class="pause">●</span>暂停中</div>
+				  		<div class="pt55 editType" v-if="activeData.newEventStatus == 6"><span class="end">●</span>已结束</div>
+				   </el-col>
 				    <el-col :span="2"><div class="pt55"></div></el-col>
 				    <el-col :span="3">	
 				    	<a href="javascript:history.go(-1)">查看更多活动</a>
@@ -220,29 +262,28 @@
 				</li>
 			</ul>
 			<!--设置内容-->
-			<div class="activeDetail" v-if="showPart == 1">
+			<div class="activeDetail" v-show="showPart == 1">
 				<ul class="clear">
 					<li>
 						<label>活动表现形式：</label>
-						<el-select v-model="pAdd.couponType">
+						<el-select v-model="activeData.eventManId">
 						    <el-option
-						      v-for="item in pAdd.activityForm"
-						      :key="item.value"
-						      :label="item.label"
-						      :value="item.value">
+						      v-for="item in serachData.activityForm"
+						      :key="item.eventManCode"
+						      :label="item.eventManName"
+						      :value="item.eventManCode">
 						    </el-option>
 						</el-select>
 					</li>
 					<li>
 						<label>中奖提示：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.overRemark"></el-input>
 					</li>
 					<li>
 						<label>活动类型：</label>
-						<el-select v-model="pAdd.couponType">
+						<el-select v-model="activeData.eventTypeId">
 						    <el-option
-						      v-for="item in pAdd.activityType"
+						      v-for="item in serachData.activityType"
 						      :key="item.value"
 						      :label="item.label"
 						      :value="item.value">
@@ -251,45 +292,43 @@
 					</li>
 					<li>
 						<label>未中奖提示：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.outRemark"></el-input>
 					</li>
 					<li>
 						<label>活动名称：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.eventName"></el-input>
 					</li>
 					<li>
 						<label>未开始提示：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.msgHasNot"></el-input>
 					</li>
 					<li>
 						<label>开始时间：</label>
 						<el-date-picker
-					      v-model="pAdd.startTime"
+					      v-model="activeData.beginTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择日期时间"
+					      value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
 					</li>
 					<li>
 						<label>已结束提示：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.msgEnd"></el-input>
 					</li>
 					<li>
 						<label>结束时间：</label>
 						<el-date-picker
-					      v-model="pAdd.endTime"
+					      v-model="activeData.endTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择日期时间"
+					      value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
 					</li>					
 					<li>
 						<label>活动周期：</label>
-						<el-select v-model="pAdd.couponType">
+						<el-select v-model="activeData.eventPeriod">
 						    <el-option
-						      v-for="item in pAdd.activityType"
+						      v-for="item in serachData.eventPeriod"
 						      :key="item.value"
 						      :label="item.label"
 						      :value="item.value">
@@ -299,107 +338,91 @@
 					<li>
 						<label>展示时间：</label>
 						<el-date-picker
-					      v-model="pAdd.showTime"
+					      v-model="activeData.releaseTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择日期时间"
+					      value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
 					</li>
 					<li>
 						<label>每周期每人抽奖次数：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.personCount"></el-input>
 						<span>（0为不限）</span>
 					</li>					
 					<li>
 						<label>失效时间：</label>
 						<el-date-picker
-					      v-model="pAdd.failureTime"
+					      v-model="activeData.stockoutTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择日期时间"
+					      value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
 					</li>
 					<li>
 						<label>每次抽奖抵扣积分：</label>
-						<el-input type="text" v-model="pAdd.activeName"></el-input>
-						<!--<input type="text" :value="pAdd.activeName" />-->
+						<el-input type="text" v-model="activeData.deduction"></el-input>
 					</li>					
 				</ul>
 				<div class="activeTips clear">
 					<label>活动描述：</label>
-					<!--<textarea ></textarea>-->
 					<div class="fl">
 						<div id="editor">
-						  <p>Hello World!</p>
-						  <p>Some initial <strong>bold</strong> text</p>
-						  <p><br></p>
+							<p>{{activeData.description}}</p>
 						</div>
-					</div>
-					
+					</div>					
 				</div>				
 				<div class="btnPart bgf4 pd20">
 	                <el-button type="search" round @click="submitData">确定</el-button>
-	           </div>
-				
+	           	</div>				
 			</div>
 			<!--活动奖品-->
 			<div class="allContent bgf4" v-if="showPart == 2">
 				<div class="clear bgf4 pd20">
 					<div class="btnPart bgf4 fr">
 		                <el-button round @click="exportPrizePool">导出奖品池</el-button>
-		                <!--<el-button round @click="setPrizePool">设置奖品池</el-button>
-		                <el-button round @click="addGoods">添加奖品</el-button>-->
+		                <el-button round @click="setPrizePool">设置奖品池</el-button>
+		                <el-button round @click="addGoods">添加奖品</el-button>
 		           	</div>
 					<h2 class="fl fs14">奖品设置</h2>
 				</div>
 				<ul class="activeGoodsList">
-					<li class="clear">
+					<li class="clear" v-for="(item,index) in goodsList">
 						<div class="activeGoodsImg fl">
-							<img src="../images/im.png"/>
+							<img :src="item.imageUrl"/>
 							<el-upload
 	                            class="avatar-uploader"
 	                            action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
 	                            :data="Token"
 	                            :show-file-list="false"
 	                            :on-success="handleAvatarSuccess"
-	                            :before-upload="beforeAvatarUpload">
+	                            :before-upload="beforeAvatarUpload"
+	                            align="center">
 		                        <el-button round size="small" type="search">上传图片</el-button>
 	                    	</el-upload>
 						</div>
 						<div class="activeGoodscont">
 							<h2 class="fs14 clear">
-								<span class="fr sortDown"></span>
-								<span class="fr sortUp"></span>
-								<span class="fr delete" @click="delectFun"></span>
-								100元优惠券									
+								<span class="fr sortDown" v-if="index != goodsList.length-1" @click="sortFun('down',index)"></span>
+								<span class="fr sortUp" v-if="index != 0" @click="sortFun('up',index)"></span>
+								<span class="fr delete" @click="delectFun(index)"></span>
+								{{item.prizeName}}									
 							</h2>
 							<div class="clear">
 								<div class="fr">
-									<el-button round size="small" @click="downloadTemplate">下载模板</el-button>
-									<el-button round size="small">导入券码</el-button>
-									<el-button round size="small">编辑</el-button>
+									<el-button round size="small" @click="editFun(index)">编辑</el-button>
 								</div>
 								<ul class="fl">
-									<li><span>奖品名称：</span>100元优惠券</li>
-									<li><span>奖品类型：</span>100元优惠券</li>
-									<li><span>奖品数量：</span>6000</li>
-									<li><span>优惠券指定类型：</span>100元优惠券</li>
-									<li><span>奖品描述：</span>100元优惠券100元优惠券100元优惠券100元优惠券100元优惠券</li>
+									<li><span>奖品名称：</span>{{item.prizeName}}</li>
+									<li><span>奖品类型：</span>{{item.prizeTypeId}}</li>
+									<li><span>奖品数量：</span>{{item.countTotal}}</li>
+									<li><span>优惠券指定类型：</span>{{item.prizeObject.couponAssignType == 2 ? item.prizeObject.nyCustom.customName : '全场'}}</li>
+									<li><span>奖品描述：</span>{{item.prizeDesc}}</li>
 								</ul>
 							</div>
 							
 						</div>
 					</li>
-				</ul>
-				<!--<el-pagination style="margin-bottom: 20px;" 
-					@size-change="handleSizeChange" 
-					@current-change="handleCurrentChange" 
-					:current-page="pagination.pageNo" 
-					:page-sizes="pagination.pageSizes" 
-					:page-size="pagination.pageSize" 
-					layout="total, sizes, prev, pager, next, jumper" 
-					:total="pagination.count">
-				</el-pagination>-->
-				
+				</ul>			
 			</div>
 			<!--中奖名单-->
 			<div v-if="showPart == 3">
@@ -433,7 +456,90 @@
 			</div>			
 			<!--描述：弹窗-->
 			<div id="fixedBg" v-show="fBgIsShow"></div>
-
+			<div class="popup_public activePopup" v-show="editPopupShow" >
+				<h2>编辑</h2>				
+				<div class="edit_area pr">
+					<el-form :model="goodsEdit" ref="goodsEdit" label-width="150px" class="demo-ruleForm">
+					  <el-form-item label="奖品名称：" prop="activityForm">
+					    <el-input type="text" v-model="goodsEdit.prizeName"></el-input>
+					  </el-form-item>
+					  <el-form-item label="奖品等奖：" prop="prizeTypeId">
+					    <el-input type="text" v-model="goodsEdit.prizeTypeId"></el-input>
+					  </el-form-item>
+					  <el-form-item label="奖品数量：" prop="countTotal">
+					    <el-input type="text" v-model="goodsEdit.countTotal"></el-input>
+					  </el-form-item>
+					  <el-form-item label="奖品描述：" prop="prizeDesc">
+					     <el-input type="textarea" placeholder="最多输入20字符" v-model="goodsEdit.prizeDesc"></el-input>
+					  </el-form-item>
+					  <el-form-item label="是否自动补充：" prop="isAutoGet">
+					     <el-radio-group v-model="goodsEdit.isAutoGet">
+					      <el-radio label="是"></el-radio>
+					      <el-radio label="否"></el-radio>
+					    </el-radio-group>
+					  </el-form-item>
+					  <el-form-item>
+					    <el-button round @click="resetForm('goodsEdit')">取消</el-button>
+	  					<el-button round type="search" @click="submitForm('goodsEdit')">确定</el-button>
+					  </el-form-item>
+					</el-form>
+				</div>
+			</div>
+			<div class="popup_public goodsSerachPart" v-show="addPopupShow" >
+				<h2>添加奖品</h2>	
+				<!--<el-button round type="search" @click="choseGoods" style="float: right;margin-top: 10px;">确定</el-button>-->
+				<div class="edit_area pr">
+					<div class="top">		
+						<el-cascader
+						  :options="scene"
+						  @active-item-change="sceneChange"
+						  :show-all-levels="false"
+						  :props="props"
+						></el-cascader>
+						<el-select v-model="value5" multiple placeholder="请选择">
+							<el-option
+						      v-for="item in options"
+						      :key="item.value"
+						      :label="item.label"
+						      :value="item.value">
+						    </el-option>
+						</el-select>
+						<el-input type="text" placeholder="优惠券名称" style="width: 200px;"></el-input>
+						<el-button round @click="getNewgoodsData">查询</el-button>
+					</div>
+					<el-table :data="newGoodsList" border style="margin: 20px auto;">
+						<el-table-column align="center" prop="id" label="id" v-if=0 >
+						</el-table-column>
+						<el-table-column align="center" label="操作">
+							<template slot-scope="scope">
+		                    	<el-button round size="small" @click="choseGoods(scope.$index,scope.row)">添加</el-button>		                    	
+		                    </template>
+					    </el-table-column>
+						<!--<el-table-column align="center" prop="id" label="优惠券类型Id">
+						</el-table-column>-->
+						<el-table-column align="center" prop="nyEventPrizes.prizeTypeId" label="优惠券指定类型">
+							<template slot-scope="scope">
+	                        	{{serachData.useRange[scope.row.couponAssignType].label !='单个' ? serachData.useRange[scope.row.couponAssignType].label : scope.row.nyCustom.customName}}
+						    </template>
+						</el-table-column>
+						<el-table-column align="center" prop="couponTypeName" label="优惠券类型名称">
+						</el-table-column>
+						<el-table-column align="center" label="奖品数量">
+							<template slot-scope="scope">
+								<el-input type="text" v-model="scope.row.countLeft" style="width: 100px;"></el-input>
+						   </template>							
+						</el-table-column>
+					</el-table>
+					<!--描述：分页-->
+					<el-pagination 
+						@current-change="currentChange" 
+						:current-page="page2.pageNo" 
+						:page-size="page2.pageSize" 
+						layout="total, prev, pager, next, jumper" 
+						:total="page2.count">
+					</el-pagination>					
+				</div>
+			</div>
 		</div>
 		<script type="text/javascript" src="../js/quill.js" ></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
