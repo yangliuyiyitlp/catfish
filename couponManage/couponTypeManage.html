@@ -37,7 +37,7 @@
 				</div> 
 				<div class="shopDiv searchDiv pa" v-show="shopNameIsShow" v-on:click.stop="shopNameIsShow=true" >
 					<h3>
-						<input type="text" placeholder="输入店铺名称" :value="useRangeSearch" v-model="useRangeSearch" v-on:keydown="KeyDownEnter($event,1)" spellcheck="false"/>
+						<input type="text" placeholder="输入商户名称" :value="useRangeSearch" v-model="useRangeSearch" v-on:keydown="KeyDownEnter($event,1)" spellcheck="false"/>
 						<el-button type="search" style="width: 80px;" size="small" round v-on:click.stop="GetSearchShop(1)">搜索</el-button>
 					</h3>
 					<ul>
@@ -76,7 +76,7 @@
                         align="center"
                         label="优惠券指定类型">
                         <template slot-scope="scope">
-                        	{{serachData.useRange[scope.row.couponAssignType].label !='单个' ? serachData.useRange[scope.row.couponAssignType].label : scope.row.nyCustomStore.storeName}}
+                        	{{serachData.useRange[scope.row.couponAssignType].label !='单个' ? serachData.useRange[scope.row.couponAssignType].label : scope.row.nyCustom.customName}}
 					    </template>
                 </el-table-column>
                 <el-table-column
@@ -185,7 +185,7 @@
 					</p>
 					<div class="AddDiv searchDiv pa" v-show="pAdd.pUR.shopNameIsShow" v-on:click.stop="pAdd.pUR.shopNameIsShow=true">
 						<h3>
-							<input type="text" placeholder="输入店铺名称" :value="pAdd.pUR.useRangeSearch" v-model="pAdd.pUR.useRangeSearch" v-on:keydown="KeyDownEnter($event,2)" spellcheck="false"/>
+							<input type="text" placeholder="输入商户名称" :value="pAdd.pUR.useRangeSearch" v-model="pAdd.pUR.useRangeSearch" v-on:keydown="KeyDownEnter($event,2)" spellcheck="false"/>
 							<input type="button" value="搜索" v-on:click="GetSearchShop(2)"/>
 						</h3>
 						<ul>
