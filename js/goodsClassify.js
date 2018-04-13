@@ -16,7 +16,7 @@ var store = new Vue({
             isForm: false,
             rules: {
                 name: [
-                    {required: true, message: '请输入类别名称', trigger: 'blur'},
+                    {required: true, message: '请输入类别名称'},
                     { min: 1, max: 10, message: '长度在 1 到 10个字符', trigger: 'blur' }
                 ],
                 catOrder: [
@@ -476,7 +476,7 @@ var store = new Vue({
                 _this.treeName =data[0].name
             }, function (msg) {
                 fadeInOut(msg);
-            }, '', '', '', '', 1)
+            }, '', '', '', '', 1,3)
         },
         initExpand: function () {
             var _this = this
@@ -485,16 +485,16 @@ var store = new Vue({
             });
             this.isLoadingTree = true;
         },
-        handleAddTop: function () {
-            this.isForm = true
-            this.formClass ={}
-            this.formClass.parent = null
-            this.formClass.parentName = this.treeName||'无'
-            this.formClass.catOrder = '0'
-            this.formClass.initials = ''
-            this.initials = ''
-
-        },
+        // handleAddTop: function () {
+        //     this.isForm = true
+        //     this.formClass ={}
+        //     this.formClass.parent = null
+        //     this.formClass.parentName = this.treeName||'无'
+        //     this.formClass.catOrder = '0'
+        //     this.formClass.initials = ''
+        //     this.initials = ''
+        //
+        // },
         handleAdd: function (s, d, n) {//增加节点
             if (n.level >= 5) {
                 this.$message.warning("最多只支持五级！")
@@ -505,10 +505,14 @@ var store = new Vue({
             this.formClass.parent = d.id
             this.formClass.parentName = d.name
             this.formClass.catOrder = '0'
+            this.initials=''
+            this.$refs.formClass.resetFields();
         },
         handleEdit: function (s, d, n) {//编辑节点
-            this.isForm = true
             var _this = this
+            _this.isForm = true
+            _this.$refs.formClass.resetFields();
+
             PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/form/'+d.id, function (data) {
                 _this.formClass = data
                 if (n.parent.data.id) {
@@ -559,19 +563,31 @@ var store = new Vue({
             this.formClass.initials =''
             this.initials =''
             this.formClass.catOrder ='0'
+            this.$refs.formClass.resetFields();
         },
-        submitForm: function () {
+        submitForm:function(formClass) {
             var _this = this
             if(typeof(_this.initials)=='object' ){
                 _this.formClass.initials = _this.initials.join(',')
                 _this.initials = _this.initials.join(',')
             }
-            PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/save', function (data) {
-                _this.getTreeList()
-                _this.isForm = false
-            }, function (msg) {
-                fadeInOut(msg);
-            })
-        }
+            if(!/^(0|[1-9][0-9]*|-[1-9][0-9]*)$/.test(_this.formClass.catOrder)){
+                _this.$message.warning('排序只能输入整数')
+                return
+            }
+            _this.$refs[formClass].validate((valid) => {
+                if (valid) {
+                    PostAjax(_this, 'post', _this.formClass, '/layer/goods/nyGoodsCat/save', function (data) {
+                        _this.getTreeList()
+                        _this.isForm = false
+                    }, function (msg) {
+                        fadeInOut(msg);
+                    })
+
+                } else {
+                    return false;
+                }
+            });
+        },
     }
 })

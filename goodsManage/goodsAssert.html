@@ -198,10 +198,7 @@
                         <el-input v-model="pinyin" disabled></el-input>
                     </el-form-item>
 
-                    <el-form-item
-                            label="排序"
-                            prop="goodsIndex"
-                            :rules="[{ type: 'number', message: '排序必须为数字值'}]">
+                    <el-form-item label="排序">
                         <el-input type="age" v-model.number="basicInfo.goodsIndex" auto-complete="off"></el-input>
                     </el-form-item>
 
@@ -213,11 +210,8 @@
  iconDelete" @click.stop="tasteDelete(val)"></i></a>
                     </el-form-item>
 
-                    <el-form-item
-                            label="可预约天数"
-                            prop="appointmentDays"
-                            :rules="[{ type: 'number', message: '天数必须为数字值'}]">
-                        <el-input type="age" v-model.number="basicInfo.appointmentDays" auto-complete="off"></el-input>
+                    <el-form-item label="可预约天数">
+                        <el-input type="age" v-model="basicInfo.appointmentDays" auto-complete="off"></el-input>
                     </el-form-item>
 
                     <el-form-item label="可约最近时间：">
@@ -232,7 +226,7 @@
                         </el-radio-group>
                     </el-form-item>
 
-                    <el-form-item label="商品列表图：">
+                    <el-form-item label="商品列表图：" prop="thumbnail">
                         <el-upload
                                 class="avatar-uploader"
                                 action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
@@ -245,9 +239,9 @@
                             <i v-else class="el-icon-plus
                 avatar-uploader-icon"></i>
                         </el-upload>
-                        <i>（图片大小：150k內 长=1.65宽 如：132*80 347*210）</i>
+                        <i>（图片大小：150k內 长=1.65*宽 如：132*80 347*210）</i>
                     </el-form-item>
-                    <el-form-item label="商品轮播图：">
+                    <el-form-item label="商品轮播图："prop="goodsPic1">
                         <el-upload
                                 class="avatar-uploader goodsPic"
                                 action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
@@ -299,7 +293,7 @@
                         <p>（图片大小：150k內 长=宽 如：800*800）</p>
                     </el-form-item>
                     <!--todo 富文本-->
-                    <el-form-item label="商品详情图：">
+                    <el-form-item label="商品详情：">
                         <i>（单张图片大小：200k内）</i>
                         <div>
 
@@ -424,7 +418,7 @@
                             label="价格"
                             prop="price">
                         <template slot-scope="scope">
-                            <el-input v-if='skuRight' v-model=scope.row.price class="SKUConfig"></el-input>
+                            <el-input type='text' v-if='skuRight' v-model=scope.row.price class="SKUConfig" @keyup.native="priceChange(scope.row.price,scope.$index)"> </el-input>>
                             <a href="#!" v-else>{{scope.row.price}}</a>
                         </template>
                     </el-table-column>
