@@ -418,7 +418,7 @@
                             label="价格"
                             prop="price">
                         <template slot-scope="scope">
-                            <input type='text' v-if='skuRight' v-model=scope.row.price class="SKUConfig" @keydown="priceChange(scope.row.price,scope.row.id)">
+                            <el-input type='text' v-if='skuRight' v-model=scope.row.price class="SKUConfig" @keyup.native="priceChange(scope.row.price,scope.$index)"> </el-input>>
                             <a href="#!" v-else>{{scope.row.price}}</a>
                         </template>
                     </el-table-column>

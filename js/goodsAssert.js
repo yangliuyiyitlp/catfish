@@ -69,36 +69,36 @@ var store = new Vue({
         this.searchArea()
         this.getlists()
     },
-    // watch:{
-    //     SKUData:{
-    //         handler:function(newval,oldval){
-    //             var _this=this
-    //             _this.SKUData.forEach(function (item,index) {
-    //                 // if(!/^\d+(\.\d{0,2})?$/.test(item.price)){
-    //                 //     _this.$message.warning('价格最多为2位小数的正数')
-    //                 //     return
-    //                 // }
-    //                 // else{
-    //                 //    item.price = parseFloat(item.price)
-    //                     var value=String(item.price)
-    //                     if(value.indexOf('.')>0){
-    //                         var left =value.substr(0,value.indexOf('.'))
-    //                         var right =value.substr(value.indexOf('.')+1,value.length)
-    //                         if(right.length>2){
-    //                             right=right.substr(0,2)
-    //                         }
-    //                         value=left+'.'+right
-    //                         _this.SKUData[index].price =value
-    //                     }
-    //                     // item.price =value
-    //                 console.log(_this.SKUData)
-    //
-    //                 // }
-    //             })
-    //         },
-    //         deep:true
-    //     }
-    // },
+    watch: {
+        SKUData: {
+            handler: function (newval, oldval) {
+                var _this = this
+                _this.SKUData.forEach(function (item, index) {
+                    if (!/^\d+(\.\d{0,2})?$/.test(item.price)) {
+                        _this.$message.warning('价格最多为2位小数的正数')
+                        return
+                    }
+                    // else{
+                    //    item.price = parseFloat(item.price)
+                    //     var value=String(item.price)
+                    //     if(value.indexOf('.')>0){
+                    //         var left =value.substr(0,value.indexOf('.'))
+                    //         var right =value.substr(value.indexOf('.')+1,value.length)
+                    //         if(right.length>2){
+                    //             right=right.substr(0,2)
+                    //         }
+                    //         value=left+'.'+right
+                    //         _this.SKUData[index].price =value
+                    //     }
+                    //     // item.price =value
+                    // console.log(_this.SKUData)
+
+                    // }
+                })
+            },
+            deep: true
+        }
+    },
     // computed: {
     //     SKUData: function() {
     //         this.SKUData.forEach(function (item,index) {
@@ -109,7 +109,6 @@ var store = new Vue({
     mounted() {
     },
     methods: {
-        // todo
         priceChange: function (price, id) {
             var value = String(price)
             if (value.indexOf('.') > 0) {
@@ -120,13 +119,9 @@ var store = new Vue({
                 }
                 value = left + '.' + right
             }
-            for (var i = 0; i < this.SKUData.length; i++) {
-                if(this.SKUData[i].id == id){
-                    this.SKUData[i].price =55555
-                    console.log(this.SKUData);
-                    console.log(34,this.SKUData[i].price);
-                }
-            }
+            var demo = this.SKUData[id]
+            demo.price = value
+            Vue.set(this.SKUData, id, demo);
         },
         // 列表开始
         handleClick: function (tab, event) {
@@ -407,7 +402,7 @@ var store = new Vue({
         },
         moreInfo: function (row) {
             var _this = this
-            _this.$refs.basicInfo.resetFields()
+            _this.$refs['basicInfo'].resetFields()
             PostAjax(_this, 'post', {'id': row.id}, '/layer/goods/nyGoods/form', function (data) {
                 _this.basicInfo = data
                 _this.filterText = _this.basicInfo.goodsCatName
