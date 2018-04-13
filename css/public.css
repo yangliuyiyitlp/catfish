@@ -292,7 +292,7 @@ i{ font-style:normal}
 	height: 150px;
 }
 /*loading*/
-#loading_p{position:fixed;top: 0;left: 0;bottom: 0;right: 0;background: none;margin: 0;height: 100%;}
+#loading_p{position:fixed;top: 0;left: 0;bottom: 0;right: 0;background: none;margin: 0;height: 100%;z-index: 99999999;}
 #loading_p img{display: block;margin: 0px auto;position: absolute;top: 50%;left: 50%;margin-left: -25px;margin-top: -27px;}
 
 /*活动管理*/
@@ -302,6 +302,9 @@ i{ font-style:normal}
 	margin: 0 auto; 
 	width: 97.5%;
 	border-bottom: solid 1px #D8D8D8;
+}
+.activeList .el-row:last-child{
+	border: none;
 }
 .activeList img{
 	width: 80px;
@@ -362,20 +365,27 @@ i{ font-style:normal}
 	
 }
 .funbtn{
-	flex: 1;
+	display: inline-block;
+	margin-left: 5px;
+	cursor: pointer;
 }
 .funbtn i{
 	margin-top: 25px;
-	font-size: 24px;
-	
+	font-size: 24px;	
 	display: block;
 	margin-bottom: 5px;
 }
 .activeList .el-button { 
 	width: 60px;
 	height: 33px;
-	margin: 25px auto 0;
+	/*margin: 25px auto 0;*/
 	padding: 0;
+	position: relative;
+	top: -15px;
+}
+.activeList .el-button.noTop{
+	margin: 25px auto 0;
+	top: 0;
 }
 .activePopup .edit_area  p {
 	margin-bottom: 10px;

@@ -9,6 +9,54 @@
 		<link rel="stylesheet" href="../css/public.css" />		
 		<style type="text/css">
 			
+			.activePopup{
+				height: 562px;
+				margin-top: -281px;
+			}
+			.auditPopup {
+				width: 400px;
+				margin-left: -200px;
+				height: 300px;
+				margin-top: -150px;
+			}
+			.auditPopup .edit_area{
+				width: 350px;
+			}
+			.auditPopup .el-input{
+				width: 250px;
+			}
+			.auditPopup textarea{
+				resize: none;
+				width: 250px;
+				height: 80px;
+			}
+			
+			.activeList .type p{
+				width: 60px;
+				background: url(../images/error.png) no-repeat left top;
+				background-size: 20px;
+				padding-left: 25px;
+				margin-top: 25px;
+			}
+			
+			.onBtn,.offBtn,.editBtn,.delectBtn{
+				width: 43px;
+				height: 50px;
+				margin-top: 25px;
+				background: url(../images/activeFun1.png) no-repeat center top;				
+			}
+			.offBtn{
+				background-image: url(../images/activeFun2.png);
+			}
+			.editBtn{
+				background-image: url(../images/activeFun4.png);
+			}
+			.delectBtn{
+				background-image: url(../images/activeFun3.png);
+			}
+			.onBtn:hover,.offBtn:hover,.editBtn:hover,.delectBtn:hover{
+				background-position: center bottom; 
+			}
 		</style>
 	</head>
 	<body>
@@ -31,9 +79,9 @@
 					<el-select clearable v-model="serachData.activityFormVal">
 					    <el-option
 					      v-for="item in serachData.activityForm"
-					      :key="item.value"
-					      :label="item.label"
-					      :value="item.value">
+					      :key="item.eventManCode"
+					      :label="item.eventManName"
+					      :value="item.eventManCode">
 					    </el-option>
 					</el-select>
 				</div>
@@ -49,7 +97,7 @@
 					</el-select>
 				</div> 
 				<div class="btnPart">
-	                <el-button type="search" round @click="getData">查询</el-button>
+	                <el-button type="search" round @click="getSerach">查询</el-button>
 	  				<el-button round @click="addPopupShow=true,fBgIsShow=true">添加</el-button>
 	           	</div>
 			</div>	
@@ -60,31 +108,31 @@
 				  		<img :src="item.nyEventMan.eventManPic"/>
 					  	<div class="one">
 					  		<h2>{{item.eventName}}<a :href="'activeEdit.html?activeId='+ item.id">查看详情</a></h2>
-					  		<p>{{item.eventTypeId}}</p>
+					  		<p>{{serachData.activityType[item.eventTypeId].label}}</p>
 					  		<p><i class="el-icon-time"></i>{{item.beginTime}} 至 {{item.endTime}}</p>
 				  		</div>					  				  	
 				  	</el-col>
 					<el-col :span="3"><div class="pt55">剩余数量：{{item.nyEventPrizes != undefined ? item.nyEventPrizes.countLeft : ''}}</div></el-col>
 					<el-col :span="3"><div class="pt55">中奖数量：{{item.nyEventPrizes != undefined ? item.nyEventPrizes.countWinning : ''}}</div></el-col>
-					<el-col :span="1"><div class="pt55"></div></el-col>
 					<el-col :span="2" style="text-align: center;">
-						<div class="type" v-if="item.newEventStatus == 0"><span class="toBeAudited"></span>待审核</div>
+						<!--2：未提交审核，1：已提交审核，0：未通过审核，5：未开始，4：运行中，3：暂停，6：结束-->
+						<div class="type" v-if="item.newEventStatus == 2"><span class="toBeAudited"></span>待审核</div>
 						<div class="type" v-if="item.newEventStatus == 1"><span class="audit"></span>审核中</div>
-				  		<div class="type" v-if="item.newEventStatus == 2">
-				  			<span></span>{{item.auditComment}}
+				  		<div class="type" v-if="item.newEventStatus == 0">
+				  			<p>审核不通过<br>{{item.auditComment}}</p>
 				  		</div>
-				  		<div class="type" v-if="item.newEventStatus == 3"><span></span>未开始</div>
+				  		<div class="type" v-if="item.newEventStatus == 5"><span></span>未开始</div>
 				  		<div class="type" v-if="item.newEventStatus == 4"><span class="underway"></span>正在进行</div>
-				  		<div class="type" v-if="item.newEventStatus == 5"><span class="pause"></span>暂停中</div>
+				  		<div class="type" v-if="item.newEventStatus == 3"><span class="pause"></span>暂停中</div>
 				  		<div class="type" v-if="item.newEventStatus == 6"><span class="end"></span>已结束</div>
 				    </el-col>
-				    <el-col :span="3" style="text-align: center;display: flex;">
-					  	<p class="funbtn" v-if="item.newEventStatus == 5" @click="changeFun(index)"><i class="el-icon-delete"></i>开启</p>
-					  	<p class="funbtn" v-if="item.newEventStatus == 4" @click="changeFun(index)"><i class="el-icon-delete"></i>暂停</p>
-					  	<p class="funbtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 2"><i class="el-icon-edit-outline"></i>编辑</p>
-					  	<p class="funbtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 6 || item.newEventStatus == 2" @click="delectFun(index)"><i class="el-icon-delete"></i>删除</p>
-					  	<el-button round v-if="item.newEventStatus == 1" size="small">审核</el-button>
-					  	<el-button round v-if="item.newEventStatus == 0" size="small" @click="updataFun()">提交审核</el-button>
+				    <el-col :span="4" style="text-align: center">
+					  	<p class="funbtn onBtn" v-if="item.newEventStatus == 3" @click="changeFun(index)"></p>
+					  	<p class="funbtn offBtn" v-if="item.newEventStatus == 4" @click="changeFun(index)"></p>
+					  	<p class="funbtn editBtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 2" @click="editFun(item.id)"></p>
+					  	<p class="funbtn delectBtn" v-if="item.newEventStatus == 0 || item.newEventStatus == 6 || item.newEventStatus == 2" @click="delectFun(index)"></p>
+					  	<p class="funbtn" v-if="item.newEventStatus == 1" ><el-button round size="small" class="noTop" @click="auditFun(index,item.id)">审核</el-button></p>
+					  	<p class="funbtn" v-if="item.newEventStatus == 2 || item.newEventStatus == 0" ><el-button round size="small" @click="updataFun(index)">提交</el-button></p>
 				    </el-col>
 				</el-row>				
 			</div>
@@ -96,74 +144,25 @@
                     :page-size="pagination.pageSize"
                     layout="total, sizes, prev, pager, next, jumper"
                     :total="pagination.count" style="margin: 20px;">
-            </el-pagination>
+           </el-pagination>
 			<!--描述：弹窗-->
 			<div id="fixedBg" v-show="fBgIsShow"></div>
 			<div class="popup_public activePopup" v-show="addPopupShow" >
-				<h2>添加新活动</h2>
-				<!--<el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
-				  <el-form-item label="活动名称" prop="name">
-				    <el-input v-model="ruleForm.name"></el-input>
-				  </el-form-item>
-				  <el-form-item label="活动区域" prop="region">
-				    <el-select v-model="ruleForm.region" placeholder="请选择活动区域">
-				      <el-option label="区域一" value="shanghai"></el-option>
-				      <el-option label="区域二" value="beijing"></el-option>
-				    </el-select>
-				  </el-form-item>
-				  <el-form-item label="活动时间" required>
-				    <el-col :span="11">
-				      <el-form-item prop="date1">
-				        <el-date-picker type="date" placeholder="选择日期" v-model="ruleForm.date1" style="width: 100%;"></el-date-picker>
-				      </el-form-item>
-				    </el-col>
-				    <el-col class="line" :span="2">-</el-col>
-				    <el-col :span="11">
-				      <el-form-item prop="date2">
-				        <el-time-picker type="fixed-time" placeholder="选择时间" v-model="ruleForm.date2" style="width: 100%;"></el-time-picker>
-				      </el-form-item>
-				    </el-col>
-				  </el-form-item>
-				  <el-form-item label="即时配送" prop="delivery">
-				    <el-switch v-model="ruleForm.delivery"></el-switch>
-				  </el-form-item>
-				  <el-form-item label="活动性质" prop="type">
-				    <el-checkbox-group v-model="ruleForm.type">
-				      <el-checkbox label="美食/餐厅线上活动" name="type"></el-checkbox>
-				      <el-checkbox label="地推活动" name="type"></el-checkbox>
-				      <el-checkbox label="线下主题活动" name="type"></el-checkbox>
-				      <el-checkbox label="单纯品牌曝光" name="type"></el-checkbox>
-				    </el-checkbox-group>
-				  </el-form-item>
-				  <el-form-item label="特殊资源" prop="resource">
-				    <el-radio-group v-model="ruleForm.resource">
-				      <el-radio label="线上品牌商赞助"></el-radio>
-				      <el-radio label="线下场地免费"></el-radio>
-				    </el-radio-group>
-				  </el-form-item>
-				  <el-form-item label="活动形式" prop="desc">
-				    <el-input type="textarea" v-model="ruleForm.desc"></el-input>
-				  </el-form-item>
-				  <el-form-item>
-				    <el-button type="primary" @click="submitForm('ruleForm')">立即创建</el-button>
-				    <el-button @click="resetForm('ruleForm')">重置</el-button>
-				  </el-form-item>
-				</el-form>-->
+				<h2>添加新活动</h2>				
 				<div class="edit_area pr">
-					<p class="required">
-						<label><em>*</em>活动表现形式：</label>
-						<el-select v-model="pAdd.activityForm">
+					<el-form :model="pAdd" :rules="rules" ref="pAdd" label-width="150px" class="demo-ruleForm">
+					  <el-form-item label="活动表现形式：" prop="activityForm">
+					    <el-select v-model="pAdd.activityForm">
 						    <el-option
 						      v-for="item in serachData.activityForm"
-						      :key="item.value"
-						      :label="item.label"
-						      :value="item.value">
+						      :key="item.eventManCode"
+						      :label="item.eventManName"
+						      :value="item.eventManCode">
 						    </el-option>
 						</el-select>
-					</p>					
-					<p class="required">
-						<label><em>*</em>活动类型：</label>
-						<el-select v-model="pAdd.activityType">
+					  </el-form-item>
+					  <el-form-item label="活动类型：" prop="activityType">
+					    <el-select v-model="pAdd.activityType">
 						    <el-option
 						      v-for="item in serachData.activityType"
 						      :key="item.value"
@@ -171,53 +170,72 @@
 						      :value="item.value">
 						    </el-option>
 						</el-select>
-					</p>
-					<p class="required canSearch">
-						<label><em>*</em>活动名称：</label>
-						<input type="text" :value="pAdd.activeName" />
-						<span v-show="pAdd.goodsNameShow">请输入活动名称</span>
-					</p>
-					<p class="required">
-						<label><em>*</em>开始时间：</label>
-						<el-date-picker
+					  </el-form-item>
+					  <el-form-item label="活动名称：" prop="activeName">
+					    <el-input type="text" v-model="pAdd.activeName"></el-input>
+					  </el-form-item>
+					  <el-form-item label="开始时间：" prop="startTime">
+					    <el-date-picker
 					      v-model="pAdd.startTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择开始时间"
+		      			  value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
-						<span v-show="pAdd.parValueShow">请选择开始时间</span>
-					</p>
-					<p class="required">
-						<label><em>*</em>结束时间：</label>
-						<el-date-picker
+					  </el-form-item>
+					  <el-form-item label="结束时间：" prop="endTime">
+					    <el-date-picker
 					      v-model="pAdd.endTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择结束时间"
+		      			  value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
-						<span v-show="pAdd.parValueShow">请选择结束时间</span>
-					</p>
-					<p class="required">
-						<label><em>*</em>展示时间：</label>
-						<el-date-picker
+					  </el-form-item>
+					  <el-form-item label="展示时间：" prop="showTime">
+					    <el-date-picker
 					      v-model="pAdd.showTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择展示时间"					      
+		      			  value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
-						<span v-show="pAdd.parValueShow">请选择展示时间</span>
-					</p>
-					<p class="required">
-						<label><em>*</em>失效时间：</label>
-						<el-date-picker
+					  </el-form-item>
+					  <el-form-item label="失效时间：" prop="failureTime">
+					    <el-date-picker
 					      v-model="pAdd.failureTime"
 					      type="datetime"
-					      placeholder="选择日期时间">
+					      placeholder="选择失效时间"
+		      			  value-format="yyyy-MM-dd HH:mm:ss">
 					    </el-date-picker>
-						<span v-show="pAdd.parValueShow">请选择失效时间</span>
-					</p>
+					  </el-form-item>
+					  <el-form-item>
+					    <el-button round @click="resetForm('pAdd')">取消</el-button>
+	  					<el-button round type="search" @click="submitForm('pAdd')">确定</el-button>
+					  </el-form-item>
+					</el-form>
 				</div>
-				<p class="edit_sure_box">
-					<el-button round @click="PopupConcel">取消</el-button>
-	  				<el-button round type="search" v-on:click="AddCouponType()">确定</el-button>
-				</p>
+			</div>
+			<div class="popup_public auditPopup" v-show="auditPopupShow" >
+				<h2>审核</h2>				
+				<div class="edit_area pr">
+					<el-form :model="audit" ref="audit" label-width="60px">
+					  <el-form-item label="审核：" prop="audit">
+					    <el-select v-model="audit.auditId">
+						    <el-option
+						      v-for="item in audit.auditList"
+						      :key="item.value"
+						      :label="item.label"
+						      :value="item.value">
+						    </el-option>
+						</el-select>
+					  </el-form-item>
+					  <el-form-item label="备注：" prop="auditTips">
+					    <el-input type="textarea" placeholder="最多输入20字符" v-model="audit.auditTips"></el-input>
+					  </el-form-item>					  
+					  <el-form-item>
+					    <el-button round @click="resetAudit('audit')">取消</el-button>
+	  					<el-button round type="search" @click="submitAudit('audit')">确定</el-button>
+					  </el-form-item>
+					</el-form>
+				</div>
 			</div>
 		</div>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
@@ -226,5 +244,4 @@
 		<script type="text/javascript" src="../js/public.js"></script>
 		<script type="text/javascript" src="../js/activeList.js"></script>
 	</body>
-
 </html>

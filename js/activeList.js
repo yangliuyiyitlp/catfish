@@ -1,6 +1,34 @@
 var couponType = new Vue({
 	el: "#activeList",
 	data: {
+        rules: {
+          activityForm: [
+            { required: true, message: '请选择活动表现形式', trigger: 'change' }
+          ],
+          activityType: [
+            { required: true, message: '请选择活动类型', trigger: 'change' }
+          ],          
+          activeName: [
+            {required: true, message: '请输入活动名称', trigger: 'blur' }
+          ],
+          startTime: [
+            { required: true, message: '请选择开始时间', trigger: 'change' }
+          ],
+          endTime: [
+            { required: true, message: '请选择结束时间', trigger: 'change' }
+          ],
+          showTime: [
+            { required: true, message: '请选择展示时间', trigger: 'change' }
+          ],
+          failureTime: [
+            { required: true, message: '请选择失效时间', trigger: 'change' }
+          ]
+        },
+        newSerachData:{
+        	activeStateVal:'',//活动状态值
+			activityFormVal:'',//活动表现形式值
+			activityTypeVal:'',//活动类型值
+        },
 		serachData:{
 			activeStateVal:'',//活动状态值
 			activityFormVal:'',//活动表现形式值
@@ -11,8 +39,7 @@ var couponType = new Vue({
 		},
 		formInline: {
             pageSize: 10,
-            pageNo: 1,
-            storeName: ''
+            pageNo: 1
        	},
 		pagination: {
 			pageSizes: [10, 20, 30], 
@@ -32,153 +59,94 @@ var couponType = new Vue({
 		},
 		activeList: [],
 		fBgIsShow: false,
-		addPopupShow:false
+		addPopupShow:false,
+		auditPopupShow:false,
+		audit:{
+			id:'',
+			index:'',
+			auditId:3,
+			auditList:[
+				{
+					value:3,
+					label:'通过'
+				},
+				{
+					value:2,
+					label:'未通过'
+				}
+			],
+			auditTips:''
+		}
 	},
 	methods: {
-		getData:function(){
+		getSerach:function(){
 			var that = this;
 			that.formInline.pageNo = 1;
+			that.newSerachData.activeStateVal = that.serachData.activeStateVal;//活动状态值
+			that.newSerachData.activityFormVal = that.serachData.activityFormVal;//活动表现形式值
+			that.newSerachData.activityTypeVal = that.serachData.activityTypeVal;//活动类型值
+			that.getData();
+		},
+		getData:function(){//搜索获取活动列表
+			var that = this;			
 			var content = {
-				eventTypeId: that.serachData.activityTypeVal,
-				eventManId: that.serachData.activityFormVal,
-				newEventStatus: that.serachData.activeStateVal,							
+				eventTypeId: that.newSerachData.activityTypeVal,
+				eventManId: that.newSerachData.activityFormVal,
+				newEventStatus: that.newSerachData.activeStateVal,							
 				pageSize: that.formInline.pageSize,
 				pageNo:that.formInline.pageNo
 			}
+			console.log(content)
 			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/list', function(data) {
 				console.log(data)
 				that.activeList = data.result;
-				that.formInline.pageNo ++;
+				that.pagination.count = data.total
 			},'','','','','','',4)
 		},
-		BlurValue: function(event, name) { //失去焦点
-			if(name == 'typeName') { //类型名称
-				var reg = /^[0-9a-zA-Z\u4e00-\u9fa5]{1,20}$/;
-				if(!reg.test(this.pAdd.typeName)) {
-					this.pAdd.typeNameShow = true;
-				} else {
-					this.pAdd.typeNameShow = false;
+		submitForm(formName) {//添加活动提交
+	        this.$refs[formName].validate((valid) => {
+	          if (valid) {
+				var that = this;
+				var pAdd = that.pAdd;
+				var content = {
+					eventName: pAdd.activeName,
+					eventTypeId: pAdd.activityType,
+					eventManId: pAdd.activityForm,							
+					beginTime: pAdd.startTime,
+					endTime:pAdd.endTime,
+					releaseTime:pAdd.showTime,
+					stockoutTime:pAdd.failureTime,
 				}
-			} else if(name == 'parValue') { //类型金额
-				var reg = /^[1-9]+[0-9]*$/;
-				if(!reg.test(this.pAdd.parValue)) {
-					this.pAdd.parValueShow = true;
-				} else {
-					this.pAdd.parValueShow = false;
-				}
-			} else if(name == 'validPeriod') { //有效期
-				if(this.pAdd.validPeriod !== '0' && this.pAdd.validPeriod !== 0) {
-					var reg = /^[1-9]+[0-9]*$/;
-					if(!reg.test(this.pAdd.validPeriod)) {
-						this.pAdd.validPeriodShow = true;
-					} else {
-						this.pAdd.validPeriodShow = false;
-					}
-				} else {
-					this.pAdd.validPeriodShow = false;
-				}
-			} else if(name == 'conditionValue') { //满足条件金额
-				var reg = /^[1-9]+[0-9]*$/;
-				if(!reg.test(this.pAdd.conditionValue)) {
-					this.pAdd.conditionValueShow = true;
-				} else {
-					this.pAdd.conditionValueShow = false;
-				}
-			}
-		},
-		AddActive: function() { //添加
-			var content = "";
-			var that = this;
-			var pAdd = that.pAdd;
-			content = {
-				eventTypeId: '',
-				eventManId: '',
-				newEventStatus: '',							
-				pageSize: 10,
-				pageSize:1
-			}
-			console.log(content)
-			that.addPopupShow = false;
-			that.fBgIsShow = false;
-			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
-				console.log(data);
-//				that.loadingShow = false;				
-				if(pAdd.id === -1){					
-					that.formInline.pageNo = 1;				
+				console.log(content)
+				PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/save', function(data) {
+					console.log(data);
 					that.getData();
-				}else{		
-					Vue.set(that.couponList, that.pAdd.index, data)
-				}
-				that.PopupConcel();
-			},'','','','','','',4)
-		},
-		PopupConcel: function() {
-			this.fBgIsShow = false;
+					that.resetForm('pAdd');
+				},'','','','','','',4)
+	          } else {
+	            console.log('error submit!!');
+	            return false;
+	          }
+	        });
+	    },
+	    resetForm(formName) {//添加弹窗数据重置
+	    	this.fBgIsShow = false;
 			this.addPopupShow = false;
-			this.pAdd = {
-				activityForm: [{//活动表现形式
-					value: 1,
-					label: "不限"
-				}, {
-					value: 0,
-					label: "全场"
-				}, {
-					value: -1,
-					label: "单个"
-				}],
-				activityType: [{//活动类型
-					value: 1,
-					label: "不限"
-				}, {
-					value: 0,
-					label: "全场"
-				}, {
-					value: -1,
-					label: "单个"
-				}],
-				activeName:'',
-				startTime:'',
-				endTime:'',
-				showTime:'',
-				failureTime:''
-			};
-		},
-		changeTypes: function(index,data) { //启动/停止
-			console.log(data)
-			var that = this;			
-			that.pAdd.index = index;
-			that.loadingShow = true;
-			var isUse = data.isUse == true ? 0 : 1;
-			var content = {
-				id: data.id,
-				isUse: isUse,
-				couponTypeName: data.couponTypeName,
-				parValue: data.parValue,							
-				couponAssignType: data.couponAssignType,
-				storeId:data.storeId,
-				validPeriod: data.validPeriod,
-				conditionValue: data.conditionValue,
-				isRepeatable: data.isRepeatable,
-				isMixable: data.isMixable,
-				couponType: data.couponType
-			}
-			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
-				console.log(data);
-				that.loadingShow = false;				
-				Vue.set(that.couponList, that.pAdd.index, data)
-			},'','','','','','',4)
-		},
+	        this.$refs[formName].resetFields();	        
+	    },
 		handleCurrentChange: function (val) {
-            this.formInline.pageNo = val
-            this.pagination.pageNo = val
-            this.query()
+			console.log(val)
+            this.formInline.pageNo = val;
+            this.pagination.pageNo = val;
+            console.log(this.pagination)
+            this.getData();
         },
         handleSizeChange: function (val) {
             this.formInline.pageSize = val
             this.pagination.pageSize = val
-            this.query()
+            this.getData();
         },
-        delectFun(index) {
+        delectFun(index) {//删除活动
         	var that = this;
         	var oldList = that.activeList;
         	var list = oldList[index];
@@ -193,14 +161,17 @@ var couponType = new Vue({
 	        }).then(() => {        	
 	          	PostAjax(that, 'post', {'id':list.id}, '/layer/nyevent/nyEvent/delete', function(data) {					
 					that.activeList.splice(index,1);
-					console.log(that.activeList)
+					that.getData();
 				},'','','','','','',4)
 	        }).catch(() => {
 	          	
 	        });
 	    },
-	    updataFun() {
-	        this.$confirm('确定提交？', '', {
+	    updataFun(index) {
+	    	var that = this;
+	    	var oldList = that.activeList;
+        	var list = oldList[index];
+	        that.$confirm('确定提交？', '', {
 	          confirmButtonText: '确定',
 	          cancelButtonText: '取消',
 	          confirmButtonClass:'confirm',
@@ -208,45 +179,72 @@ var couponType = new Vue({
 	          type: 'warning',
 	          center: true
 	        }).then(() => {
-	          
+	          	PostAjax(that, 'post', {'id':list.id}, '/layer/nyevent/nyEvent/submit', function(data) {
+	          		console.log(data);
+	          		Vue.set(that.activeList, index, data)
+//					console.log(that.activeList)
+				},'','','','','','',4)
 	        }).catch(() => {
 	          
 	        });
 	    },
-	    audit(){
-	    	 this.$prompt('请输入邮箱', '提示', {
-	          confirmButtonText: '确定',
-	          cancelButtonText: '取消',
-	          inputPattern: /[\w!#$%&'*+/=?^_`{|}~-]+(?:\.[\w!#$%&'*+/=?^_`{|}~-]+)*@(?:[\w](?:[\w-]*[\w])?\.)+[\w](?:[\w-]*[\w])?/,
-	          inputErrorMessage: '邮箱格式不正确',
-	          center: true
-	        }).then(({ value }) => {
-	          
-	        }).catch(() => {
-	               
-	        });
+	    auditFun(index,id){//审核弹窗
+	    	 this.auditPopupShow = true;
+	    	 this.fBgIsShow = true;
+	    	 this.audit.id = id;
+	    	 this.audit.index = index;
 	    },
-	    changeFun(){
-	    	alert(1)
+	    changeFun(index){//修改活动状态
 	    	var that = this;
-	    	var content={
-	    		'id':'002891091fa949628d0e5350c84d28ed',	    		
-	    	}
-	    	PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/status', function(data) {
-					console.log(data);
+	    	var oldList = that.activeList;
+        	var list = oldList[index];        	
+        	var con = {
+        		'id':list.id
+        	}
+        	console.log(con);
+	    	PostAjax(that, 'post', con, '/layer/nyevent/nyEvent/status', function(data) {
+				console.log(data);
+				Vue.set(that.activeList, index, data)
 			},'','','','','','',4)
 	    },
-	    ///layer/nyevent/nyEvent/status
 	    getKeyWords:function(){
 	      	var that = this;
-	      	PostAjax(that, 'post', {"types":"activityType,activeState,activityForm"}, '/layer/dict/sysDict/listByTypes', function(data) {
+	      	//活动状态
+	      	PostAjax(that, 'post', {"types":"activeState,activityType"}, '/layer/dict/sysDict/listByTypes', function(data) {
 	      		console.log(data)
 				that.serachData.activeState = data.activeState;
-				that.serachData.activityForm = data.activityForm;
-				that.serachData.activityType = data.activityType;				
-
-			},'','','','','',1,1)
-	    }
+				that.serachData.activityType = data.activityType;
+			},'','','','','',1,1);			
+			//表现形式，活动类型
+			PostAjax(that, 'post', '', '/layer/nyeventman/nyEventMan/list', function(data) {
+	      		console.log(data)
+				that.serachData.activityForm = data.men;
+//				that.serachData.activityType = data.types;
+			},'','','','','',1,4)
+	   },
+	   editFun:function(id){//跳转到编辑页面
+	   		window.location.href = 'activeEdit.html?activeId='+ id;
+	   },
+	   submitAudit() {//审核
+	        var that = this;
+			var audit = that.audit;
+			var content = {
+				id: audit.id,
+				auditStatus: audit.auditId,
+				auditComment: audit.auditTips,
+			}
+			console.log(content)
+			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/audit', function(data) {
+				console.log(data);
+				Vue.set(that.activeList, audit.index, data)
+				that.resetAudit('audit');
+			},'','','','','','',4)
+	    },
+	    resetAudit(formName) {//审核弹窗数据重置
+	    	this.fBgIsShow = false;
+			this.auditPopupShow = false;
+	        this.$refs[formName].resetFields();	        
+	    },
 	},
 	created: function() {
 		var that = this;	
