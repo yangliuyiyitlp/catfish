@@ -38,11 +38,12 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 	}else if(urlDr == 6){
         netLink = 'http://192.168.0.164:8080';
     }
-
+	
 	var guid = NewGuid();
 	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
 	var ConType = ContentType ? ContentType : 'application/json'
     console.log(content);
+    console.log(ConType)
     if(showLod != 1){
     	loadingFun();
     }
