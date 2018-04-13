@@ -30,7 +30,7 @@ var store = new Vue({
             thumbnail: '',
             cityVisible: false,
             cityVisibleCity: false,
-            skuRight:false,
+            skuRight: false,
             filterText: '',
             filterCity: '',
             filterId: '',
@@ -48,13 +48,18 @@ var store = new Vue({
             timeSelect: '',
             formId: '',
             SKUData: [],
-            SKUForm:{pageSize: 30,
-                pageNo: 1,},
+            SKUForm: {
+                pageSize: 30,
+                pageNo: 1,
+            },
             fallList: [],
             rules: {
                 goodsCatId: [{required: true, message: '请选择商品分类', trigger: 'blur'}],
                 goodsName: [{required: true, message: '请输入名称', trigger: 'blur'},
-                    {min: 0, max: 30, message: '长度小于30字符', trigger: 'blur'}],
+                    {min: 1, max: 30, message: '长度需小于30字符', trigger: 'blur'}],
+                thumbnail: [{required: true, message: '请上传列表图'}],
+                goodsPic1: [{required: true, message: '请按顺序上传轮播图片'}]
+
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
             paginate: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1}
@@ -64,10 +69,65 @@ var store = new Vue({
         this.searchArea()
         this.getlists()
     },
-    computed: {},
+    // watch:{
+    //     SKUData:{
+    //         handler:function(newval,oldval){
+    //             var _this=this
+    //             _this.SKUData.forEach(function (item,index) {
+    //                 // if(!/^\d+(\.\d{0,2})?$/.test(item.price)){
+    //                 //     _this.$message.warning('价格最多为2位小数的正数')
+    //                 //     return
+    //                 // }
+    //                 // else{
+    //                 //    item.price = parseFloat(item.price)
+    //                     var value=String(item.price)
+    //                     if(value.indexOf('.')>0){
+    //                         var left =value.substr(0,value.indexOf('.'))
+    //                         var right =value.substr(value.indexOf('.')+1,value.length)
+    //                         if(right.length>2){
+    //                             right=right.substr(0,2)
+    //                         }
+    //                         value=left+'.'+right
+    //                         _this.SKUData[index].price =value
+    //                     }
+    //                     // item.price =value
+    //                 console.log(_this.SKUData)
+    //
+    //                 // }
+    //             })
+    //         },
+    //         deep:true
+    //     }
+    // },
+    // computed: {
+    //     SKUData: function() {
+    //         this.SKUData.forEach(function (item,index) {
+    //             return  this.SKUData[index].price
+    //         })
+    //     }
+    // },
     mounted() {
     },
     methods: {
+        // todo
+        priceChange: function (price, id) {
+            var value = String(price)
+            if (value.indexOf('.') > 0) {
+                var left = value.substr(0, value.indexOf('.'))
+                var right = value.substr(value.indexOf('.') + 1, value.length)
+                if (right.length > 2) {
+                    right = right.substr(0, 2)
+                }
+                value = left + '.' + right
+            }
+            for (var i = 0; i < this.SKUData.length; i++) {
+                if(this.SKUData[i].id == id){
+                    this.SKUData[i].price =55555
+                    console.log(this.SKUData);
+                    console.log(34,this.SKUData[i].price);
+                }
+            }
+        },
         // 列表开始
         handleClick: function (tab, event) {
             console.log(tab.name)
@@ -117,11 +177,6 @@ var store = new Vue({
         // 图片
         beforeAvatarUpload1: function (file) {
             var that = this;
-            var isLt2M = file.size / 1024 < 150
-            if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 150KB!')
-                return
-            }
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
@@ -137,11 +192,6 @@ var store = new Vue({
         },
         beforeAvatarUpload2: function (file) {
             var that = this;
-            var isLt2M = file.size / 1024 < 150
-            if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 150KB!')
-                return
-            }
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
@@ -157,11 +207,6 @@ var store = new Vue({
         },
         beforeAvatarUpload3: function (file) {
             var that = this;
-            var isLt2M = file.size / 1024 < 150
-            if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 150KB!')
-                return
-            }
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
@@ -177,11 +222,6 @@ var store = new Vue({
         },
         beforeAvatarUpload4: function (file) {
             var that = this;
-            var isLt2M = file.size / 1024 < 150
-            if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 150KB!')
-                return
-            }
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
@@ -197,11 +237,6 @@ var store = new Vue({
         },
         beforeAvatarThumbnail: function (file) {
             var that = this;
-            var isLt2M = file.size / 1024 < 150
-            if (!isLt2M) {
-                this.$message.error('上传图片大小不能超过 150KB!')
-                return
-            }
             return new Promise(function (resolve) {
                 PostAjax(that, 'post', {'user_dir': 'storeManage'}, '/layer/oss/ossUtil/policy', function (data) {
                     that.Token = data
@@ -315,10 +350,10 @@ var store = new Vue({
         },
         isOnChange: function (row) {//开启关闭
             var _this = this
-            var openFlag =''
+            var openFlag = ''
             if (row.openFlag == '1') {
                 openFlag = '0'
-            } else if (row.openFlag == '0'){
+            } else if (row.openFlag == '0') {
                 openFlag = '1'
             }
             PostAjax(_this, 'post', {
@@ -381,8 +416,8 @@ var store = new Vue({
                 _this.goodsPic2 = _this.basicInfo.goodsPic2
                 _this.goodsPic3 = _this.basicInfo.goodsPic3
                 _this.goodsPic4 = _this.basicInfo.goodsPic4
-                if(_this.basicInfo.goodsLable.length>0){
-                    _this.goodsLableArr =_this.basicInfo.goodsLable.split(',')
+                if (_this.basicInfo.goodsLable.length > 0) {
+                    _this.goodsLableArr = _this.basicInfo.goodsLable.split(',')
                 }
                 _this.pinyin = _this.basicInfo.pinyin
                 if (_this.basicInfo.releaseTime == null) {
@@ -408,7 +443,7 @@ var store = new Vue({
             this.goodsPic3 = ''
             this.goodsPic4 = ''
             this.thumbnail = ''
-            this.timeSelect = ''
+            this.timeSelect = 2
             this.filterText = ''
             this.pinyin = ''
             this.goodsLableArr = []
@@ -417,7 +452,16 @@ var store = new Vue({
             this.setEmptyForm()
         },
         releaseTimeChange: function (val) {
-            this.basicInfo.releaseTime = convertDate(val.getTime())
+            if (val) {
+                if (val < new Date()) {
+                    this.$message.warning('“自定义上架时间”请选择晚于当前时间')
+                    this.basicInfo.releaseTime = ''
+                    return
+                }
+                this.basicInfo.releaseTime = convertDate(val.getTime())
+            }
+
+
         },
         //pinyin 开始
         getPinYi: function () {
@@ -859,14 +903,17 @@ var store = new Vue({
         //标签
         tasteAdd: function () {
             var _this = this
-            if (_this.basicInfo.goodsTaste.trim() == '') {
+            var newTaste = trimAll(_this.basicInfo.goodsTaste)
+            if (newTaste.length <= 0) {
                 _this.$message.warning('请填写新标签')
+                return false
+            } else if (newTaste.length > 10) {
+                _this.$message.warning('长度需小时12字符')
                 return false
             } else {
                 // var valueLabel = new Date().getTime()
-                _this.goodsLableArr.push(_this.basicInfo.goodsTaste)
+                _this.goodsLableArr.push(newTaste)
                 _this.basicInfo.goodsTaste = ''
-
             }
         },
         tasteDelete: function (val) {
@@ -886,12 +933,22 @@ var store = new Vue({
             _this.basicInfo.recommendFlag = '0'
             _this.basicInfo.updateDate = convertDate(new Date().getTime())
             _this.basicInfo.customId = '1' //todo 目前写死是登陆后传给前端的商户id
+            if (_this.basicInfo.goodsIndex && !/^[1-9]|\d*$/.test(_this.basicInfo.goodsIndex)) {
+                this.$message.warning('排序只能输入正整数')
+                return
+            }
+
+            if (_this.basicInfo.appointmentDays && !/^[1-9]|\d*$/.test(_this.basicInfo.appointmentDays)) {
+                this.$message.warning('预约天数只能输入正整数')
+                return
+            }
             if (_this.timeSelect == 2) {
                 _this.basicInfo.releaseTime = null
             } else if (_this.timeSelect == 1 && !_this.basicInfo.releaseTime) {
                 _this.$message.warning('“自定义上架时间”请选择时间')
                 return
             }
+
             _this.$refs[ruleForm].validate((valid) => {
                 if (valid) {
                     PostAjax(_this, 'post', _this.basicInfo, '/layer/goods/nyGoods/save', function (data) {
@@ -923,16 +980,22 @@ var store = new Vue({
         },
         propertyAdd: function (propertyId, propertyValue, index) {
             var _this = this
-            if (propertyValue && trim(propertyValue).length > 0) {
-                PostAjax(_this, 'post', {
-                    'propertyId': propertyId,
-                    'propertyValue': propertyValue
-                }, '/layer/goods/nyGoodsPropertyValue/save', function (data) {
-                    //添加属性值成功
-                    _this.propertyList()
-                }, function (msg) {
-                    fadeInOut(msg)
-                })
+            if (propertyValue && trimAll(propertyValue).length > 0) {
+                if (trimAll(propertyValue).length > 20) {
+                    _this.$message.warning('属性值长不超过20')
+                    return
+                } else {
+                    PostAjax(_this, 'post', {
+                        'propertyId': propertyId,
+                        'propertyValue': propertyValue
+                    }, '/layer/goods/nyGoodsPropertyValue/save', function (data) {
+                        //添加属性值成功
+                        _this.propertyList()
+                    }, function (msg) {
+                        fadeInOut(msg)
+                    })
+                }
+
             } else {
                 _this.$message.warning('请填写属性值')
                 return
@@ -965,15 +1028,27 @@ var store = new Vue({
         },
         addList: function (propertyValue, index) {
             var _this = this
-            PostAjax(_this, 'post', {
-                'name': propertyValue, 'goodsId': _this.formId
-            }, '/layer/goods/nyGoodsProperty/save', function (data) {
-                _this.fallList[index].label = _this.fallList[index].name
-                //添加属性成功
-                _this.propertyList()
-            }, function (msg) {
-                fadeInOut(msg)
-            })
+            if (propertyValue && trimAll(propertyValue).length > 0) {
+                if (trimAll(propertyValue).length > 20) {
+                    _this.$message.warning('属性名长不超过20')
+                    return
+                } else {
+                    PostAjax(_this, 'post', {
+                        'name': propertyValue, 'goodsId': _this.formId
+                    }, '/layer/goods/nyGoodsProperty/save', function (data) {
+                        _this.fallList[index].label = _this.fallList[index].name
+                        //添加属性成功
+                        _this.propertyList()
+                    }, function (msg) {
+                        fadeInOut(msg)
+                    })
+                }
+
+            } else {
+                _this.$message.warning('请填写属性名')
+                return
+            }
+
         },
         addProperty: function () {
             var _this = this
@@ -981,23 +1056,24 @@ var store = new Vue({
         },
         PropertyNext: function () {
             this.activeClass = 'SKU设置'
+            this.skuRight = false
             this.SKUList()
         },
         //sku
         SKUList: function () {
             var _this = this
             _this.SKUForm.goodsId = _this.formId
-            PostAjax(_this, 'post',_this.SKUForm , '/layer/goods/nyGoodsSku/list', function (data) {
+            PostAjax(_this, 'post', _this.SKUForm, '/layer/goods/nyGoodsSku/list', function (data) {
                 _this.paginate.count = data.total
                 _this.SKUData = data.result
 
-                for(var i=0;i<_this.SKUData.length;i++){
-                        _this.SKUData[i].price='￥'+ _this.SKUData[i].price/100
+                for (var i = 0; i < _this.SKUData.length; i++) {
+                    _this.SKUData[i].price = _this.SKUData[i].price / 100
                 }
-                if(_this.SKUData[0].propertyString){
-                    _this.SKUData.propertyARR =[]
+                if (_this.SKUData[0].propertyString) {
+                    _this.SKUData.propertyARR = []
                     var propertyData = _this.SKUData[0].propertyString
-                    for(var key in propertyData){
+                    for (var key in propertyData) {
                         _this.SKUData.propertyARR.push(key)
                     }
                 }
@@ -1013,22 +1089,43 @@ var store = new Vue({
                 fadeInOut(msg)
             })
         },
-        skuSubmit:function(){
+        skuSubmit: function () {
             var _this = this
-            for(var i=0;i<_this.SKUData.length;i++){
-                _this.SKUData[i].price=(_this.SKUData[i].price.split('￥')[1])/100
+
+            for (var i = 0; i < _this.SKUData.length; i++) {
+                if ((_this.SKUData[i].price !== 0 && !_this.SKUData[i].price) || (_this.SKUData[i].sn !== 0 && !_this.SKUData[i].sn ) || (_this.SKUData[i].stock !== 0 && !_this.SKUData[i].stock)) {
+                    _this.$message.warning('请填写完当前页“价格”、“条形码”、“库存”')
+                    return false
+                }
+                if (!/^\d+$/.test(_this.SKUData[i].sn)) {
+                    _this.$message.warning('条形码只能输入正整数')
+                    return false
+                }
+                if (!/^\d+$/.test(_this.SKUData[i].stock)) {
+                    _this.$message.warning('库存只能输入正整数')
+                    return false
+                }
+                if (!/^\d+(\.\d{0,2})?$/.test(_this.SKUData[i].price)) {
+                    _this.$message.warning('价格最多为2位小数的正数')
+                    return false
+                }
+
             }
-            PostAjax(_this, 'post',_this.SKUData, '/layer/goods/nyGoodsSku/updateAll', function (data) {
-                _this.activeName='first'
+            for (var i = 0; i < _this.SKUData.length; i++) {
+                _this.SKUData[i].price = _this.SKUData[i].price * 100
+            }
+            PostAjax(_this, 'post', _this.SKUData, '/layer/goods/nyGoodsSku/updateAll', function (data) {
+                _this.activeName = 'first'
+                _this.skuRight = false
                 _this.query()
             }, function (msg) {
                 fadeInOut(msg)
             })
         },
-        allUpdate:function(){
+        allUpdate: function () {
             this.skuRight = true
         },
-        skuCancel:function(){
+        skuCancel: function () {
             this.SKUList()
         }
     }

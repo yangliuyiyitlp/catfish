@@ -111,7 +111,9 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
 function trim(str) {
   return str.replace(/(^\s+)|(\s+$)/g, "");
 }
-
+function trimAll(str) {
+    return str.replace(/\s+/g, '');
+}
 //截取参数
 function getParameter(name) {
 	var reg = new RegExp("(^|&)"+ name +"=([^&]*)(&|$)"); 
