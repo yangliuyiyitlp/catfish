@@ -219,6 +219,24 @@
 			.goodsSerachPart div.top .el-input{
 				width: 145px;
 			}
+			.poorPopupShow .el-table--enable-row-hover .el-table__body tr:hover>td{
+				background: #fff;
+			}
+			.poorPopupShow .el-table tr:nth-child(2n-1){
+				background: #fff;
+			}
+			.poorPopupShow .el-table td, .poorPopupShow .el-table th.is-leaf{
+				border: none;
+			}
+			.poorPopupShow .edit_area p label{
+				width: 90px;
+			}
+			.poorPopupShow .el-date-editor.el-input, .poorPopupShow .el-date-editor.el-input__inner{
+				width: 200px;
+			}
+			.pd50{
+				padding-top: 50px;
+			}
 		</style>
 	</head>
 	<body>
@@ -254,6 +272,18 @@
 				    </el-col>
 				</el-row>
 			</div>
+			<el-upload
+                class="avatar-uploader"
+                action='http://192.168.0.123:8080/layer/nycoupon/nyCoupon/import'
+                :data="report"
+                :show-file-list="false"
+                :on-success="Success"
+                :before-upload="Upload"
+                align="center"
+                :limit="1"
+                accept = ".xlsx,.xls">
+                <el-button round size="small" type="search">上传文件</el-button>
+        	</el-upload>
 			<!--切换效果-->
 			<ul class="tabListTT clear">
 				<li v-for="item in tabList"  :class="showPart == item.id ? 'show':''" @click="changeShow(item.id)">
@@ -396,8 +426,10 @@
 	                            :show-file-list="false"
 	                            :on-success="handleAvatarSuccess"
 	                            :before-upload="beforeAvatarUpload"
-	                            align="center">
-		                        <el-button round size="small" type="search">上传图片</el-button>
+	                            align="center"
+	                            :limit="1"
+	                            accept = "image/jpeg,image/gif,image/png">
+		                        <el-button round size="small" type="search" @click="setImgIndex(index)">上传图片</el-button>
 	                    	</el-upload>
 						</div>
 						<div class="activeGoodscont">
@@ -486,17 +518,19 @@
 				</div>
 			</div>
 			<div class="popup_public goodsSerachPart" v-show="addPopupShow" >
+				<div class="erp_close" @click="closePopup"><i class="el-icon-close"></i></div>
 				<h2>添加奖品</h2>	
 				<!--<el-button round type="search" @click="choseGoods" style="float: right;margin-top: 10px;">确定</el-button>-->
 				<div class="edit_area pr">
 					<div class="top">		
 						<el-cascader
 						  :options="scene"
-						  @active-item-change="sceneChange"
 						  :show-all-levels="false"
 						  :props="props"
+						  v-model="planData"
+						  @change="conChan"
 						></el-cascader>
-						<el-select v-model="value5" multiple placeholder="请选择">
+						<el-select v-model="value5" placeholder="请选择">
 							<el-option
 						      v-for="item in options"
 						      :key="item.value"
@@ -540,6 +574,49 @@
 					</el-pagination>					
 				</div>
 			</div>
+			<div class="popup_public poorPopupShow" v-show="poorPopupShow" >				
+				<h2>设置奖品池</h2>				
+				<div class="edit_area pr">
+					<p>奖品总数量：</p>
+					<div class="clear" style="border: solid 1px #D4D4D4;">
+						<div class="fl" style="width: 50%;-webkit-box-sizing: border-box;box-sizing: border-box;border-right: solid 1px #D4D4D4;">
+							<el-table :data="poorData.prize" max-height="300" height="300">
+								<el-table-column align="center" prop="id" label="id" v-if=0 >
+								</el-table-column>
+								<el-table-column align="center" prop="prizeName" label="奖品名">
+								</el-table-column>
+								<el-table-column align="center" label="中奖数量">
+									<template slot-scope="scope">
+										<el-input type="text" v-model="scope.row.countWinning" style="width: 100px;"></el-input>
+								   </template>
+								</el-table-column>
+							</el-table>
+						</div>
+						<div class="fl pd50" style="width: 50%;">							
+							<p>
+								<label>中奖时间：</label>
+								<el-date-picker
+							      v-model="poorData.releaseTime"
+							      type="datetime"
+							      placeholder="选择日期时间"
+							      value-format="yyyy-MM-dd HH:mm:ss">
+							    </el-date-picker>
+							</p>
+							<p>
+								<label>中奖概率：</label>
+								<el-input type="text" v-model="poorData.probability"></el-input> %
+							</p>
+						</div>
+					</div>
+				</div>
+				<p class="edit_sure_box">
+					<!--@click="PopupConcel"-->
+					<el-button round @click="setPoorConcel">取消</el-button>
+	  				<el-button round type="search" @click="setPoor">确定</el-button>
+	  				 <!--@click="setPoor()"-->
+				</p>
+			</div>
+			
 		</div>
 		<script type="text/javascript" src="../js/quill.js" ></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
