@@ -476,7 +476,7 @@ var store = new Vue({
                 _this.treeName =data[0].name
             }, function (msg) {
                 fadeInOut(msg);
-            }, '', '', '', '', 1,3)
+            }, '', '', '', '', 1)
         },
         initExpand: function () {
             var _this = this
