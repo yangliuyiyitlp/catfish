@@ -1,6 +1,8 @@
 var couponType = new Vue({
 	el: "#activeEdit",
 	data: {
+		report:{
+		},
 		rules: {
           activityForm: [
             { required: true, message: '请选择活动表现形式', trigger: 'change' }
@@ -103,19 +105,22 @@ var couponType = new Vue({
 		fBgIsShow: false,
 		editPopupShow:false,
 		addPopupShow:false,
+		poorPopupShow:false,
 		goodsEdit:'',
 		goodsIndex:'',
 		newGoodsList:'',
 		scene: [{
-          label: '商户',
-          cities: []
+          customName: '商户',
+          id:-1,
+          children: []
         }, {
-          label: '平台',
-          cities: []
+          customName: '平台',
+          id:-2          
         }],
         props: {
-          value: 'label',
-          children: 'cities'
+          value: 'id',
+          label:'customName',
+          children: 'children'
         },
         options: [{
           value: '1',
@@ -130,23 +135,28 @@ var couponType = new Vue({
 			pageSize: 3, 
 			count: 0, 
 			pageNo: 1
+        },
+        poorEdit:'',
+        planData:'',
+        poorData:{
+        	prize:[],
+        	releaseTime:'',
+        	probability:'',
         }
 	},
-	methods: {
-		sceneChange(val) {
-	        console.log('active item:', val);
-	        setTimeout(_ => {
-	          if (val.indexOf('商户') > -1 && !this.scene[0].cities.length) {
-	            this.options2[0].cities = [{
-	              label: '南京'
-	            }];
-	          } else if (val.indexOf('平台') > -1 && !this.scene[1].cities.length) {
-	            this.options2[1].cities = [{
-	              label: '杭州'
-	            }];
-	          }
-	        }, 300);
-      	},       	
+	methods: {	
+		conChan:function(){
+			console.log(this.planData)
+		},
+		getCustom:function(){
+			var that = this;
+			PostAjax(that, 'post', '', '/layer/custom/nyCustom/list', function(data) {
+				console.log(data)
+				var list = that.scene[0];
+				list.children = data.result;
+				Vue.set(that.scene, 0, list);
+			})
+		},
 		getData:function(){
 			var that = this;
 			var id = getParameter('activeId');
@@ -208,13 +218,25 @@ var couponType = new Vue({
 				that.goodsList = data.result;
 			})
 		},
-		setPrizePool:function(){//设置奖品池
+		setPrizePool:function(){//设置奖品池弹窗
+			var that = this; 
+			var list = that.goodsList
+			if(list.length == 0){
+				fadeInOut('请先添加奖品');
+				return;
+			}
+			var prize = []
+			for (var i = 0;i<list.length;i++) {
+				prize[i] = {id:list[i].id,countWinning:list[i].countWinning,prizeName:list[i].prizeName}
+			}
+			that.poorData={
+				prize:prize,
+        		releaseTime:that.activeData.releaseTime,
+        		probability:(that.activeData.probability/100),
+			}
 			
-		},
-		addGoods:function(){//添加奖品
-			///layer/nyeventprizes/nyEventPrizes/rank
-			var that = this;
-			
+        	that.fBgIsShow = true;
+			that.poorPopupShow = true;
 		},
 		downloadTemplate:function(){//下载导入模板
 			PostAjax(this, 'post', '', '/layer/nyeventprizes/nyEventPrizes/import/template', function(data) {
@@ -300,6 +322,7 @@ var couponType = new Vue({
         	var id = list.id,
         	displayIn = list.displayIndex,
         	otherIn;
+        	console.log(list)
         	if(type == 'up'){
         		otherIn = index - 1;        		
         	}else if(type == 'down'){
@@ -344,7 +367,7 @@ var couponType = new Vue({
 	    		this.getGoodsList()
 	    	}
 	    },
-	    // 获取oss秘钥
+	     // 获取oss秘钥
         beforeAvatarUpload: function (file) {
             var that = this;
             return new Promise(function (resolve) {
@@ -352,16 +375,37 @@ var couponType = new Vue({
                     that.Token = data
                     that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
                     that.Token.OSSAccessKeyId = that.Token.accessid
-                    that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+//                  that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
                     resolve()
 
                 }, function (data) {
                     fadeInOut(data);
-                })
+                }, '', '', '', 'application/json', '', 1)
             })
         },
         handleAvatarSuccess: function () {
-            this.iconUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + this.Token.key
+        	var that = this;
+        	var item = that.goodsList[that.uploadIndex];
+        	item.imageUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key;
+        	var con = {
+        		'eventId' : that.activeId,
+        		'id' : item.id,
+        		"imageUrl": 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
+        	};
+        	PostAjax(that, 'post', con, '/layer/nyeventprizes/nyEventPrizes/save', function (data) {
+        		console.log(data)
+        		Vue.set(that.goodsList, that.uploadIndex, item);
+            })
+            
+        },
+        Upload:function(file){
+        	var that = this;
+        },
+        Success:function(file){
+        	console.log(file)
+        },
+        setImgIndex:function(index){
+        	this.uploadIndex = index
         },
         getnNewList:function(){
         	var that = this;
@@ -380,7 +424,7 @@ var couponType = new Vue({
         currentChange: function (val) {//添加奖品弹窗页切换分页
 			console.log(val)
             this.page2.pageNo = val
-//          this.query()
+            this.getnNewList();
         },
         getNewgoodsData:function(){//查询优惠券
         	var that = this;
@@ -393,6 +437,7 @@ var couponType = new Vue({
         		'eventId': that.activeId,
         		"prizeName": item.couponTypeName,
 				"countTotal": item.countLeft,
+				'countWinning': item.countLeft,
 				"prizeObject":{
 					"id": item.id
 				}
@@ -402,12 +447,40 @@ var couponType = new Vue({
         		that.getData();
         		that.getnNewList();
             })
+        },
+        closePopup:function(){
+        	this.fBgIsShow = false;
+        	this.addPopupShow = false;
+        },
+        //设置奖品池
+        setPoor:function(){
+        	var that = this;
+        	var list = that.goodsList;
+        	var con = {
+        	  "appearTime": that.poorData.releaseTime,
+              "eventId": that.activeId,
+              "probability":that.poorData.probability*100,
+              "prizes":that.poorData.prize
+        	}
+        	console.log(con)
+        	PostAjax(that, 'post', con, '/layer/nyeventprizespool/nyEventPrizesPool/save', function (data) {
+        		console.log(data)
+        		that.setPoorConcel();
+        		that.getData();	
+        		that.getGoodsList();
+            })
+        	///
+        },
+        setPoorConcel:function(){
+        	this.fBgIsShow = false;
+        	this.poorPopupShow = false;
         }
 	},
 	created: function() {
 		var that = this;	
 		that.getKeyWords();
-		that.getData();		
+		that.getData();	
+		that.getCustom();
 	}
 })
 var options = {

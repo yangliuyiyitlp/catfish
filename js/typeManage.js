@@ -33,6 +33,14 @@ var couponType = new Vue({
 			{
 				id: 1,
 				name: "虚拟券"
+			},
+			{
+				id: 2,
+				name: "现金券"
+			},
+			{
+				id: 3,
+				name: "实体券"
 			}
 		],
 		isRepeatableList:[
@@ -167,7 +175,7 @@ var couponType = new Vue({
 					return false;
 				}
 				content = {
-					storeName: that.useRangeSearch
+					customName: that.useRangeSearch
 				};
 			} else if(type == 2) {
 				if(that.pAdd.pUR.useRangeSearch == "") {
@@ -175,11 +183,11 @@ var couponType = new Vue({
 					return false;
 				}
 				content = {
-					storeName: that.pAdd.pUR.useRangeSearch
+					customName: that.pAdd.pUR.useRangeSearch
 				};
 			}
 			that.loadingShow = true;
-			PostAjax(that, 'post', content, '/layer/customstore/nyCustomStore/list', function(data) {
+			PostAjax(that, 'post', content, '/layer/custom/nyCustom/list', function(data) {
 				console.log(data)
 				that.loadingShow = false;
 				if(data.result.length > 0) {
