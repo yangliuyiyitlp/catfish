@@ -6,6 +6,7 @@
     <title>商户维护</title>
     <!-- 引入样式 -->
     <link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
+    <link rel="stylesheet" href="../css/quill.snow.css"/>
     <link rel="stylesheet" href="../css/public.css"/>
     <link rel="stylesheet" href="../css/goodsAssert.css"/>
     <!--富文本-->
@@ -241,7 +242,7 @@
                         </el-upload>
                         <i>（图片大小：150k內 长=1.65*宽 如：132*80 347*210）</i>
                     </el-form-item>
-                    <el-form-item label="商品轮播图："prop="goodsPic1">
+                    <el-form-item label="商品轮播图：" prop="goodsPic1">
                         <el-upload
                                 class="avatar-uploader goodsPic"
                                 action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
@@ -292,13 +293,24 @@
                         </el-upload>
                         <p>（图片大小：150k內 长=宽 如：800*800）</p>
                     </el-form-item>
-                    <!--todo 富文本-->
-                    <el-form-item label="商品详情：">
+                    <el-form-item label="商品详情：" id="goodsDetails" prop="goodsDetails">
                         <i>（单张图片大小：200k内）</i>
-                        <div>
-
-
+                        <div class="activeTips clear">
+                                <div id="editor">
+                                </div>
                         </div>
+                        <el-upload
+                                class="avatar-uploader"
+                                action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                                :data="Token"
+                                :show-file-list="false"
+                                :on-success="descriptionSuccess"
+                                :before-upload="descriptionUpload"
+                                align="center"
+                                accept="image/jpeg,image/gif,image/png">
+                            <el-button round size="small" style="visibility: hidden;" type="search" id="upimg">上传图片
+                            </el-button>
+                        </el-upload>
                     </el-form-item>
                     <el-form-item label="上架时间：" class="showTime">
                         <el-radio-group v-model="timeSelect">
@@ -380,7 +392,7 @@
             </div>
             <!--SKU设置-->
             <div v-if="activeClass =='SKU设置'?true:false" class="SKUData">
-               <button class="addForm floatRight" round type="button" @click.stop="allUpdate">批量修改</button>
+                <button class="addForm floatRight" round type="button" @click.stop="allUpdate">批量修改</button>
 
                 <el-table
                         :data="SKUData"
@@ -418,7 +430,9 @@
                             label="价格"
                             prop="price">
                         <template slot-scope="scope">
-                            <el-input type='text' v-if='skuRight' v-model=scope.row.price class="SKUConfig" @keyup.native="priceChange(scope.row.price,scope.$index)"> </el-input>>
+                            <el-input type='text' v-if='skuRight' v-model=scope.row.price class="SKUConfig"
+                                      @keyup.native="priceChange(scope.row.price,scope.$index)"></el-input>
+                            >
                             <a href="#!" v-else>{{scope.row.price}}</a>
                         </template>
                     </el-table-column>
@@ -451,7 +465,7 @@
                             align="center"
                             label="操作">
                         <template slot-scope="scope">
-                            <i  class='skuDel' @click.stop="skuDelete(scope.row.id)">删除</i>
+                            <i class='skuDel' @click.stop="skuDelete(scope.row.id)">删除</i>
                         </template>
                     </el-table-column>
 
@@ -478,7 +492,7 @@
 </div>
 
 <!-- 引入组件库 -->
-
+<script type="text/javascript" src="../js/quill.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/vue"></script>
 <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 <script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>

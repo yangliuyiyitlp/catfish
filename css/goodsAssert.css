@@ -212,3 +212,18 @@ width:200px;
 .iconTaste{
     margin-right:10px;
 }
+#editor{
+    height: 150px;
+}
+.activeTips{
+    width: 880px;
+}
+.activeTips > div{
+    width: 642px;
+}
+.showTime{
+    margin-top:-20px;
+}
+#goodsDetails .avatar-uploader .el-upload{
+    border:none;
+}

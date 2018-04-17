@@ -58,7 +58,8 @@ var store = new Vue({
                 goodsName: [{required: true, message: '请输入名称', trigger: 'blur'},
                     {min: 1, max: 30, message: '长度需小于30字符', trigger: 'blur'}],
                 thumbnail: [{required: true, message: '请上传列表图'}],
-                goodsPic1: [{required: true, message: '请按顺序上传轮播图片'}]
+                goodsPic1: [{required: true, message: '请按顺序上传轮播图片'}],
+                goodsDetails: [{required: true, message: '请填写商品详情'}]
 
             },
             pagination: {pageSizes: [30, 40, 60, 100], pageSize: 30, count: 0, pageNo: 1},
@@ -125,7 +126,6 @@ var store = new Vue({
         },
         // 列表开始
         handleClick: function (tab, event) {
-            console.log(tab.name)
             if (tab.name == 'second') {
                 this.setEmptyForm()
                 this.title = '添加商品'
@@ -159,6 +159,26 @@ var store = new Vue({
         },
         // 基本信息开始
         //获取字典数据
+        //富文本
+        descriptionSuccess:function(){
+            var that = this;
+            var imageUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key;
+            editor.insertEmbed(editor.getSelection().index, 'image', imageUrl)
+
+        },
+        descriptionUpload: function (file) {
+            var that = this;
+            return new Promise(function (resolve) {
+                PostAjax(that, 'post', {'user_dir': 'activeManage'}, '/layer/oss/ossUtil/policy', function (data) {
+                    that.Token = data
+                    that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
+                    that.Token.OSSAccessKeyId = that.Token.accessid
+                    resolve()
+                }, function (data) {
+                    fadeInOut(data);
+                }, '', '', '', 'application/json', '', 1)
+            })
+        },
         getlists: function () {
             var _this = this
             PostAjax(_this, 'post', {"types": "laterTime,gapTime"}, '/layer/dict/sysDict/listByTypes', function (data) {
@@ -368,7 +388,6 @@ var store = new Vue({
             } else if (row.recommendFlag == '0') {
                 url = '/layer/goods/nyGoods/recommend/insert/' + row.id
             }
-            console.log(url);
             PostAjax(_this, 'post', '', url, function (data) {
                 _this.query()
             }, function (msg) {
@@ -385,7 +404,6 @@ var store = new Vue({
                 type: 'warning'
             }).then(function () {
                 PostAjax(_this, 'post', _this.exportForm, '/layer/goods/nyGoods/exportAll', function (data) {
-                    console.log(data)
                     window.location.href = 'http://192.168.0.216:10005' + data;
                 }, '', '', '', '', '', '', 4)
             }).catch(function () {
@@ -402,7 +420,7 @@ var store = new Vue({
         },
         moreInfo: function (row) {
             var _this = this
-            _this.$refs['basicInfo'].resetFields()
+            _this.$refs.basicInfo.resetFields()
             PostAjax(_this, 'post', {'id': row.id}, '/layer/goods/nyGoods/form', function (data) {
                 _this.basicInfo = data
                 _this.filterText = _this.basicInfo.goodsCatName
@@ -411,6 +429,8 @@ var store = new Vue({
                 _this.goodsPic2 = _this.basicInfo.goodsPic2
                 _this.goodsPic3 = _this.basicInfo.goodsPic3
                 _this.goodsPic4 = _this.basicInfo.goodsPic4
+               editor.clipboard.dangerouslyPasteHTML(_this.basicInfo.goodsDetails)
+
                 if (_this.basicInfo.goodsLable.length > 0) {
                     _this.goodsLableArr = _this.basicInfo.goodsLable.split(',')
                 }
@@ -442,6 +462,7 @@ var store = new Vue({
             this.filterText = ''
             this.pinyin = ''
             this.goodsLableArr = []
+            editor.clipboard.dangerouslyPasteHTML('')
         },
         resetForm: function (formName) {
             this.setEmptyForm()
@@ -927,12 +948,16 @@ var store = new Vue({
             _this.basicInfo.openFlag = '1'
             _this.basicInfo.recommendFlag = '0'
             _this.basicInfo.updateDate = convertDate(new Date().getTime())
+            _this.basicInfo.goodsDetails = editor.container.firstChild.innerHTML
             _this.basicInfo.customId = '1' //todo 目前写死是登陆后传给前端的商户id
             if (_this.basicInfo.goodsIndex && !/^[1-9]|\d*$/.test(_this.basicInfo.goodsIndex)) {
                 this.$message.warning('排序只能输入正整数')
                 return
             }
-
+            if (!_this.basicInfo.goodsDetails) {
+                this.$message.warning('请填写商品详情')
+                return
+            }
             if (_this.basicInfo.appointmentDays && !/^[1-9]|\d*$/.test(_this.basicInfo.appointmentDays)) {
                 this.$message.warning('预约天数只能输入正整数')
                 return
@@ -1125,3 +1150,37 @@ var store = new Vue({
         }
     }
 })
+var options = {
+    debug: 'info',
+    modules: {
+        toolbar: {
+            container: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'header': 1 }, { 'header': 2 }],
+                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+                [{ 'script': 'sub' }, { 'script': 'super' }],
+                [{ 'indent': '-1' }, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'size': ['small', false, 'large', 'huge'] }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
+                [{ 'font': [] }],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'align': [] }],
+                ['clean'],
+                ['link', 'image']
+            ],  // 工具栏
+            handlers: {
+                'image': function (value) {
+                    if (value) {
+                        document.querySelector('#upimg').click()
+                    } else {
+
+                    }
+                }
+            },
+        }
+    },
+    theme: 'snow'
+}
+var editor = new Quill('#editor', options);
