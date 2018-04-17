@@ -1,3 +1,4 @@
+
 var couponType = new Vue({
 	el: "#activeEdit",
 	data: {
@@ -67,8 +68,10 @@ var couponType = new Vue({
 			notBeginningTips:'',
 			noWinningTips:'',
 			winningTips:'',
+			content:''
 		},		
 		Token: {},
+		descriptionToken:'',
 		serachData:{
 			activityForm:'',
 			activeState:'',
@@ -167,33 +170,38 @@ var couponType = new Vue({
 			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/form', function(data) {
 				console.log(data)
 				that.activeData = data;
+				that.settingData = data;
+				editor.clipboard.dangerouslyPasteHTML(data.description)
+//				
 				console.log(that.activeData)
-			},'','','','','','',4)
+				console.log(that.settingData)
+			},'','','','','',1,4)
 		},
 		submitData:function(){//提交基础设置
 			var that = this;
-			var activeData = that.activeData;
+			var settingData = that.settingData;
 			var content = {
 				id: that.activeId,
-				eventManId: activeData.eventManId,
-				overRemark: activeData.overRemark,
-				eventTypeId: activeData.eventTypeId,							
-				outRemark: activeData.outRemark,
-				eventName:activeData.eventName,
-				msgHasNot:activeData.msgHasNot,
-				beginTime:activeData.beginTime,
-				msgEnd:activeData.msgEnd,
-				endTime:activeData.endTime,
-				eventPeriod:activeData.eventPeriod,
-				releaseTime:activeData.releaseTime,				
-				personCount:activeData.personCount,				
-				stockoutTime:activeData.stockoutTime,
-				deduction:activeData.deduction,
-				description:activeData.description == undefined ? '' : activeData.description
+				eventManId: settingData.eventManId,
+				overRemark: settingData.overRemark,
+				eventTypeId: settingData.eventTypeId,							
+				outRemark: settingData.outRemark,
+				eventName:settingData.eventName,
+				msgHasNot:settingData.msgHasNot,
+				beginTime:settingData.beginTime,
+				msgEnd:settingData.msgEnd,
+				endTime:settingData.endTime,
+				eventPeriod:settingData.eventPeriod,
+				releaseTime:settingData.releaseTime,				
+				personCount:settingData.personCount,				
+				stockoutTime:settingData.stockoutTime,
+				deduction:settingData.deduction,
+				description:editor.container.firstChild.innerHTML
 			}
 			PostAjax(that, 'post', content, '/layer/nyevent/nyEvent/save', function(data) {
 				console.log(data)
-				that.activeData = data;
+//				that.activeData = data;
+				that.getData();
 			},'','','','','','',4)
 		},
 		getWinningList:function(){//获取中奖名单
@@ -237,12 +245,7 @@ var couponType = new Vue({
 			
         	that.fBgIsShow = true;
 			that.poorPopupShow = true;
-		},
-		downloadTemplate:function(){//下载导入模板
-			PostAjax(this, 'post', '', '/layer/nyeventprizes/nyEventPrizes/import/template', function(data) {
-				window.location.href = 'http://192.168.0.216:10005'+data;
-			})
-		},
+		},		
 		exportPrizePool:function(){//导出奖品池
 			PostAjax(this, 'post', '', '/layer/nyeventprizespool/nyEventPrizesPool/exportAll', function(data) {
 				window.location.href = 'http://192.168.0.216:10005' + data;
@@ -375,9 +378,7 @@ var couponType = new Vue({
                     that.Token = data
                     that.Token.key = that.Token.dir + '/' + (+new Date()) + file.name
                     that.Token.OSSAccessKeyId = that.Token.accessid
-//                  that.ruleForm.storePic1 = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key
                     resolve()
-
                 }, function (data) {
                     fadeInOut(data);
                 }, '', '', '', 'application/json', '', 1)
@@ -395,14 +396,30 @@ var couponType = new Vue({
         	PostAjax(that, 'post', con, '/layer/nyeventprizes/nyEventPrizes/save', function (data) {
         		console.log(data)
         		Vue.set(that.goodsList, that.uploadIndex, item);
+           })            
+        },
+        descriptionUpload: function (file) {
+        	console.log('402 --- 上传前')
+            var that = this;
+            return new Promise(function (resolve) {
+                PostAjax(that, 'post', {'user_dir': 'activeManage'}, '/layer/oss/ossUtil/policy', function (data) {
+                    console.log('cengg sggd gdf df fg---',data)
+                    that.descriptionToken = data
+                    that.descriptionToken.key = that.descriptionToken.dir + '/' + (+new Date()) + file.name
+                    that.descriptionToken.OSSAccessKeyId = that.descriptionToken.accessid
+                    console.log(that.descriptionToken)
+                    resolve()
+                }, function (data) {
+                    fadeInOut(data);
+                }, '', '', '', 'application/json', '', 1)
             })
-            
         },
-        Upload:function(file){
-        	var that = this;
-        },
-        Success:function(file){
-        	console.log(file)
+        descriptionSuccess:function(){
+        	console.log('416 --- 上传成功')
+        	var that = this;        	
+        	var imageUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.descriptionToken.key;
+			editor.insertEmbed(editor.getSelection().index, 'image', imageUrl) 
+        	  
         },
         setImgIndex:function(index){
         	this.uploadIndex = index
@@ -483,6 +500,7 @@ var couponType = new Vue({
 		that.getCustom();
 	}
 })
+
 var options = {
   	debug: 'info',
 	modules: {
@@ -501,18 +519,16 @@ var options = {
 		      [{ 'color': [] }, { 'background': [] }],
 		      [{ 'align': [] }],
 		      ['clean'],
-		      ['link', 'image', 'video']
+		      ['link', 'image']
 		    ],  // 工具栏
 	      	handlers: {
 		        'image': function (value) {
-		        	 alert(1)
-		          if (value) {
-		            alert(1)
-//			            document.querySelector('#quill-upload').click()
-		          } else {
-		          	alert('ddd')
-//			            this.quill.format('image', false);
-		          }
+		        	if (value) {
+		        		console.log('fffffffffff')
+			           	document.querySelector('#upimg').click()
+		          	} else {
+		          	
+		          	}
 		        }
 	      	},
 	    }			    

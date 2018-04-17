@@ -272,7 +272,7 @@
 				    </el-col>
 				</el-row>
 			</div>
-			<el-upload
+			<!--<el-upload
                 class="avatar-uploader"
                 action='http://192.168.0.123:8080/layer/nycoupon/nyCoupon/import'
                 :data="report"
@@ -283,7 +283,7 @@
                 :limit="1"
                 accept = ".xlsx,.xls">
                 <el-button round size="small" type="search">上传文件</el-button>
-        	</el-upload>
+        	</el-upload>-->
 			<!--切换效果-->
 			<ul class="tabListTT clear">
 				<li v-for="item in tabList"  :class="showPart == item.id ? 'show':''" @click="changeShow(item.id)">
@@ -296,7 +296,7 @@
 				<ul class="clear">
 					<li>
 						<label>活动表现形式：</label>
-						<el-select v-model="activeData.eventManId">
+						<el-select v-model="settingData.eventManId">
 						    <el-option
 						      v-for="item in serachData.activityForm"
 						      :key="item.eventManCode"
@@ -307,11 +307,11 @@
 					</li>
 					<li>
 						<label>中奖提示：</label>
-						<el-input type="text" v-model="activeData.overRemark"></el-input>
+						<el-input type="text" v-model="settingData.overRemark"></el-input>
 					</li>
 					<li>
 						<label>活动类型：</label>
-						<el-select v-model="activeData.eventTypeId">
+						<el-select v-model="settingData.eventTypeId">
 						    <el-option
 						      v-for="item in serachData.activityType"
 						      :key="item.value"
@@ -322,20 +322,20 @@
 					</li>
 					<li>
 						<label>未中奖提示：</label>
-						<el-input type="text" v-model="activeData.outRemark"></el-input>
+						<el-input type="text" v-model="settingData.outRemark"></el-input>
 					</li>
 					<li>
 						<label>活动名称：</label>
-						<el-input type="text" v-model="activeData.eventName"></el-input>
+						<el-input type="text" v-model="settingData.eventName"></el-input>
 					</li>
 					<li>
 						<label>未开始提示：</label>
-						<el-input type="text" v-model="activeData.msgHasNot"></el-input>
+						<el-input type="text" v-model="settingData.msgHasNot"></el-input>
 					</li>
 					<li>
 						<label>开始时间：</label>
 						<el-date-picker
-					      v-model="activeData.beginTime"
+					      v-model="settingData.beginTime"
 					      type="datetime"
 					      placeholder="选择日期时间"
 					      value-format="yyyy-MM-dd HH:mm:ss">
@@ -343,12 +343,12 @@
 					</li>
 					<li>
 						<label>已结束提示：</label>
-						<el-input type="text" v-model="activeData.msgEnd"></el-input>
+						<el-input type="text" v-model="settingData.msgEnd"></el-input>
 					</li>
 					<li>
 						<label>结束时间：</label>
 						<el-date-picker
-					      v-model="activeData.endTime"
+					      v-model="settingData.endTime"
 					      type="datetime"
 					      placeholder="选择日期时间"
 					      value-format="yyyy-MM-dd HH:mm:ss">
@@ -356,7 +356,7 @@
 					</li>					
 					<li>
 						<label>活动周期：</label>
-						<el-select v-model="activeData.eventPeriod">
+						<el-select v-model="settingData.eventPeriod">
 						    <el-option
 						      v-for="item in serachData.eventPeriod"
 						      :key="item.value"
@@ -368,7 +368,7 @@
 					<li>
 						<label>展示时间：</label>
 						<el-date-picker
-					      v-model="activeData.releaseTime"
+					      v-model="settingData.releaseTime"
 					      type="datetime"
 					      placeholder="选择日期时间"
 					      value-format="yyyy-MM-dd HH:mm:ss">
@@ -376,13 +376,13 @@
 					</li>
 					<li>
 						<label>每周期每人抽奖次数：</label>
-						<el-input type="text" v-model="activeData.personCount"></el-input>
+						<el-input type="text" v-model="settingData.personCount"></el-input>
 						<span>（0为不限）</span>
 					</li>					
 					<li>
 						<label>失效时间：</label>
 						<el-date-picker
-					      v-model="activeData.stockoutTime"
+					      v-model="settingData.stockoutTime"
 					      type="datetime"
 					      placeholder="选择日期时间"
 					      value-format="yyyy-MM-dd HH:mm:ss">
@@ -390,17 +390,27 @@
 					</li>
 					<li>
 						<label>每次抽奖抵扣积分：</label>
-						<el-input type="text" v-model="activeData.deduction"></el-input>
+						<el-input type="text" v-model="settingData.deduction"></el-input>
 					</li>					
 				</ul>
 				<div class="activeTips clear">
 					<label>活动描述：</label>
 					<div class="fl">
 						<div id="editor">
-							<p>{{activeData.description}}</p>
 						</div>
 					</div>					
-				</div>				
+				</div>	
+				<el-upload
+                    class="avatar-uploader"
+                    action='http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com'
+                    :data="descriptionToken"
+                    :show-file-list="false"
+                    :on-success="descriptionSuccess"
+                    :before-upload="descriptionUpload"
+                    align="center"
+                    accept = "image/jpeg,image/gif,image/png">
+                    <el-button round size="small" style="visibility: hidden;" type="search" id="upimg">上传图片</el-button>
+            	</el-upload>
 				<div class="btnPart bgf4 pd20">
 	                <el-button type="search" round @click="submitData">确定</el-button>
 	           	</div>				
@@ -620,7 +630,6 @@
 		</div>
 		<script type="text/javascript" src="../js/quill.js" ></script>
 		<script src="https://cdn.jsdelivr.net/npm/vue"></script>
-<!--		<script type="text/javascript" src="../js/quill.core.js" ></script>-->
 		<script src="https://unpkg.com/axios/dist/axios.min.js"></script>
 		<script src="https://unpkg.com/element-ui@2.2.2/lib/index.js"></script>		
 		<script type="text/javascript" src="../js/public.js"></script>

@@ -3,6 +3,7 @@ var couponType = new Vue({
 	data: {
 		serachData:{
 			couponAssignType:'',
+			couponStatusVal:'',
 			storeName:'',
 			storeId:'',
 			couponTypeName:'',
@@ -16,7 +17,16 @@ var couponType = new Vue({
 			}, {
 				id: -1,
 				name: "单个"
-			}]
+			}],
+			couponStatus:[{
+				id: 1,
+				name: "使用中"
+			},{
+				id: 2,
+				name: "未使用"
+			}],
+			couponGeneration:[],
+			couponGenerationVal:''
 		},
 		formInline: {
             pageSize: 30,
@@ -334,13 +344,11 @@ var couponType = new Vue({
 
 				}
 			}
-//			this.loadingShow = true;
 			console.log(content)
 			that.pAdd.popupShow = false;
 			that.fBgIsShow = false;
 			PostAjax(that, 'post', content, '/layer/nycoupontype/nyCouponType/save', function(data) {
-				console.log(data);
-//				that.loadingShow = false;				
+				console.log(data);				
 				if(pAdd.id === -1){					
 					that.formInline.pageNo = 1;				
 					that.getData();
@@ -460,12 +468,21 @@ var couponType = new Vue({
 	    },
 	    getKeyWords:function(){
 	      	var that = this;
-	      	PostAjax(that, 'post', {"types":"CouponSpecifiedType"}, '/layer/dict/sysDict/listByTypes', function(data) {
+	      	PostAjax(that, 'post', {"types":"CouponSpecifiedType,couponStatus,couponGeneration"}, '/layer/dict/sysDict/listByTypes', function(data) {
 	      		console.log(data)
 				that.serachData.useRange = data.CouponSpecifiedType;
-
+				that.serachData.couponStatus = data.couponStatus;
+				that.serachData.couponGeneration = data.couponGeneration;
+				
+                
 			},'','','','','',1,1)
-	    }
+	    },
+	    downloadTemplate:function(){//下载导入模板
+			PostAjax(this, 'post', '', '/layer/nycoupon/nyCoupon/import/template', function(data) {
+//				console.log()
+				window.location.href = 'http://192.168.0.123:8080'+data;
+			},'','','','','','',4)
+		},
 	},
 	created: function() {
 		var that = this;	
