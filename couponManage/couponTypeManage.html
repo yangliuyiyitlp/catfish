@@ -6,14 +6,25 @@
 		<title>优惠券类型管理</title>
 		<!--<link href="/Content/css/erp_public2.css?ver=201707201119" rel="stylesheet" />-->
 		<link rel="stylesheet" href="https://unpkg.com/element-ui@2.2.2/lib/theme-chalk/index.css">
-		<link rel="stylesheet" href="../css/public.css" />		
+		<link rel="stylesheet" href="../css/public.css" />	
+		<style>
+			.popup_public{
+				height: 600px;
+				margin-top: -300px;
+			}
+			.edit_area p span{
+				margin-left: 5px;
+				color: #ff2929;
+				font-size: 12px;
+			}
+		</style>
 	</head>
 	<body>
 		<div id="couponType" class="erp_content wp" v-clock  v-on:click="shopNameIsShow=false,pAdd.pUR.shopNameIsShow=false">
 			<!--筛选头部-->
 			<div class="searchPart">
 				<div class="searchItem">
-					<label>优惠劵指定类型：</label>
+					<label>优惠券指定类型：</label>
 					<el-select v-model="serachData.couponAssignType" class="smSelect">
 					    <el-option
 					      v-for="item in serachData.useRange"
@@ -35,6 +46,17 @@
 				<div class="searchItem">
 					<label>金额：</label> <el-input v-model="serachData.parValue"></el-input>
 				</div> 
+				<div class="searchItem">
+					<label>优惠券状态：</label>
+					<el-select clearable v-model="serachData.couponStatusVal">
+					    <el-option
+					      v-for="item in serachData.couponStatus"
+					      :key="item.value"
+					      :label="item.label"
+					      :value="item.value">
+					    </el-option>
+					</el-select>					
+				</div>
 				<div class="shopDiv searchDiv pa" v-show="shopNameIsShow" v-on:click.stop="shopNameIsShow=true" >
 					<h3>
 						<input type="text" placeholder="输入商户名称" :value="useRangeSearch" v-model="useRangeSearch" v-on:keydown="KeyDownEnter($event,1)" spellcheck="false"/>
@@ -46,7 +68,8 @@
 				</div>
 				<div class="btnPart">
 	                <el-button type="search" round @click="getData">查询</el-button>
-	  				<el-button round v-on:click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true">添加</el-button>
+	  				<el-button round @click="pAdd.popupShow=true,pAdd.popupName='添加',fBgIsShow=true">添加</el-button>
+	  				<el-button round @click="downloadTemplate">下载模板</el-button>
 	           </div>
 			</div>			
             <el-table :data="couponList" border style="margin: 20px auto; width: 97.5%;">
@@ -60,7 +83,7 @@
                         align="center"
                         prop="couponTypeName"
                         label="名称"
-                        width="200">
+                        width="100">
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -74,6 +97,19 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
+                        prop="validPeriod"
+                        label="固定时长">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="isRepeatable"
+                        label="状态">
+                        <template slot-scope="scope">                        	
+                        	{{serachData.couponStatus[scope.row.isLock].label}}
+					    </template>
+                </el-table-column>
+                <el-table-column
+                        align="center"
                         label="优惠券指定类型">
                         <template slot-scope="scope">
                         	{{serachData.useRange[scope.row.couponAssignType].label !='单个' ? serachData.useRange[scope.row.couponAssignType].label : scope.row.nyCustom.customName}}
@@ -81,8 +117,18 @@
                 </el-table-column>
                 <el-table-column
                         align="center"
+                        prop="validPeriod"
+                        label="剩余数量">
+                </el-table-column>
+                <el-table-column
+                        align="center"
                         prop="conditionValue"
                         label="订单满足条件（元）">
+                </el-table-column>
+                <el-table-column
+                        align="center"
+                        prop="validPeriod"
+                        label="使用数量">
                 </el-table-column>
                 <el-table-column
                         align="center"
@@ -131,7 +177,8 @@
 					<p class="required">
 						<label><em>*</em>名称：</label>
 						<input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" />
-						<span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span></p>					
+						<span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span>
+					</p>					
 					<!--<p class="required"><label><em>*</em>名称：</label><input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" /><span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span></p>-->
 					<p class="required"><label><em>*</em>优惠券形式：</label>
 						<el-select v-model="pAdd.couponType">
@@ -163,7 +210,7 @@
 					<p class="required type1"><label><em>*</em>订单满足条件：</label><input type="text" class="int" :value="pAdd.conditionValue" v-model="pAdd.conditionValue" v-on:blur="BlurValue($event,'conditionValue')" maxlength="20" /><span v-show="pAdd.conditionValueShow">请输入正整数</span></p>
 					<p class="required type1">
 						<label><em>*</em>是否叠加：</label>
-						<el-select v-model="pAdd.isRepeatable" class="smSelect">
+						<el-select v-model="pAdd.isRepeatable">
 						    <el-option
 						      v-for="item in isRepeatableList"
 						      :key="item.id"
@@ -174,7 +221,7 @@
 					</p>
 					<p class="required type1">
 						<label><em>*</em>是否混合使用：</label>
-						<el-select v-model="pAdd.isMixable" class="smSelect">
+						<el-select v-model="pAdd.isMixable">
 						    <el-option
 						      v-for="item in isMixableList"
 						      :key="item.id"
@@ -182,6 +229,22 @@
 						      :value="item.id">
 						    </el-option>
 						</el-select>
+					</p>
+					<p class="required type1">
+						<label><em>*</em>优惠券生成方式：</label>
+						<el-select v-model="pAdd.couponGenerationVal">
+						    <el-option
+						      v-for="item in pAdd.couponGeneration"
+						      :key="item.id"
+						      :label="item.name"
+						      :value="item.id">
+						    </el-option>
+						</el-select>
+					</p>
+					<p class="required">
+						<label><em>*</em>生成数量：</label>
+						<input type="text" :value="pAdd.typeName" v-model="pAdd.typeName" v-on:blur="BlurValue($event,'typeName')" maxlength="20" />
+						<span v-show="pAdd.typeNameShow">必填项：仅支持中英文数字,且最长20位</span>
 					</p>
 					<div class="AddDiv searchDiv pa" v-show="pAdd.pUR.shopNameIsShow" v-on:click.stop="pAdd.pUR.shopNameIsShow=true">
 						<h3>
