@@ -61,13 +61,23 @@ var store = new Vue({
                 children: 'children'
             },
             selectedCities: [],
-            cityNames:''
+            cityNames:'',
+            permissionList:[],
         }
     },
     created: function () {
+        var _this=this
+        sessionId(_this, _this.permissionList) // 请求按钮权限
         this.getCity()
     },
     methods: {
+        //权限编写中
+        hasPermission(data) {
+            if (this.permissionList && this.permissionList.length && this.permissionList.includes(data)) {
+                return true
+            }
+            return false
+        },
         mapSelect: function (longitude, latitude, storeAddr) {
             var that = this
             var marker

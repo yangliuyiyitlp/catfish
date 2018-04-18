@@ -126,3 +126,12 @@ textarea{
     -webkit-transform: translateY(0%);
     transform: translateY(0%);
 }
+.storeOnOff{
+    float:left;
+}
+.storeModify{
+    float:right;
+}
+.el-table .cell{
+    height:23px;
+}

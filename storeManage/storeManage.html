@@ -35,8 +35,11 @@
             <label>所属商户：</label>
             <el-input v-model="formInline.customName"></el-input>
             <div class="btnBar">
-                <button class="query" round @click="query" type="button">查询</button>
-                <button class='addForm' @click="addForm" round type="button">添加</button>
+                <button class="query" round @click="query" type="button" v-if="hasPermission('store/Manage/query')">查询
+                </button>
+                <button class='addForm' @click="addForm" round type="button" v-if="hasPermission('store/Manage/add')">
+                    添加
+                </button>
             </div>
             <el-table
                     :data="tableData"
@@ -75,18 +78,25 @@
                         label="营业时间">
                 </el-table-column>
                 <el-table-column
+                        v-if="hasPermission('store/Manage/isOn')||hasPermission('store/Manage/modify')"
                         align="center"
                         fixed="right"
                         label="操作"
                         width="120">
                     <template slot-scope="scope">
-                        <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false class="isOn">
-                            启用
-                        </button>
-                        <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
-                        <button @click="modifyRow(scope.row)" class="modifyBtn">
-                            修改
-                        </button>
+                        <div v-if="hasPermission('store/Manage/isOn')" class="storeOnOff">
+                            <button @click="isOnChange(scope.row)" v-if=(scope.row.openFlag)==='1'?true:false
+                                    class="isOn">
+                                启用
+                            </button>
+                            <button @click="isOnChange(scope.row)" v-else class="isOff">停用</button>
+                        </div>
+                        <div class="storeModify"  v-if="hasPermission('store/Manage/modify')">
+                            <button @click="modifyRow(scope.row)" class="modifyBtn"
+                                   >
+                                修改
+                            </button>
+                        </div>
                     </template>
                 </el-table-column>
             </el-table>
@@ -100,7 +110,8 @@
                     :total="pagination.count">
             </el-pagination>
         </el-tab-pane>
-        <el-tab-pane label="配置管理" name="second">
+        <el-tab-pane label="配置管理" name="second"
+                     v-if="hasPermission('store/Manage/modify')||hasPermission('store/Manage/add')">
 
             <el-form :model="ruleForm" :rules="rules" ref="ruleForm" label-width="100px" class="demo-ruleForm">
                 <el-input v-if="0" v-model="ruleForm.id"></el-input>
@@ -109,7 +120,8 @@
                 </el-form-item>
                 <el-form-item label="联系电话：" prop="storeTel">
                     <el-input class='storeTop' v-model="ruleForm.storeTop" placeholder="区号"></el-input>
-                    <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input><span v-show='reg'class="redTip">电话位数请核实</span>
+                    <el-input v-model="ruleForm.storeTel" placeholder="请输入电话号码（区号可留空）"></el-input>
+                    <span v-show='reg' class="redTip">电话位数请核实</span>
                 </el-form-item>
                 <el-form-item label="所属区域：" prop="selectedCities">
                     <el-cascader
