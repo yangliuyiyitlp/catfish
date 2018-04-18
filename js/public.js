@@ -40,7 +40,7 @@ function PostAjax(who,type,content,Pri,callBack,failCallBack,isShowMsg,hideloa,s
     }
 	
 	var guid = NewGuid();
-	var adminId = localStorage.getItem('adminId') == null ? '999999999': localStorage.getItem('adminId');
+	var adminId = localStorage.getItem('adminId') == null ? '1': localStorage.getItem('adminId');
 	var ConType = ContentType ? ContentType : 'application/json'
     console.log(content);
     console.log(ConType)

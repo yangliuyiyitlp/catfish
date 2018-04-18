@@ -359,7 +359,7 @@ var store = new Vue({
             var _this = this
             _this.exportForm.goodsName = _this.formInline.goodsName
             _this.exportForm.goodsCatId = _this.filterId
-            _this.exportForm.skuId = _this.formInline.skuId
+            _this.exportForm.id = _this.formInline.id
             _this.exportForm.sn = _this.formInline.sn
             _this.exportForm.openFlag = _this.formInline.openFlag
             PostAjax(_this, 'post', this.formInline, '/layer/goods/nyGoods/list', function (data) {
