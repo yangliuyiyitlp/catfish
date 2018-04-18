@@ -2,6 +2,7 @@ var store = new Vue({
     el: '#goodsAssert',
     data: function () {
         return {
+            permissionList: [],
             activeName: 'first',
             title: '添加商品',
             formInline: {
@@ -67,6 +68,7 @@ var store = new Vue({
         }
     },
     created: function () {
+        // sessionId(this,this.permissionList) // 请求按钮权限
         this.searchArea()
         this.getlists()
     },
@@ -108,8 +110,15 @@ var store = new Vue({
     //     }
     // },
     mounted() {
+
     },
     methods: {
+        hasPermission (data) {
+            if (this.permissionList && this.permissionList.length && this.permissionList.includes(data)) {
+                return true
+            }
+            return false
+        },
         priceChange: function (price, id) {
             var value = String(price)
             if (value.indexOf('.') > 0) {

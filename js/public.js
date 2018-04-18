@@ -186,3 +186,21 @@ function stt(str){
 	str = str.replace('T','  ');
 	return str;
 }
+
+//权限编写中
+function sessionId(who,permissionList){
+    var url = window.location.origin + '/' + window.location.hash
+    if (url.indexOf('?') !== -1) {
+        url = url.split('?')[0]
+    }
+    PostAjax(who, 'post', {'href':url}, 'http://192.168.0.167:10013/layer/menu/menu/listByUser', function (data) {
+        for (var i = 0; i < data.data.length; i++) {
+            if (data.data[i].permission !== '' && data.data[i].permission !== undefined) {
+                permissionList.push(data.data[i].permission)
+                console.log(permissionList)
+            }
+        }
+    }, function (msg) {
+        fadeInOut(msg)
+    }, '', '', '', '', 1)
+}
