@@ -28,8 +28,8 @@
                 <label>分类：</label>
                 <el-button class="searchBtn" icon="el-icon-search" @click="searchMechanismCity">{{filterCity}}
                 </el-button>
-                <label>SKUID：</label>
-                <el-input v-model="formInline.skuId"></el-input>
+                <label>商品id：</label>
+                <el-input v-model="formInline.id"></el-input>
                 <label>条形码：</label>
                 <el-input v-model="formInline.sn"></el-input>
                 <label>状态：</label>
@@ -76,13 +76,13 @@
                 <el-table-column
                         show-overflow-tooltip="false"
                         align="center"
-                        prop="skuId"
-                        label="SKUID">
-                </el-table-column>
+                        prop="salesVolume"
+                        label="销量">
+                </el-table-column>-->
                 <el-table-column
                         align="center"
-                        prop="sn"
-                        label="条形码">
+                        prop="stock"
+                        label="库存">
                 </el-table-column>
                 <el-table-column
                         align="center"
