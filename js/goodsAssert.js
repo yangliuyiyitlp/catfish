@@ -68,7 +68,8 @@ var store = new Vue({
         }
     },
     created: function () {
-        // sessionId(this,this.permissionList) // 请求按钮权限
+        var _this=this
+         sessionId(_this, _this.permissionList) // 请求按钮权限
         this.searchArea()
         this.getlists()
     },
@@ -113,7 +114,8 @@ var store = new Vue({
 
     },
     methods: {
-        hasPermission (data) {
+        //权限编写中
+        hasPermission(data) {
             if (this.permissionList && this.permissionList.length && this.permissionList.includes(data)) {
                 return true
             }
@@ -169,7 +171,7 @@ var store = new Vue({
         // 基本信息开始
         //获取字典数据
         //富文本
-        descriptionSuccess:function(){
+        descriptionSuccess: function () {
             var that = this;
             var imageUrl = 'http://jjdcjavaweb.oss-cn-shanghai.aliyuncs.com/' + that.Token.key;
             editor.insertEmbed(editor.getSelection().index, 'image', imageUrl)
@@ -438,7 +440,7 @@ var store = new Vue({
                 _this.goodsPic2 = _this.basicInfo.goodsPic2
                 _this.goodsPic3 = _this.basicInfo.goodsPic3
                 _this.goodsPic4 = _this.basicInfo.goodsPic4
-               editor.clipboard.dangerouslyPasteHTML(_this.basicInfo.goodsDetails)
+                editor.clipboard.dangerouslyPasteHTML(_this.basicInfo.goodsDetails)
 
                 if (_this.basicInfo.goodsLable.length > 0) {
                     _this.goodsLableArr = _this.basicInfo.goodsLable.split(',')
@@ -1166,16 +1168,16 @@ var options = {
             container: [
                 ['bold', 'italic', 'underline', 'strike'],
                 ['blockquote', 'code-block'],
-                [{ 'header': 1 }, { 'header': 2 }],
-                [{ 'list': 'ordered' }, { 'list': 'bullet' }],
-                [{ 'script': 'sub' }, { 'script': 'super' }],
-                [{ 'indent': '-1' }, { 'indent': '+1' }],
-                [{ 'direction': 'rtl' }],
-                [{ 'size': ['small', false, 'large', 'huge'] }],
-                [{ 'header': [1, 2, 3, 4, 5, 6, false] }],
-                [{ 'font': [] }],
-                [{ 'color': [] }, { 'background': [] }],
-                [{ 'align': [] }],
+                [{'header': 1}, {'header': 2}],
+                [{'list': 'ordered'}, {'list': 'bullet'}],
+                [{'script': 'sub'}, {'script': 'super'}],
+                [{'indent': '-1'}, {'indent': '+1'}],
+                [{'direction': 'rtl'}],
+                [{'size': ['small', false, 'large', 'huge']}],
+                [{'header': [1, 2, 3, 4, 5, 6, false]}],
+                [{'font': []}],
+                [{'color': []}, {'background': []}],
+                [{'align': []}],
                 ['clean'],
                 ['link', 'image']
             ],  // 工具栏
@@ -1193,3 +1195,5 @@ var options = {
     theme: 'snow'
 }
 var editor = new Quill('#editor', options);
+
+

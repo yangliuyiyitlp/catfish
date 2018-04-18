@@ -17,15 +17,15 @@
     <!--<link href="http://cdn.quilljs.com/1.3.4/quill.bubble.css" rel="stylesheet">-->
     <!--<link href="http://cdn.quilljs.com/1.3.4/quill.core.css" rel="stylesheet">-->
 </head>
-<style id="antiClickjack">body{display:none !important;}</style>
-<script>
-    if (self === top) {
-        var antiClickjack = document.getElementById("antiClickjack");
-        antiClickjack.parentNode.removeChild(antiClickjack);
-    } else {
-        top.location = self.location;
-    }
-</script>
+<!--<style id="antiClickjack">body{display:none !important;}</style>-->
+<!--<script>-->
+    <!--if (self === top) {-->
+        <!--var antiClickjack = document.getElementById("antiClickjack");-->
+        <!--antiClickjack.parentNode.removeChild(antiClickjack);-->
+    <!--} else {-->
+        <!--top.location = self.location;-->
+    <!--}-->
+<!--</script>-->
 <body>
 <div id="goodsAssert" v-clock>
     <el-tabs v-model="activeName" type="card" @tab-click="handleClick">
@@ -51,8 +51,8 @@
                 </el-select>
             </el-form>
             <div class="btnBar">
-                <button class="query" round @click="query" type="button">查询</button>
-                <!--<button class="query" round @click="query" type="button" v-if="hasPermission('goods/assert/query')">查询</button>-->
+                <!--<button class="query" round @click="query" type="button">查询</button>-->
+                <button class="query" round @click="query" type="button" v-if="hasPermission('goods/assert/query')">查询</button>
                 <button class="addForm" round @click.stop="exportAll" type="button">导出</button>
                 <button class='addForm' @click="addForm" round type="button">添加商品</button>
             </div>

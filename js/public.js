@@ -187,20 +187,20 @@ function stt(str){
 	return str;
 }
 
-//权限编写中
-function sessionId(who,permissionList){
-    var url = window.location.origin + '/' + window.location.hash
+function sessionId(who, permissionList) {
+    var url = window.location.href
     if (url.indexOf('?') !== -1) {
         url = url.split('?')[0]
     }
-    PostAjax(who, 'post', {'href':url}, 'http://192.168.0.167:10013/layer/menu/menu/listByUser', function (data) {
-        for (var i = 0; i < data.data.length; i++) {
-            if (data.data[i].permission !== '' && data.data[i].permission !== undefined) {
-                permissionList.push(data.data[i].permission)
-                console.log(permissionList)
+    PostAjax(who, 'post', {'href': url}, '/layer/menu/menu/listByUser', function (data) {
+        for (var i = 0; i < data.length; i++) {
+            if (data[i].permission !== '' && data[i].permission !== undefined) {
+                permissionList.push(data[i].permission)
+                console.log(5656,permissionList)
             }
+            console.log(9999)
         }
     }, function (msg) {
         fadeInOut(msg)
-    }, '', '', '', '', 1)
+    }, '', '', '', '', 1,1)
 }
