@@ -125,10 +125,18 @@
                                 <!--<span  :class="[data.id > expandId ? 'tree-new tree-label' : 'tree-label']">-->
 	                    		<span>{{data.name}}</span>
 	                    	</span>
-	                    	<span class="tree-btn" >
-	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
-	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
-	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)" v-if='node.level <=1 && true?false:true'></i>
+	                    	<!--<span class="tree-btn" >-->
+	                    		<!--<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if='node.level <=1 && true?false:true'></i>-->
+	                    		<!--<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if='node.level <=1 && true?false:true'></i>-->
+	                    		<!--<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)" v-if='node.level <=1 && true?false:true'></i>-->
+	                    	<!--</span>-->
+                            <span class="tree-btn" >
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-if="node.level <=1 && hasPermission('parent/edit')&& hasPermission('classify/modify')"></i>
+	                    		<i class="el-icon-edit" @click.stop="handleEdit(store,data,node)" v-else="node.level >1 && hasPermission('children/edit')&& hasPermission('classify/modify')"></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-if="node.level <=1 && hasPermission('parent/edit')&& hasPermission('classify/delete')"></i>
+	                    		<i class="el-icon-delete" @click.stop="handleDelete(store,data,node)" v-else="node.level >1 && hasPermission('children/edit')&& hasPermission('classify/delete')"></i>
+	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)" v-if="node.level <=1 && hasPermission('parent/edit')&& hasPermission('classify/add')"></i>
+	                    		<i class="el-icon-plus" @click.stop="handleAdd(store,data,node)" v-else="node.level >1 && hasPermission('children/edit')&& hasPermission('classify/add')"></i>
 	                    	</span>
 	                    </span>
                             </span>

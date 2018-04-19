@@ -22,16 +22,26 @@ var store = new Vue({
                 catOrder: [
                     {required: true, message: '请输入排序', trigger: 'blur'}
                 ]
-            }
+            },
+            permissionList:[]
         }
     },
     created: function () {
+        var _this=this
+        sessionId(_this, _this.permissionList) // 请求按钮权限
         this.getTreeList()
     },
     mounted: function () {
         this.initExpand()
     },
     methods: {
+        //权限编写中
+        hasPermission(data) {
+            if (this.permissionList && this.permissionList.length && this.permissionList.includes(data)) {
+                return true
+            }
+            return false
+        },
         query: function () {
             this.formClass.initials = ''
             this.initials = ''
