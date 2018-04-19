@@ -51,8 +51,8 @@
                 </el-select>
             </el-form>
             <div class="btnBar">
-                <!--<button class="query" round @click="query" type="button">查询</button>-->
-                <button class="query" round @click="query" type="button" v-if="hasPermission('goods/assert/query')">查询</button>
+                <button class="query" round @click="query" type="button">查询</button>
+                <!--<button class="query" round @click="query" type="button" v-if="hasPermission('goods/assert/query')">查询</button>-->
                 <button class="addForm" round @click.stop="exportAll" type="button">导出</button>
                 <button class='addForm' @click="addForm" round type="button">添加商品</button>
             </div>
@@ -209,7 +209,8 @@
                     </el-form-item>
 
                     <el-form-item label="排序">
-                        <el-input type="age" v-model.number="basicInfo.goodsIndex" auto-complete="off"></el-input>
+                        <!--<el-input type="age"   v-model.number="basicInfo.goodsIndex" auto-complete="off"></el-input>-->
+                        <el-input   @keyup.native="goodsIndexChange(basicInfo.goodsIndex,'排序只能输入数字')" v-model="basicInfo.goodsIndex" auto-complete="off"></el-input>
                     </el-form-item>
 
                     <el-form-item label="标签：">
@@ -221,7 +222,8 @@
                     </el-form-item>
 
                     <el-form-item label="可预约天数">
-                        <el-input type="age" v-model="basicInfo.appointmentDays" auto-complete="off"></el-input>
+                        <el-input  @keyup.native="goodsIndexChange(basicInfo.appointmentDays,'预约天数只能输入数字')" v-model="basicInfo.appointmentDays" auto-complete="off"></el-input>
+                        <!--<el-input type="age" v-model="basicInfo.appointmentDays" auto-complete="off"></el-input>-->
                     </el-form-item>
 
                     <el-form-item label="可约最近时间：">

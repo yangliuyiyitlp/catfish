@@ -121,6 +121,12 @@ var store = new Vue({
             }
             return false
         },
+        goodsIndexChange:function(sort,msg){
+            if (!/^\d+$/.test(sort)) {
+                this.$message.warning(msg)
+                return false
+            }
+        },
         priceChange: function (price, id) {
             var value = String(price)
             if (value.indexOf('.') > 0) {
@@ -961,23 +967,23 @@ var store = new Vue({
             _this.basicInfo.updateDate = convertDate(new Date().getTime())
             _this.basicInfo.goodsDetails = editor.container.firstChild.innerHTML
             _this.basicInfo.customId = '1' //todo 目前写死是登陆后传给前端的商户id
-            if (_this.basicInfo.goodsIndex && !/^[1-9]|\d*$/.test(_this.basicInfo.goodsIndex)) {
-                this.$message.warning('排序只能输入正整数')
-                return
+            if (_this.basicInfo.goodsIndex && !/^\d+$/.test(_this.basicInfo.goodsIndex)) {
+                this.$message.warning('排序只能输入数字')
+                return false
             }
             if (!_this.basicInfo.goodsDetails) {
                 this.$message.warning('请填写商品详情')
-                return
+                return false
             }
-            if (_this.basicInfo.appointmentDays && !/^[1-9]|\d*$/.test(_this.basicInfo.appointmentDays)) {
-                this.$message.warning('预约天数只能输入正整数')
-                return
+            if (_this.basicInfo.appointmentDays && !/^\d+$/.test(_this.basicInfo.appointmentDays)) {
+                this.$message.warning('预约天数只能输入数字')
+                return false
             }
             if (_this.timeSelect == 2) {
                 _this.basicInfo.releaseTime = null
             } else if (_this.timeSelect == 1 && !_this.basicInfo.releaseTime) {
                 _this.$message.warning('“自定义上架时间”请选择时间')
-                return
+                return false
             }
 
             _this.$refs[ruleForm].validate((valid) => {
