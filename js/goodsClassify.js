@@ -29,7 +29,7 @@ var store = new Vue({
     created: function () {
         var _this=this
         sessionId(_this, _this.permissionList) // 请求按钮权限
-        this.getTreeList()
+        _this.getTreeList()
     },
     mounted: function () {
         this.initExpand()
@@ -521,8 +521,6 @@ var store = new Vue({
         handleEdit: function (s, d, n) {//编辑节点
             var _this = this
             _this.isForm = true
-            _this.$refs.formClass.resetFields();
-
             PostAjax(_this, 'post', '', '/layer/goods/nyGoodsCat/form/'+d.id, function (data) {
                 _this.formClass = data
                 if (n.parent.data.id) {
@@ -533,6 +531,7 @@ var store = new Vue({
                     _this.formClass.parentName = '无'
                 }
                 _this.initials =  _this.formClass.initials
+                _this.$refs['formClass'].resetFields();
             }, function (msg) {
                 fadeInOut(msg);
             }, '', '', '', '', 1)
